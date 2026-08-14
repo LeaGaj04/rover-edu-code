@@ -1,8 +1,27 @@
 [gd_scene format=3 uid="uid://cyf3iw3lcipme"]
 
-[sub_resource type="MeshLibrary" id="MeshLibrary_1sur8"]
+[ext_resource type="PackedScene" uid="uid://dgngl5x1t4er7" path="res://escenas/rover.tscn" id="1_cdbbl"]
+
+[sub_resource type="MeshLibrary" id="MeshLibrary_cdbbl"]
+item/0/name = ""
+item/0/mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/0/mesh_cast_shadow = 1
+item/0/shapes = []
+item/0/navigation_mesh_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+item/0/navigation_layers = 1
 
 [node name="Mundo" type="Node3D" unique_id=661431235]
 
 [node name="GridMap" type="GridMap" parent="." unique_id=647921843]
-mesh_library = SubResource("MeshLibrary_1sur8")
+mesh_library = SubResource("MeshLibrary_cdbbl")
+
+[node name="Rover" parent="GridMap" unique_id=771188890 instance=ExtResource("1_cdbbl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.4613905, 0)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=879746297]
+
+[node name="TextEdit" type="TextEdit" parent="CanvasLayer" unique_id=1732974269]
+offset_left = 3.0
+offset_top = 476.0
+offset_right = 1149.0
+offset_bottom = 645.0
