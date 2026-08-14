@@ -35,6 +35,6 @@ text = "Ejecutar
 "
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=173857337]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4562483, 3.6703386, 18.972742)
+transform = Transform3D(1, 0, 0, 0, 0.7173485, 0.6967145, 0, -0.6967145, 0.7173485, 1.3442678, 6.597416, 14.338987)
 
 [connection signal="pressed" from="CanvasLayer/Button" to="CanvasLayer" method="_on_button_pressed"]
