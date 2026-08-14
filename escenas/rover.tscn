@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dgngl5x1t4er7"]
+
+[ext_resource type="Script" uid="uid://grkn58ugprsn" path="res://script/rover.gd" id="1_il8ej"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_8cnl3"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d4gi6"]
+
+[node name="Rover" type="CharacterBody3D" unique_id=771188890]
+script = ExtResource("1_il8ej")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1651494632]
+mesh = SubResource("BoxMesh_8cnl3")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=927511492]
+shape = SubResource("BoxShape3D_d4gi6")
