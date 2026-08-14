@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://c52kwlyvwukj3"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_07tbp"]
+size = Vector3(2, 0.2, 2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_po8bs"]
+albedo_color = Color(0.010168674, 0.16784397, 0.14522022, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2wfvv"]
+size = Vector3(2, 0.2, 2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w5nvr"]
+albedo_color = Color(0, 0, 0, 1)
+
+[node name="FabricaDeBloques" type="Node3D" unique_id=1761925413]
+
+[node name="CasillaClara" type="MeshInstance3D" parent="." unique_id=1514973617]
+mesh = SubResource("BoxMesh_07tbp")
+surface_material_override/0 = SubResource("StandardMaterial3D_po8bs")
+
+[node name="CasillaOscura" type="MeshInstance3D" parent="." unique_id=1308928118]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0101617575, -0.002142787, 1.0217474)
+mesh = SubResource("BoxMesh_2wfvv")
+surface_material_override/0 = SubResource("StandardMaterial3D_w5nvr")
