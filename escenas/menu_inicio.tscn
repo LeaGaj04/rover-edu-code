@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://dorjiuvlmgpes"]
+
+[ext_resource type="Script" uid="uid://xb6duvsny44v" path="res://escenas/menu_inicio.gd" id="1_leqng"]
+
+[node name="MenuInicio" type="Control" unique_id=528121207]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_leqng")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=6149339]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.09411765, 0.11764706, 0.29803923, 1)
+
+[node name="ContenedorPrincipal" type="VBoxContainer" parent="." unique_id=189309735]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="Titulo" type="Label" parent="ContenedorPrincipal" unique_id=1829891911]
+layout_mode = 2
+text = "Edu_Code"
+
+[node name="BotonJugar" type="Button" parent="ContenedorPrincipal" unique_id=2141127539]
+layout_mode = 2
+text = "Jugar"
+
+[node name="BotonConfiguracion" type="Button" parent="ContenedorPrincipal" unique_id=126250605]
+layout_mode = 2
+text = "Configuración"
+
+[node name="BotonSalir" type="Button" parent="ContenedorPrincipal" unique_id=469375245]
+layout_mode = 2
+text = "Salir"
+
+[connection signal="pressed" from="ContenedorPrincipal/BotonJugar" to="." method="_on_boton_jugar_pressed"]
+[connection signal="pressed" from="ContenedorPrincipal/BotonSalir" to="." method="_on_boton_salir_pressed"]
