@@ -40,3 +40,25 @@ Base de Datos: No relacional (estructuras JSON) para almacenar asíncronamente e
 Control de Versiones y Despliegue: Git y GitHub para el repositorio del equipo , junto con GitHub Desktop para facilitar la integración continua. La Landing Page promocional será desplegada mediante hosting gratuito como  Vercel
 
 ---
+
+# Mapa de Carpetas (Estructura del Proyecto)
+## Para facilitar la lectura y escalabilidad del código bajo la metodología Scrum, el proyecto en Godot está estructurado de la siguiente manera:
+
+Plaintext
+ Edu_Code/
+├──  assets/            # Modelos 3D (.glb/.gltf), texturas, materiales y sonidos
+├──  scenes/            # Nodos y escenas visuales de Godot
+│   ├──  mundo.tscn     # Escena principal (GridMap, iluminación y cámara)
+│   ├──  rover.tscn     # Escena del jugador (CharacterBody3D)
+│   └──  main_menu.tscn # Interfaz de inicio (Jugar, Configuraciones, Salir)
+├──  scripts/           # Lógica central en GDScript
+│   ├──  parser.gd      # Analizador léxico y validación algorítmica de código
+│   ├──  rover.gd       # Funciones de movimiento y POO del vehículo
+│   └──  ui_manager.gd  # Control de menús e interacciones del jugador
+├──  database/          # Archivos de conexión y lógica en la nube
+│   └──  supabase.gd    # SDK y scripts de conexión con el Backend as a Service
+├──  project.godot      # Archivo de configuración general del motor de juego
+└──  README.md          # Documentación técnica del proyecto
+
+---
+
