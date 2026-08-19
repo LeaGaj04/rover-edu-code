@@ -21,3 +21,25 @@ Backend y Cloud Computing: Es la capa de infraestructura externa gestionada medi
 
 ---
 
+# Tecnología Usada (Tech Stack)
+Para garantizar que el proyecto mantenga un rendimiento óptimo tanto en el procesamiento lógico como en el renderizado gráfico, Edu_Code está construido utilizando herramientas especializadas y open-source:
+
+
+## Motor de Videojuegos: Godot Engine (v4.x - Estándar). Elegido por su arquitectura nativa orientada a objetos (nodos) y su ligereza.
+
+## Lenguaje de Scripting: GDScript. Utilizado para el desarrollo general del juego y para programar el analizador léxico (Parser) interno del jugador.
+
+
+## Nodos Clave: GridMap (para el entorno modular) y CharacterBody3D (para las físicas del Rover).
+
+
+## Interfaz y Entorno (IDE In-Game): Nodos TextEdit nativos de Godot, configurados con CodeHighlighter para ofrecer una experiencia real de resaltado de sintaxis, numeración de líneas y menús desplegables.
+
+
+## Backend y Persistencia (Nube): Supabase. Seleccionados como infraestructura Backend as a Service (BaaS).
+
+
+## Base de Datos: No relacional (estructuras JSON) para almacenar asíncronamente el progreso, inventario y sintaxis desbloqueada de los usuarios sin interrumpir el Gameplay Loop.
+
+
+## Control de Versiones y Despliegue: Git y GitHub para el repositorio del equipo , junto con GitHub Desktop para facilitar la integración continua. La Landing Page promocional será desplegada mediante hosting gratuito como  Vercel
