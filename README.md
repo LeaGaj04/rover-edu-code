@@ -63,3 +63,17 @@ Control de Versiones y Despliegue: Git y GitHub para el repositorio del equipo ,
 
 ---
 
+# Metodología y Sprints de Desarrollo
+El desarrollo de Edu_Code se gestiona bajo el marco de trabajo ágil Scrum. Para garantizar un avance fluido y evitar cuellos de botella técnicos, el proyecto se estructuró dividiendo la arquitectura en áreas aisladas, trabajando en Sprints de desarrollo.
+
+La asignación de responsabilidades y la ejecución real de los primeros Sprints se han distribuido de la siguiente manera para levantar el Producto Mínimo Viable (MVP):
+
+Sprint Lógico y Entorno 3D: Encargado de la inicialización del repositorio base. Comprende la creación del entorno isométrico (GridMap), el desarrollo físico del Rover y el hito crítico de conectar el analizador léxico (Parser) con el modelo 3D para que el vehículo responda a las instrucciones de código. (Fase completada)
+
+Sprint de Interfaz (UI) y Navegación: Encargado de la capa visual del usuario fuera del gameplay. Comprende el desarrollo y diseño de la interfaz de menús principales, habilitando la navegación funcional entre las pantallas de "Jugar", "Configuraciones" y "Salir". (Fase completada)
+
+Sprint de Cloud e Infraestructura: Encargado de la arquitectura de red. Comprende la configuración y conexión exitosa del proyecto en Godot con el entorno de Supabase, preparando el terreno para la autenticación y bases de datos. (Fase completada)
+
+Próximos Sprints (Backlog actual): El equipo se enfocará en las mecánicas de gamificación (recolección de minerales), la validación de condiciones de victoria y la persistencia asíncrona de datos en la nube (guardado de progreso).
+
+---
