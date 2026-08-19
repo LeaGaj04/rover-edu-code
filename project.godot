@@ -15,6 +15,10 @@ run/main_scene="uid://cyf3iw3lcipme"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+Supabase="*uid://8fusfri8k4ft"
+
 [dotnet]
 
 project/assembly_name="RoverEduCode"
