@@ -44,7 +44,7 @@ Control de Versiones y Despliegue: Git y GitHub para el repositorio del equipo ,
 # Mapa de Carpetas (Estructura del Proyecto)
 ## Para facilitar la lectura y escalabilidad del código bajo la metodología Scrum, el proyecto en Godot está estructurado de la siguiente manera:
 
-Plaintext
+´´´
  Edu_Code/
 ├──  assets/            # Modelos 3D (.glb/.gltf), texturas, materiales y sonidos
 ├──  scenes/            # Nodos y escenas visuales de Godot
@@ -59,6 +59,7 @@ Plaintext
 │   └──  supabase.gd    # SDK y scripts de conexión con el Backend as a Service
 ├──  project.godot      # Archivo de configuración general del motor de juego
 └──  README.md          # Documentación técnica del proyecto
+´´´
 
 ---
 
