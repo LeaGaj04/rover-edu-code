@@ -37,6 +37,6 @@ Backend y Persistencia (Nube): Supabase. Seleccionados como infraestructura Back
 Base de Datos: No relacional (estructuras JSON) para almacenar asíncronamente el progreso, inventario y sintaxis desbloqueada de los usuarios sin interrumpir el Gameplay Loop.
 
 
-## Control de Versiones y Despliegue: Git y GitHub para el repositorio del equipo , junto con GitHub Desktop para facilitar la integración continua. La Landing Page promocional será desplegada mediante hosting gratuito como  Vercel
+Control de Versiones y Despliegue: Git y GitHub para el repositorio del equipo , junto con GitHub Desktop para facilitar la integración continua. La Landing Page promocional será desplegada mediante hosting gratuito como  Vercel
 
 ---
