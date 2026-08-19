@@ -1,5 +1,17 @@
 # rover-edu-code
 
+<div align="center">
+
+![Godot Engine](https://img.shields.io/badge/GODOT-%23FFFFFF.svg?style=for-the-badge&logo=godot-engine)
+![GDScript](https://img.shields.io/badge/GDScript-478CBF?style=for-the-badge&logo=godot-engine&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
+![Game Design](https://img.shields.io/badge/Game_Design-FF6B6B?style=for-the-badge)
+
+</div>
+
 ## El Problema de Negocio
 La enseñanza tradicional de la programación a menudo se enfrenta a un problema histórico: la abstracción excesiva. Los estudiantes de primeros años suelen abandonar la informática o sentirse frustrados debido a la monotonía de los tutoriales secos y las aulas convencionales, donde es difícil visualizar cómo funciona el código en el mundo real. Conceptos complejos como la Programación Orientada a Objetos (POO) resultan especialmente difíciles de asimilar sin ejemplos tangibles.
 
