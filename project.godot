@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="RoverEduCode"
-run/main_scene="uid://cyf3iw3lcipme"
+run/main_scene="uid://dorjiuvlmgpes"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
 [autoload]
