@@ -2,6 +2,83 @@
 
 [ext_resource type="Script" uid="uid://xb6duvsny44v" path="res://script/menu_inicio.gd" id="1_leqng"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ppgcv"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 1, 1, 0.11764706)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+corner_detail = 16
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jc06o"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(1, 1, 1, 0.15686275)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4ogoo"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(1, 1, 1, 0.15686275)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jwptp"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(1, 1, 1, 0.15686275)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f382d"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
+bg_color = Color(1, 1, 1, 0.11764706)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g30ce"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(1, 1, 1, 0.15686275)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
 [node name="MenuInicio" type="Control" unique_id=528121207]
 layout_mode = 3
 anchors_preset = 15
@@ -20,36 +97,75 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.09411765, 0.11764706, 0.29803923, 1)
 
-[node name="ContenedorPrincipal" type="VBoxContainer" parent="." unique_id=189309735]
+[node name="Titulo" type="Label" parent="." unique_id=1829891911]
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = 5
 anchor_left = 0.5
-anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
+offset_left = -133.0
+offset_top = 40.0
+offset_right = 133.0
+offset_bottom = 117.0
 grow_horizontal = 2
-grow_vertical = 2
+theme_override_font_sizes/font_size = 56
+text = "EDUCODE"
+horizontal_alignment = 1
+
+[node name="PanelMenu" type="PanelContainer" parent="." unique_id=1374027253]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = -173.0
+offset_right = 156.0
+offset_bottom = -40.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ppgcv")
+
+[node name="ContenedorPrincipal" type="VBoxContainer" parent="PanelMenu" unique_id=189309735]
+layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="Titulo" type="Label" parent="ContenedorPrincipal" unique_id=1829891911]
+[node name="BotonJugar" type="Button" parent="PanelMenu/ContenedorPrincipal" unique_id=2141127539]
 layout_mode = 2
-text = "Edu_Code"
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_jc06o")
+text = "Continuar Partida"
 
-[node name="BotonJugar" type="Button" parent="ContenedorPrincipal" unique_id=2141127539]
+[node name="BotonConfiguracion" type="Button" parent="PanelMenu/ContenedorPrincipal" unique_id=126250605]
 layout_mode = 2
-text = "Jugar"
-
-[node name="BotonConfiguracion" type="Button" parent="ContenedorPrincipal" unique_id=126250605]
-layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_4ogoo")
 text = "Configuración"
 
-[node name="BotonSalir" type="Button" parent="ContenedorPrincipal" unique_id=469375245]
+[node name="BotonSalir" type="Button" parent="PanelMenu/ContenedorPrincipal" unique_id=469375245]
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_jwptp")
 text = "Salir"
 
-[connection signal="pressed" from="ContenedorPrincipal/BotonJugar" to="." method="_on_boton_jugar_pressed"]
-[connection signal="pressed" from="ContenedorPrincipal/BotonSalir" to="." method="_on_boton_salir_pressed"]
+[node name="PanelPerfil" type="PanelContainer" parent="." unique_id=915649287]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -167.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 87.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_f382d")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelPerfil" unique_id=1288210801]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ButtonLogin" type="Button" parent="PanelPerfil/HBoxContainer" unique_id=2118172983]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_g30ce")
+text = "Iniciar Sesion"
+
+[connection signal="pressed" from="PanelMenu/ContenedorPrincipal/BotonJugar" to="." method="_on_boton_jugar_pressed"]
+[connection signal="pressed" from="PanelMenu/ContenedorPrincipal/BotonSalir" to="." method="_on_boton_salir_pressed"]
