@@ -46,7 +46,7 @@ text = "Ejecutar
 "
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=173857337]
-transform = Transform3D(1, 0, 0, 0, 0.9286514, 0.37095362, 0, -0.37095362, 0.9286514, 1.8602514, 6.725074, 18.678036)
+transform = Transform3D(1, 0, 0, 0, 0.9284859, 0.37136787, 0, -0.37136787, 0.9284859, 1.8602514, 6.725074, 13.878555)
 
 [node name="Meshy_AI_Low_Poly_Moon_0820024724_texture" parent="." unique_id=1049214347 instance=ExtResource("4_v12yk")]
 transform = Transform3D(70, 0, 0, 0, 70, 0, 0, 0, 70, 24.306156, -87.06617, -13.149929)
