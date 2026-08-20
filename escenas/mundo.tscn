@@ -4,6 +4,16 @@
 [ext_resource type="MeshLibrary" uid="uid://be0yvkqbcvra0" path="res://bloques.tres" id="1_glrvs"]
 [ext_resource type="Script" uid="uid://br4t1ndl8asky" path="res://script/interfaz.gd" id="2_6wjgb"]
 [ext_resource type="PackedScene" uid="uid://dxhwjk03om5sy" path="res://escenas/Asteroide.tscn" id="4_v12yk"]
+[ext_resource type="Script" uid="uid://dqmlj1jkvco4u" path="res://script/ciclo_solar.gd.gd" id="5_16hu1"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_3rgfu"]
+
+[sub_resource type="Sky" id="Sky_x6etp"]
+sky_material = SubResource("ProceduralSkyMaterial_3rgfu")
+
+[sub_resource type="Environment" id="Environment_v88e1"]
+background_mode = 2
+sky = SubResource("Sky_x6etp")
 
 [node name="Mundo" type="Node3D" unique_id=661431235]
 
@@ -40,5 +50,11 @@ transform = Transform3D(1, 0, 0, 0, 0.9286514, 0.37095362, 0, -0.37095362, 0.928
 
 [node name="Meshy_AI_Low_Poly_Moon_0820024724_texture" parent="." unique_id=1049214347 instance=ExtResource("4_v12yk")]
 transform = Transform3D(70, 0, 0, 0, 70, 0, 0, 0, 70, 24.306156, -87.06617, -13.149929)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1866343555]
+environment = SubResource("Environment_v88e1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment" unique_id=844589390]
+script = ExtResource("5_16hu1")
 
 [connection signal="pressed" from="CanvasLayer/Button" to="CanvasLayer" method="_on_button_pressed"]
