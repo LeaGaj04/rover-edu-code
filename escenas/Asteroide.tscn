@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://dxhwjk03om5sy"]
+
+[ext_resource type="PackedScene" uid="uid://bxn2jawvk5xif" path="res://Asteroide/Asteroide.glb" id="1_m6a27"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q08wt"]
+albedo_color = Color(0.019607844, 0.21960784, 0.14117648, 1)
+
+[node name="Meshy_AI_Low_Poly_Moon_0820024724_texture" unique_id=1049214347 instance=ExtResource("1_m6a27")]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+
+[node name="Mesh" parent="." index="0" unique_id=388058227]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2968868, 0.3152808, 0.15027934)
+surface_material_override/0 = SubResource("StandardMaterial3D_q08wt")

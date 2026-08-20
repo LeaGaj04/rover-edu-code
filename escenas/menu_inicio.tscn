@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dorjiuvlmgpes"]
 
-[ext_resource type="Script" uid="uid://xb6duvsny44v" path="res://escenas/menu_inicio.gd" id="1_leqng"]
+[ext_resource type="Script" uid="uid://xb6duvsny44v" path="res://script/menu_inicio.gd" id="1_leqng"]
 
 [node name="MenuInicio" type="Control" unique_id=528121207]
 layout_mode = 3

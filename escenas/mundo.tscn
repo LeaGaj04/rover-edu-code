@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://dgngl5x1t4er7" path="res://escenas/rover.tscn" id="1_cdbbl"]
 [ext_resource type="MeshLibrary" uid="uid://be0yvkqbcvra0" path="res://bloques.tres" id="1_glrvs"]
 [ext_resource type="Script" uid="uid://br4t1ndl8asky" path="res://script/interfaz.gd" id="2_6wjgb"]
+[ext_resource type="PackedScene" uid="uid://dxhwjk03om5sy" path="res://escenas/Asteroide.tscn" id="4_v12yk"]
 
 [node name="Mundo" type="Node3D" unique_id=661431235]
 
@@ -35,6 +36,9 @@ text = "Ejecutar
 "
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=173857337]
-transform = Transform3D(1, 0, 0, 0, 0.7173485, 0.6967145, 0, -0.6967145, 0.7173485, 1.3442678, 6.597416, 14.338987)
+transform = Transform3D(1, 0, 0, 0, 0.9286514, 0.37095362, 0, -0.37095362, 0.9286514, 1.8602514, 6.725074, 18.678036)
+
+[node name="Meshy_AI_Low_Poly_Moon_0820024724_texture" parent="." unique_id=1049214347 instance=ExtResource("4_v12yk")]
+transform = Transform3D(70, 0, 0, 0, 70, 0, 0, 0, 70, 24.306156, -87.06617, -13.149929)
 
 [connection signal="pressed" from="CanvasLayer/Button" to="CanvasLayer" method="_on_button_pressed"]
