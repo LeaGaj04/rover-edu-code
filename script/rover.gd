@@ -1,25 +1,32 @@
 extends CharacterBody3D
 
-# Distancia de cada paso en unidades 3D
+# Distancia de cada paso en unidades 3D (el tamaño exacto de tu casilla)
 var paso_distancia: float = 2.0
 
 
-# --- FUNCIÓN AVANZAR ---
-func avanzar():
-	print("Modelo 3D: ¡Recibí la orden de AVANZAR!")
-	# Avanza hacia el FRENTE local del Rover (donde apunta su modelo)
-	global_position -= transform.basis.z * paso_distancia
+# --- FUNCIÓN NORTE ---
+func norte():
+	print("Modelo 3D: ¡Me muevo hacia el NORTE!")
+	# Vector3.FORWARD mueve siempre en el eje -Z absoluto
+	global_position += Vector3.FORWARD * paso_distancia
 
 
-# --- FUNCIÓN IZQUIERDA ---
-func izquierda():
-	print("Modelo 3D: ¡Recibí la orden de girar a la IZQUIERDA!")
-	# Rotamos +90 grados en el eje Y (convertidos a radianes)
-	rotate_y(deg_to_rad(90.0))
+# --- FUNCIÓN SUR ---
+func sur():
+	print("Modelo 3D: ¡Me muevo hacia el SUR!")
+	# Vector3.BACK mueve siempre en el eje +Z absoluto
+	global_position += Vector3.BACK * paso_distancia
 
 
-# --- FUNCIÓN DERECHA ---
-func derecha():
-	print("Modelo 3D: ¡Recibí la orden de girar a la DERECHA!")
-	# Rotamos -90 grados en el eje Y (convertidos a radianes)
-	rotate_y(deg_to_rad(-90.0))
+# --- FUNCIÓN OESTE ---
+func oeste():
+	print("Modelo 3D: ¡Me muevo hacia el OESTE!")
+	# Vector3.LEFT mueve siempre en el eje -X absoluto
+	global_position += Vector3.LEFT * paso_distancia
+
+
+# --- FUNCIÓN ESTE ---
+func este():
+	print("Modelo 3D: ¡Me muevo hacia el ESTE!")
+	# Vector3.RIGHT mueve siempre en el eje +X absoluto
+	global_position += Vector3.RIGHT * paso_distancia
