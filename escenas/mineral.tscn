@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://dfvy6lib4ga2h"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w0kn0"]
+albedo_color = Color(0.023529412, 0.8980392, 0.1764706, 1)
+
+[sub_resource type="PrismMesh" id="PrismMesh_x6etp"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v88e1"]
+
+[node name="Mineral" type="Node3D" unique_id=382361724]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2126778135 groups=["minerales"]]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.5428015, 0)
+material_override = SubResource("StandardMaterial3D_w0kn0")
+mesh = SubResource("PrismMesh_x6etp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D" unique_id=1838542237]
+shape = SubResource("BoxShape3D_v88e1")
