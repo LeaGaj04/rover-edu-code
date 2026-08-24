@@ -11,6 +11,11 @@ func _input(event: InputEvent) -> void:
 
 
 func _on_button_pressed() -> void:
+	# Validamos todas las mejoras antes de procesar cualquier linea.
+	# Si hay sintaxis no adquirida, se aborta la ejecucion completa.
+	if not GestorSintaxis.validar_codigo(caja_codigo.text):
+		return
+
 	var lineas = caja_codigo.text.split("\n")
 	
 	for linea in lineas:

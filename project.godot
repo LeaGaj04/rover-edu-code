@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 [autoload]
 
 Supabase="*uid://8fusfri8k4ft"
+GestorSintaxis="*res://script/services/gestor_sintaxis.gd"
 
 [dotnet]
 
