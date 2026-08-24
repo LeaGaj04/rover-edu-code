@@ -22,6 +22,10 @@ Supabase="*uid://8fusfri8k4ft"
 
 project/assembly_name="RoverEduCode"
 
+[filesystem]
+
+import/blender/enabled=false
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
