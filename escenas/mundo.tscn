@@ -4,7 +4,7 @@
 [ext_resource type="MeshLibrary" uid="uid://be0yvkqbcvra0" path="res://bloques.tres" id="1_glrvs"]
 [ext_resource type="Script" uid="uid://br4t1ndl8asky" path="res://script/interfaz.gd" id="2_6wjgb"]
 [ext_resource type="PackedScene" uid="uid://dxhwjk03om5sy" path="res://escenas/Asteroide.tscn" id="4_v12yk"]
-[ext_resource type="Script" uid="uid://dqmlj1jkvco4u" path="res://script/ciclo_solar.gd.gd" id="5_16hu1"]
+[ext_resource type="Script" uid="uid://dqmlj1jkvco4u" path="res://script/ciclo_solar.gd" id="5_16hu1"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_3rgfu"]
 

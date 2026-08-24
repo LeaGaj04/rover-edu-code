@@ -5,52 +5,54 @@ extends CanvasLayer
 
 
 func _on_button_pressed() -> void:
-	# 1. Obtenemos el texto del usuario
-	var texto_usuario = caja_codigo.text
+	var lineas = caja_codigo.text.split("\n")
 	
-	# 2. El Lexer limpia y separa el texto
-	var mi_lexer = Lexer.new()
-	var tokens = mi_lexer.tokenizar(texto_usuario)
-	
-	# 3. EL PARSER: Verificamos si la estructura tiene sentido (ej: rover.norte())
-	if tokens.size() == 5:
-		var es_objeto_rover = tokens[0].valor == "rover"
-		var tiene_punto = tokens[1].tipo == Lexer.TipoToken.PUNTO
-		var tiene_parentesis = tokens[3].tipo == Lexer.TipoToken.PARENTESIS_IZQ and tokens[4].tipo == Lexer.TipoToken.PARENTESIS_DER
-		
-		if es_objeto_rover and tiene_punto and tiene_parentesis:
-			var comando = tokens[2].valor
+	for linea in lineas:
+		linea = linea.strip_edges()
+		if linea == "":
+			continue # Salta líneas vacías
 			
-			# 4. EL INTÉRPRETE: Movemos el rover
-			ejecutar_movimiento_rover(comando)
-		else:
-			print("Error de Sintaxis A.D.A: Revisa los puntos y paréntesis.")
-	else:
-		print("Error de Sintaxis A.D.A: Comando incompleto.")
+		# Verificación básica
+		if not linea.begins_with("rover."):
+			print("Error de Sintaxis A.D.A en '", linea, "': Debe empezar con 'rover.'")
+			continue
+			
+		# Ubicamos los límites de la sintaxis: rover.comando(pasos)
+		var pos_punto = linea.find(".")
+		var pos_par_izq = linea.find("(")
+		var pos_par_der = linea.rfind(")")
+		
+		if pos_punto == -1 or pos_par_izq == -1 or pos_par_der == -1:
+			print("Error de Sintaxis A.D.A en '", linea, "': Falta punto o paréntesis.")
+			continue
+			
+		# Extraemos el comando y lo que está dentro de los paréntesis
+		var comando = linea.substr(pos_punto + 1, pos_par_izq - pos_punto - 1).strip_edges()
+		var dentro_parentesis = linea.substr(pos_par_izq + 1, pos_par_der - pos_par_izq - 1).strip_edges()
+		
+		var pasos = 1 # Pasos por defecto (ej: rover.sur())
+		
+		# Si hay un número válido dentro de (), lo convertimos a entero
+		if dentro_parentesis.is_valid_int():
+			pasos = int(dentro_parentesis)
+		
+		ejecutar_movimiento_rover(comando, pasos)
 
 
-# Esta es la función que ejecuta el movimiento 3D
-func ejecutar_movimiento_rover(comando: String):
-	# Verificamos que el rover esté conectado para que no dé error
+func ejecutar_movimiento_rover(comando: String, pasos: int) -> void:
 	if mi_rover == null:
 		print("Error: El Rover no está asignado en el Inspector.")
 		return
 		
+	print("Ejecutando: ", comando, " (", pasos, " pasos)")
+	
 	if comando == "norte":
-		print("El rover se mueve hacia el Norte")
-		mi_rover.norte()
-		
+		mi_rover.norte(pasos)
 	elif comando == "sur":
-		print("El rover se mueve hacia el Sur")
-		mi_rover.sur()
-		
+		mi_rover.sur(pasos)
 	elif comando == "este":
-		print("El rover se mueve hacia el Este")
-		mi_rover.este()
-		
+		mi_rover.este(pasos)
 	elif comando == "oeste":
-		print("El rover se mueve hacia el Oeste")
-		mi_rover.oeste()
-		
+		mi_rover.oeste(pasos)
 	else:
 		print("Error A.D.A: El rover no conoce el comando '", comando, "'")
