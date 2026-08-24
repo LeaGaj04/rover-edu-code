@@ -48,3 +48,30 @@ func _intentar_mover() -> void:
 		await tween.finished # Espera a que termine cada animación
 		
 	esta_moviendose = false
+
+
+func minar():
+	print("Rover posicionado. Iniciando protocolo de minería...")
+	
+	# Pausa la ejecución por 3 segundos
+	await get_tree().create_timer(3.0).timeout
+	
+	print("Minería completada. Buscando mineral en la zona...")
+	
+	# Verificar si hay un mineral en la misma posición usando un Area3D interna
+	# o revisando las distancias a los objetos del grupo 'minerales'
+	var minerales_en_mapa = get_tree().get_nodes_in_group("minerales")
+	var mineral_minado = false
+	
+	for mineral in minerales_en_mapa:
+		# Si el mineral está muy cerca del rover (en la misma casilla)
+		if global_position.distance_to(mineral.global_position) < 1.0:
+			mineral.queue_free() # Desaparece el cubo
+			mineral_minado = true
+			
+			# Llamamos al mapa para que genere uno nuevo aleatoriamente			get_parent().spawn_mineral_aleatorio()
+			print("¡Diamante recolectado! Reapareciendo en otra coordenada.")
+			break # Solo minamos uno a la vez
+			
+	if not mineral_minado:
+		print("Error: No hay ningún mineral en esta casilla.")

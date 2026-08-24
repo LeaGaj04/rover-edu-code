@@ -60,5 +60,7 @@ func ejecutar_movimiento_rover(comando: String, pasos: int) -> void:
 		mi_rover.este(pasos)
 	elif comando == "oeste":
 		mi_rover.oeste(pasos)
+	elif "rover.minar()":
+		await mi_rover.minar()
 	else:
 		print("Error A.D.A: El rover no conoce el comando '", comando, "'")

@@ -1,7 +1,9 @@
 [gd_scene format=3 uid="uid://cyf3iw3lcipme"]
 
+[ext_resource type="Script" uid="uid://cp3dprin0jl02" path="res://script/mundo.gd" id="1_7oex1"]
 [ext_resource type="PackedScene" uid="uid://dgngl5x1t4er7" path="res://escenas/rover.tscn" id="1_cdbbl"]
 [ext_resource type="MeshLibrary" uid="uid://be0yvkqbcvra0" path="res://bloques.tres" id="1_glrvs"]
+[ext_resource type="PackedScene" uid="uid://dfvy6lib4ga2h" path="res://escenas/mineral.tscn" id="2_4vydk"]
 [ext_resource type="Script" uid="uid://br4t1ndl8asky" path="res://script/interfaz.gd" id="2_6wjgb"]
 [ext_resource type="PackedScene" uid="uid://dxhwjk03om5sy" path="res://escenas/Asteroide.tscn" id="4_v12yk"]
 [ext_resource type="Script" uid="uid://dqmlj1jkvco4u" path="res://script/ciclo_solar.gd" id="5_16hu1"]
@@ -16,6 +18,8 @@ background_mode = 2
 sky = SubResource("Sky_x6etp")
 
 [node name="Mundo" type="Node3D" unique_id=661431235]
+script = ExtResource("1_7oex1")
+mineral_scene = ExtResource("2_4vydk")
 
 [node name="GridMap" type="GridMap" parent="." unique_id=647921843]
 mesh_library = ExtResource("1_glrvs")
