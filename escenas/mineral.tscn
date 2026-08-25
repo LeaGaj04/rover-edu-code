@@ -1,18 +1,40 @@
 [gd_scene format=3 uid="uid://dfvy6lib4ga2h"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w0kn0"]
-albedo_color = Color(0.023529412, 0.8980392, 0.1764706, 1)
+[ext_resource type="Script" uid="uid://grkn58ugprsn" path="res://script/rover.gd" id="1_7ytnw"]
 
-[sub_resource type="PrismMesh" id="PrismMesh_x6etp"]
+[sub_resource type="BoxMesh" id="BoxMesh_8cnl3"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_v88e1"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_d4gi6"]
 
-[node name="Mineral" type="Node3D" unique_id=382361724]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_umx8v"]
+albedo_color = Color(0, 0, 0, 1)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2126778135 groups=["minerales"]]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.5428015, 0)
-material_override = SubResource("StandardMaterial3D_w0kn0")
-mesh = SubResource("PrismMesh_x6etp")
+[node name="Rover" type="CharacterBody3D" unique_id=771188890]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
+script = ExtResource("1_7ytnw")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D" unique_id=1838542237]
-shape = SubResource("BoxShape3D_v88e1")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1651494632]
+mesh = SubResource("BoxMesh_8cnl3")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=927511492]
+shape = SubResource("BoxShape3D_d4gi6")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=911971043]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28582355, 0.3706533, 0.4978017)
+size = Vector3(0.3942871, 0.1065918, 0.1)
+material = SubResource("StandardMaterial3D_umx8v")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="CSGBox3D" unique_id=1424536447]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5702022, -0.21763273, 0.016968489)
+size = Vector3(0.21221924, 0.20505372, 0.1)
+material = SubResource("StandardMaterial3D_umx8v")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="CSGBox3D" unique_id=558388079]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0017954707, -0.21721873, 0.011542916)
+size = Vector3(0.21221924, 0.20505372, 0.1)
+material = SubResource("StandardMaterial3D_umx8v")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="CSGBox3D" unique_id=1317809236]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.583054, 0.0007381439, 0.006117344)
+size = Vector3(0.3942871, 0.1065918, 0.1)
+material = SubResource("StandardMaterial3D_umx8v")
