@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+signal mineral_recolectado(cantidad)
+
 # Distancia de cada paso en unidades 3D (el tamaño de tu casilla)
 var paso_distancia: float = 2.0
 
@@ -71,6 +73,7 @@ func minar():
 			
 			# Llamamos al mapa para que genere uno nuevo aleatoriamente			get_parent().spawn_mineral_aleatorio()
 			print("¡Diamante recolectado! Reapareciendo en otra coordenada.")
+			mineral_recolectado.emit(1) # Aquí le avisa al juego y manda el valor de 10
 			break # Solo minamos uno a la vez
 			
 	if not mineral_minado:

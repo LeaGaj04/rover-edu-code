@@ -54,9 +54,11 @@ metadata/_editor_floor_ = Vector3(0, 0, 0)
 [node name="Rover" parent="GridMap" unique_id=771188890 instance=ExtResource("1_cdbbl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8648155, 1.6373665, 1.051938)
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=879746297 node_paths=PackedStringArray("mi_rover")]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=879746297 node_paths=PackedStringArray("mi_rover", "label_nave", "label_rover")]
 script = ExtResource("2_6wjgb")
 mi_rover = NodePath("../GridMap/Rover")
+label_nave = NodePath("ContenedorContadores/HBoxContainer/LabelNave")
+label_rover = NodePath("ContenedorContadores/HBoxContainer/LabelRover")
 
 [node name="TextEdit" type="TextEdit" parent="CanvasLayer" unique_id=1732974269]
 offset_left = 3.0

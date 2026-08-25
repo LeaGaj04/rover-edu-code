@@ -3,17 +3,35 @@ extends CanvasLayer
 @onready var caja_codigo = $TextEdit
 @export var mi_rover : CharacterBody3D
 
+# --- VARIABLES DE RECURSOS ---
+var minerales_nave : int = 100 # Empezamos con 100 para que tengas saldo para probar
+var minerales_rover : int = 0
+
+# --- REFERENCIAS A LOS CONTADORES VISUALES ---
+@export var label_nave : Label
+@export var label_rover : Label
+
 # --- REFERENCIAS A LA TIENDA ---
 # ¡Aquí estaba el detalle! Usamos los nombres exactos de tu foto
 @onready var panel_tienda = $PanelTienda
 @onready var boton_tienda = $ContenedorTienda/BotonTienda
 
+const PRECIOS = {
+	"while": 15,
+	"for": 30,
+	"mapa": 30
+}
 
 func _ready() -> void:
 	# Oculta el árbol apenas arranca el juego
 	if panel_tienda != null:
 		panel_tienda.hide()
-		
+	
+	# Actualizamos los textos al iniciar
+	actualizar_contadores()
+	# Conectamos la señal del rover a una nueva función de la interfaz
+	if mi_rover != null:
+		mi_rover.mineral_recolectado.connect(_sumar_minerales_rover)
 	# Como ya conectaste la señal desde el editor (el ícono de wifi en la foto),
 	# NO necesitamos conectarla por código aquí. ¡Así que lo dejamos limpio!
 
@@ -100,3 +118,40 @@ func _on_boton_cerrar_pressed() -> void:
 	
 	# Restauramos el texto del botón principal para que vuelva a decir "Abrir Tienda"
 	boton_tienda.text = "Abrir Tienda"
+	
+func actualizar_contadores() -> void:
+	if label_nave != null:
+		label_nave.text = "Nave: " + str(minerales_nave)
+	if label_rover != null:
+		label_rover.text = "Rover: " + str(minerales_rover)
+
+func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem) -> void:
+	# 1. Verificar si ya se compró previamente
+	if GestorSintaxis.esta_desbloqueada(item_id):
+		print("El ítem ya está desbloqueado.")
+		return
+		
+	# 2. Obtener el costo
+	var costo = PRECIOS[item_id]
+	
+	# 3. Validar saldo
+	if minerales_nave >= costo:
+		minerales_nave -= costo
+		actualizar_contadores()
+		
+		# 4. Desbloquear en el backend
+		GestorSintaxis.desbloquear_sintaxis(item_id)
+		
+		# 5. Feedback visual en el árbol
+		boton.disabled = true
+		if linea_conectora != null:
+			linea_conectora.modulate = Color(1.0, 0.84, 0.0) # Color dorado brillante
+			
+		print(item_id + " adquirido exitosamente.")
+	else:
+		print("Minerales insuficientes para comprar: " + item_id)
+		
+func _sumar_minerales_rover(cantidad: int) -> void:
+	minerales_rover += cantidad
+	actualizar_contadores()
+	
