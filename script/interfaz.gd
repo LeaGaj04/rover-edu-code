@@ -3,6 +3,29 @@ extends CanvasLayer
 @onready var caja_codigo = $TextEdit
 @export var mi_rover : CharacterBody3D
 
+# --- REFERENCIAS A LA TIENDA ---
+# ¡Aquí estaba el detalle! Usamos los nombres exactos de tu foto
+@onready var panel_tienda = $PanelTienda
+@onready var boton_tienda = $ContenedorTienda/BotonTienda
+
+
+func _ready() -> void:
+	# Oculta el árbol apenas arranca el juego
+	if panel_tienda != null:
+		panel_tienda.hide()
+		
+	# Como ya conectaste la señal desde el editor (el ícono de wifi en la foto),
+	# NO necesitamos conectarla por código aquí. ¡Así que lo dejamos limpio!
+
+
+func _on_boton_tienda_pressed() -> void:
+	panel_tienda.visible = !panel_tienda.visible
+	
+	if panel_tienda.visible:
+		boton_tienda.text = "Cerrar Árbol"
+	else:
+		boton_tienda.text = "Abrir Tienda"
+
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.ctrl_pressed and event.keycode == KEY_ENTER:
@@ -69,3 +92,11 @@ func ejecutar_movimiento_rover(comando: String, pasos: int) -> void:
 		await mi_rover.minar()
 	else:
 		print("Error A.D.A: El rover no conoce el comando '", comando, "'")
+
+
+func _on_boton_cerrar_pressed() -> void:
+	# Ocultamos el panel directamente
+	panel_tienda.hide()
+	
+	# Restauramos el texto del botón principal para que vuelva a decir "Abrir Tienda"
+	boton_tienda.text = "Abrir Tienda"
