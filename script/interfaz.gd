@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+@export var nodo_nave : Node3D
+
 @onready var caja_codigo = $TextEdit
 @export var mi_rover : CharacterBody3D
 
@@ -106,8 +108,10 @@ func ejecutar_movimiento_rover(comando: String, pasos: int) -> void:
 		mi_rover.este(pasos)
 	elif comando == "oeste":
 		mi_rover.oeste(pasos)
-	elif "rover.minar()":
+	elif comando == "minar":
 		await mi_rover.minar()
+	elif comando == "transferir":
+		procesar_transferencia()
 	else:
 		print("Error A.D.A: El rover no conoce el comando '", comando, "'")
 
@@ -154,4 +158,29 @@ func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem
 func _sumar_minerales_rover(cantidad: int) -> void:
 	minerales_rover += cantidad
 	actualizar_contadores()
+	
+func procesar_transferencia() -> void:
+	if nodo_nave == null:
+		print("Error: La Nave no está asignada en el Inspector.")
+		return
+		
+	if minerales_rover == 0:
+		print("El Rover no tiene minerales para transferir.")
+		return
+		
+	# Calculamos la distancia entre el rover y la nave
+	var distancia = mi_rover.global_position.distance_to(nodo_nave.global_position)
+	
+	# Si la distancia es menor a 2.5 unidades (ajusta este número según el tamaño de tus casillas)
+	if distancia <= 5.0:
+		print("Iniciando transferencia segura... ", minerales_rover, " minerales enviados a la Nave.")
+		
+		# Pasamos los recursos de una variable a otra
+		minerales_nave += minerales_rover
+		minerales_rover = 0
+		
+		# Actualizamos los números en pantalla
+		actualizar_contadores()
+	else:
+		print("Error de transferencia: El Rover está muy lejos de la base.")
 	

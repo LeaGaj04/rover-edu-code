@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://br4t1ndl8asky" path="res://script/interfaz.gd" id="2_6wjgb"]
 [ext_resource type="PackedScene" uid="uid://dxhwjk03om5sy" path="res://escenas/Asteroide.tscn" id="4_v12yk"]
 [ext_resource type="Script" uid="uid://dqmlj1jkvco4u" path="res://script/ciclo_solar.gd" id="5_16hu1"]
+[ext_resource type="PackedScene" uid="uid://b0kuh5v2yxqd7" path="res://escenas/nave.tscn" id="8_txhqv"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4vydk"]
 content_margin_left = 5.0
@@ -54,8 +55,9 @@ metadata/_editor_floor_ = Vector3(0, 0, 0)
 [node name="Rover" parent="GridMap" unique_id=771188890 instance=ExtResource("1_cdbbl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8648155, 1.6373665, 1.051938)
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=879746297 node_paths=PackedStringArray("mi_rover", "label_nave", "label_rover")]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=879746297 node_paths=PackedStringArray("nodo_nave", "mi_rover", "label_nave", "label_rover")]
 script = ExtResource("2_6wjgb")
+nodo_nave = NodePath("../Nave")
 mi_rover = NodePath("../GridMap/Rover")
 label_nave = NodePath("ContenedorContadores/HBoxContainer/LabelNave")
 label_rover = NodePath("ContenedorContadores/HBoxContainer/LabelRover")
@@ -180,6 +182,9 @@ environment = SubResource("Environment_v88e1")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment" unique_id=844589390]
 script = ExtResource("5_16hu1")
+
+[node name="Nave" parent="." unique_id=955676958 instance=ExtResource("8_txhqv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0590315, 3.6712418, -6.6720448)
 
 [connection signal="pressed" from="CanvasLayer/Button" to="CanvasLayer" method="_on_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/ContenedorTienda/BotonTienda" to="CanvasLayer" method="_on_boton_tienda_pressed"]
