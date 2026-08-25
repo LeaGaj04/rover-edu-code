@@ -76,27 +76,6 @@ offset_bottom = 637.0
 text = "Ejecutar
 "
 
-[node name="ContenedorContadores" type="MarginContainer" parent="CanvasLayer" unique_id=549149912]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -40.0
-offset_bottom = 40.0
-grow_horizontal = 0
-theme_override_constants/margin_top = 15
-theme_override_constants/margin_right = 15
-
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/ContenedorContadores" unique_id=1782200164]
-layout_mode = 2
-
-[node name="LabelRover" type="Label" parent="CanvasLayer/ContenedorContadores/HBoxContainer" unique_id=1773966557]
-layout_mode = 2
-text = "Rover: 0/5"
-
-[node name="LabelNave" type="Label" parent="CanvasLayer/ContenedorContadores/HBoxContainer" unique_id=896875989]
-layout_mode = 2
-text = "Nave: 0/15"
-
 [node name="ContenedorTienda" type="MarginContainer" parent="CanvasLayer" unique_id=1788821658]
 offset_right = 40.0
 offset_bottom = 40.0
@@ -126,19 +105,23 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="ButtonWhile" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1074921425]
-layout_mode = 0
-offset_left = 507.0
-offset_top = 58.0
-offset_right = 587.0
-offset_bottom = 138.0
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -41.0
+offset_top = 70.0
+offset_right = 39.0
+offset_bottom = 150.0
+grow_horizontal = 2
 text = "While"
 
 [node name="ButtonFor" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=75203908]
 layout_mode = 0
-offset_left = 307.0
-offset_top = 174.0
-offset_right = 387.0
-offset_bottom = 254.0
+offset_left = 366.0
+offset_top = 158.0
+offset_right = 446.0
+offset_bottom = 238.0
 tooltip_text = "Bucle For
 Desbloquea la capacidad de repetir
 comandos un número exacto de veces.
@@ -149,10 +132,10 @@ text = "For"
 
 [node name="ButtonExpansion1" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1665977669]
 layout_mode = 0
-offset_left = 685.0
-offset_top = 176.0
-offset_right = 765.0
-offset_bottom = 256.0
+offset_left = 684.0
+offset_top = 163.0
+offset_right = 764.0
+offset_bottom = 243.0
 tooltip_text = "Bucle For
 Desbloquea la capacidad de repetir
 comandos un número exacto de veces.
@@ -163,13 +146,34 @@ text = "Mapa"
 
 [node name="BotonCerrar" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=2013989778]
 layout_mode = 0
-offset_left = 991.0
-offset_top = 15.0
-offset_right = 1134.0
-offset_bottom = 53.0
+offset_left = 17.0
+offset_top = 12.0
+offset_right = 160.0
+offset_bottom = 50.0
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxFlat_4vydk")
 text = "Cerrar Tienda"
+
+[node name="ContenedorContadores" type="MarginContainer" parent="CanvasLayer" unique_id=549149912]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -179.0
+offset_bottom = 40.0
+grow_horizontal = 0
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/ContenedorContadores" unique_id=1782200164]
+layout_mode = 2
+
+[node name="LabelRover" type="Label" parent="CanvasLayer/ContenedorContadores/HBoxContainer" unique_id=1773966557]
+layout_mode = 2
+text = "Rover: 0/5"
+
+[node name="LabelNave" type="Label" parent="CanvasLayer/ContenedorContadores/HBoxContainer" unique_id=896875989]
+layout_mode = 2
+text = "Nave: 0/15"
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=173857337]
 transform = Transform3D(1, 0, 0, 0, 0.9284859, 0.37136787, 0, -0.37136787, 0.9284859, 1.8602514, 6.725074, 13.878555)
@@ -188,4 +192,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0590315, 3.6712418, -6.6720
 
 [connection signal="pressed" from="CanvasLayer/Button" to="CanvasLayer" method="_on_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/ContenedorTienda/BotonTienda" to="CanvasLayer" method="_on_boton_tienda_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonWhile" to="CanvasLayer" method="_on_button_while_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonFor" to="CanvasLayer" method="_on_button_for_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonExpansion1" to="CanvasLayer" method="_on_button_expansion_1_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/BotonCerrar" to="CanvasLayer" method="_on_boton_cerrar_pressed"]

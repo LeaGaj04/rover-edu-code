@@ -6,7 +6,7 @@ extends CanvasLayer
 @export var mi_rover : CharacterBody3D
 
 # --- VARIABLES DE RECURSOS ---
-var minerales_nave : int = 100 # Empezamos con 100 para que tengas saldo para probar
+var minerales_nave : int = 100 
 var minerales_rover : int = 0
 
 # --- REFERENCIAS A LOS CONTADORES VISUALES ---
@@ -14,9 +14,11 @@ var minerales_rover : int = 0
 @export var label_rover : Label
 
 # --- REFERENCIAS A LA TIENDA ---
-# ¡Aquí estaba el detalle! Usamos los nombres exactos de tu foto
 @onready var panel_tienda = $PanelTienda
 @onready var boton_tienda = $ContenedorTienda/BotonTienda
+@onready var boton_while = $PanelTienda/LienzoArbol/ButtonWhile
+@onready var boton_for = $PanelTienda/LienzoArbol/ButtonFor
+@onready var boton_expansion = $PanelTienda/LienzoArbol/ButtonExpansion1
 
 const PRECIOS = {
 	"while": 15,
@@ -149,7 +151,7 @@ func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem
 		# 5. Feedback visual en el árbol
 		boton.disabled = true
 		if linea_conectora != null:
-			linea_conectora.modulate = Color(1.0, 0.84, 0.0) # Color dorado brillante
+			linea_conectora.modulate = Color(1.0, 0.84, 0.0) 
 			
 		print(item_id + " adquirido exitosamente.")
 	else:
@@ -171,7 +173,7 @@ func procesar_transferencia() -> void:
 	# Calculamos la distancia entre el rover y la nave
 	var distancia = mi_rover.global_position.distance_to(nodo_nave.global_position)
 	
-	# Si la distancia es menor a 2.5 unidades (ajusta este número según el tamaño de tus casillas)
+	# Si la distancia es menor a 2.5 unidades
 	if distancia <= 5.0:
 		print("Iniciando transferencia segura... ", minerales_rover, " minerales enviados a la Nave.")
 		
@@ -183,4 +185,13 @@ func procesar_transferencia() -> void:
 		actualizar_contadores()
 	else:
 		print("Error de transferencia: El Rover está muy lejos de la base.")
+		
+func _on_button_while_pressed() -> void:
+	intentar_compra("while", boton_while, null)
+
+func _on_button_for_pressed() -> void:
+	intentar_compra("for", boton_for, null)
+
+func _on_button_expansion1_pressed() -> void:
+	intentar_compra("mapa", boton_expansion, null)
 	
