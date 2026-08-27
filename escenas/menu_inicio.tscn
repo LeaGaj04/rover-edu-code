@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dorjiuvlmgpes"]
 
 [ext_resource type="Script" uid="uid://xb6duvsny44v" path="res://script/menu_inicio.gd" id="1_leqng"]
-[ext_resource type="Texture2D" uid="uid://dhthfvb4r7bhb" path="res://Fondos/fondo_asteroide2.jpg" id="2_lkhye"]
+[ext_resource type="Texture2D" uid="uid://dgq285g3xyany" path="res://Fondos/asteroide.jpg" id="2_lkhye"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ppgcv"]
 content_margin_left = 16.0
