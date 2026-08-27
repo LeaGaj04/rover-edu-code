@@ -25,11 +25,126 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.48658872, 0.694682, 0.8527369, 1)
+bg_color = Color(0.11119685, 0.11119684, 0.11119684, 1)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ppgcv"]
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.2, 0.2, 1)
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jcqeh"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.225, 0.225, 0.225, 0.6)
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kckb2"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.225, 0.225, 0.225, 0.6)
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+corner_detail = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mb57o"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.2, 0.2, 1)
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ijldy"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.225, 0.225, 0.225, 0.6)
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2q7jt"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.225, 0.225, 0.225, 0.6)
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jh10v"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.2, 0.2, 1)
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ry7fl"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.225, 0.225, 0.225, 0.6)
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kxf8l"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.225, 0.225, 0.225, 0.6)
+corner_radius_top_left = 100
+corner_radius_top_right = 100
+corner_radius_bottom_right = 100
+corner_radius_bottom_left = 100
 corner_detail = 5
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_3rgfu"]
@@ -104,45 +219,127 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Line2D" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=256662853]
+points = PackedVector2Array(570, 88, 406, 177, 231, 221)
+width = 4.0
+default_color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Line2D2" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1749080935]
+points = PackedVector2Array(575, 88, 760, 196)
+width = 4.0
+default_color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Line2D3" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1908208215]
+points = PackedVector2Array(570, 87, 567, 286)
+closed = true
+width = 4.0
+default_color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Line2D4" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=849995506]
+points = PackedVector2Array(761, 199, 903, 325)
+width = 4.0
+default_color = Color(0.2, 0.2, 0.2, 1)
+
 [node name="ButtonWhile" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1074921425]
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -41.0
-offset_top = 70.0
-offset_right = 39.0
-offset_bottom = 150.0
+offset_left = -44.0
+offset_top = 46.0
+offset_right = 36.0
+offset_bottom = 126.0
 grow_horizontal = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_ppgcv")
+theme_override_styles/hover = SubResource("StyleBoxFlat_jcqeh")
 text = "While"
 
+[node name="ButtonIf" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1252370721]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -48.0
+offset_top = 245.0
+offset_right = 32.0
+offset_bottom = 325.0
+grow_horizontal = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_ppgcv")
+theme_override_styles/hover = SubResource("StyleBoxFlat_kckb2")
+text = "IF"
+
 [node name="ButtonFor" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=75203908]
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 0
 offset_left = 366.0
-offset_top = 158.0
+offset_top = 133.0
 offset_right = 446.0
-offset_bottom = 238.0
+offset_bottom = 213.0
 tooltip_text = "Bucle For
 Desbloquea la capacidad de repetir
 comandos un número exacto de veces.
 Ideal para trayectos largos.
 
 Costo: 50 Minerales"
+theme_override_styles/normal = SubResource("StyleBoxFlat_mb57o")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ijldy")
 text = "For"
 
-[node name="ButtonExpansion1" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1665977669]
+[node name="ButtonFor2" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=542620933]
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 0
-offset_left = 684.0
-offset_top = 163.0
-offset_right = 764.0
-offset_bottom = 243.0
+offset_left = 197.0
+offset_top = 176.0
+offset_right = 277.0
+offset_bottom = 256.0
 tooltip_text = "Bucle For
 Desbloquea la capacidad de repetir
 comandos un número exacto de veces.
 Ideal para trayectos largos.
 
 Costo: 50 Minerales"
-text = "Mapa"
+theme_override_styles/normal = SubResource("StyleBoxFlat_mb57o")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2q7jt")
+text = "Minar
+Speed"
+
+[node name="ButtonExpansion1" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1665977669]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 0
+offset_left = 722.0
+offset_top = 153.0
+offset_right = 802.0
+offset_bottom = 233.0
+tooltip_text = "Bucle For
+Desbloquea la capacidad de repetir
+comandos un número exacto de veces.
+Ideal para trayectos largos.
+
+Costo: 50 Minerales"
+theme_override_styles/normal = SubResource("StyleBoxFlat_jh10v")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ry7fl")
+text = "EX Mapa
+1"
+
+[node name="ButtonExpansion2" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=448735514]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 0
+offset_left = 860.0
+offset_top = 287.0
+offset_right = 940.0
+offset_bottom = 367.0
+tooltip_text = "Bucle For
+Desbloquea la capacidad de repetir
+comandos un número exacto de veces.
+Ideal para trayectos largos.
+
+Costo: 50 Minerales"
+theme_override_styles/normal = SubResource("StyleBoxFlat_jh10v")
+theme_override_styles/hover = SubResource("StyleBoxFlat_kxf8l")
+text = "EX Mapa
+2"
 
 [node name="BotonCerrar" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=2013989778]
 layout_mode = 0
@@ -193,6 +390,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0590315, 3.6712418, -6.6720
 [connection signal="pressed" from="CanvasLayer/Button" to="CanvasLayer" method="_on_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/ContenedorTienda/BotonTienda" to="CanvasLayer" method="_on_boton_tienda_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonWhile" to="CanvasLayer" method="_on_button_while_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonIf" to="CanvasLayer" method="_on_button_while_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonFor" to="CanvasLayer" method="_on_button_for_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonFor2" to="CanvasLayer" method="_on_button_for_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonExpansion1" to="CanvasLayer" method="_on_button_expansion_1_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonExpansion2" to="CanvasLayer" method="_on_button_expansion_1_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/BotonCerrar" to="CanvasLayer" method="_on_boton_cerrar_pressed"]
