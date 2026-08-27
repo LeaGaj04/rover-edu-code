@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dorjiuvlmgpes"]
 
 [ext_resource type="Script" uid="uid://xb6duvsny44v" path="res://script/menu_inicio.gd" id="1_leqng"]
+[ext_resource type="Texture2D" uid="uid://dhthfvb4r7bhb" path="res://Fondos/fondo_asteroide2.jpg" id="2_lkhye"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ppgcv"]
 content_margin_left = 16.0
@@ -88,14 +89,11 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_leqng")
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=6149339]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.09411765, 0.11764706, 0.29803923, 1)
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1861643503]
+layout_mode = 0
+offset_right = 1153.0
+offset_bottom = 651.0
+texture = ExtResource("2_lkhye")
 
 [node name="Titulo" type="Label" parent="." unique_id=1829891911]
 layout_mode = 1
