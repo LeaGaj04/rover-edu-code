@@ -14,23 +14,63 @@ content_margin_left = 5.0
 content_margin_top = 5.0
 content_margin_right = 5.0
 content_margin_bottom = 5.0
-bg_color = Color(1, 1, 1, 0.15686275)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+bg_color = Color(0.105, 0.1, 0.18, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.55, 0.53, 0.72, 1)
+shadow_color = Color(0.025, 0.02, 0.055, 0.9)
+shadow_size = 0
+shadow_offset = Vector2(5, 5)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_txhqv"]
 content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.11119685, 0.11119684, 0.11119684, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-corner_detail = 5
+bg_color = Color(0.035, 0.03, 0.075, 0.9)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tienda_panel"]
+bg_color = Color(0.075, 0.07, 0.135, 0.99)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.43, 0.42, 0.59, 1)
+shadow_color = Color(0.018, 0.015, 0.04, 0.95)
+shadow_size = 0
+shadow_offset = Vector2(10, 10)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tienda_focus"]
+bg_color = Color(0.13, 0.125, 0.22, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.48, 0.47, 0.66, 1)
+shadow_color = Color(0.025, 0.02, 0.055, 1)
+shadow_size = 0
+shadow_offset = Vector2(6, 6)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tienda_hover"]
+bg_color = Color(0.27, 0.24, 0.43, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.76, 0.73, 0.91, 1)
+shadow_color = Color(0.025, 0.02, 0.055, 1)
+shadow_size = 0
+shadow_offset = Vector2(4, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tienda_disabled"]
+bg_color = Color(0.085, 0.08, 0.13, 0.9)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.27, 0.26, 0.36, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ppgcv"]
 border_width_left = 2
@@ -199,9 +239,13 @@ theme_override_constants/margin_top = 15
 
 [node name="BotonTienda" type="Button" parent="CanvasLayer/ContenedorTienda" unique_id=1830627710]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
+theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxFlat_4vydk")
-text = "Abrir Tienda"
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+text = "MEJORAS"
 
 [node name="PanelTienda" type="Panel" parent="CanvasLayer" unique_id=922794825]
 anchors_preset = 15
@@ -211,145 +255,159 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_txhqv")
 
-[node name="LienzoArbol" type="Control" parent="CanvasLayer/PanelTienda" unique_id=78787967]
+[node name="LienzoArbol" type="Panel" parent="CanvasLayer/PanelTienda" unique_id=78787967]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -280.0
+offset_right = 500.0
+offset_bottom = 280.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tienda_panel")
+
+[node name="Titulo" type="Label" parent="CanvasLayer/PanelTienda/LienzoArbol"]
+offset_left = 40.0
+offset_top = 24.0
+offset_right = 500.0
+offset_bottom = 58.0
+theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 26
+text = "◆ CENTRO DE MEJORAS ◆"
+
+[node name="Subtitulo" type="Label" parent="CanvasLayer/PanelTienda/LienzoArbol"]
+offset_left = 42.0
+offset_top = 62.0
+offset_right = 670.0
+offset_bottom = 88.0
+theme_override_colors/font_color = Color(0.58, 0.57, 0.72, 1)
+theme_override_font_sizes/font_size = 14
+text = "Invierte los minerales de la nave para ampliar las capacidades del rover."
 
 [node name="Line2D" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=256662853]
-points = PackedVector2Array(570, 88, 406, 177, 231, 221)
+points = PackedVector2Array(500, 205, 500, 245, 240, 245, 240, 315, 125, 315, 125, 455)
 width = 4.0
-default_color = Color(0.2, 0.2, 0.2, 1)
+default_color = Color(0.42, 0.41, 0.58, 1)
 
 [node name="Line2D2" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1749080935]
-points = PackedVector2Array(575, 88, 760, 196)
+points = PackedVector2Array(500, 205, 500, 245, 760, 245, 760, 315)
 width = 4.0
-default_color = Color(0.2, 0.2, 0.2, 1)
+default_color = Color(0.42, 0.41, 0.58, 1)
 
 [node name="Line2D3" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1908208215]
-points = PackedVector2Array(570, 87, 567, 286)
-closed = true
+points = PackedVector2Array(500, 205, 500, 315)
 width = 4.0
-default_color = Color(0.2, 0.2, 0.2, 1)
+default_color = Color(0.42, 0.41, 0.58, 1)
 
 [node name="Line2D4" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=849995506]
-points = PackedVector2Array(761, 199, 903, 325)
+points = PackedVector2Array(760, 315, 875, 315, 875, 455)
 width = 4.0
-default_color = Color(0.2, 0.2, 0.2, 1)
+default_color = Color(0.42, 0.41, 0.58, 1)
 
 [node name="ButtonWhile" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1074921425]
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -44.0
-offset_top = 46.0
-offset_right = 36.0
-offset_bottom = 126.0
-grow_horizontal = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_ppgcv")
-theme_override_styles/hover = SubResource("StyleBoxFlat_jcqeh")
-text = "While"
+offset_left = 425.0
+offset_top = 155.0
+offset_right = 575.0
+offset_bottom = 225.0
+theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tienda_disabled")
+text = "[ BUCLE WHILE ]\n15 MINERALES"
 
 [node name="ButtonIf" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1252370721]
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -48.0
-offset_top = 245.0
-offset_right = 32.0
-offset_bottom = 325.0
-grow_horizontal = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_ppgcv")
-theme_override_styles/hover = SubResource("StyleBoxFlat_kckb2")
-text = "IF"
+offset_left = 425.0
+offset_top = 280.0
+offset_right = 575.0
+offset_bottom = 350.0
+theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tienda_disabled")
+text = "[ CONDICIONAL IF ]\n15 MINERALES"
 
 [node name="ButtonFor" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=75203908]
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 0
-offset_left = 366.0
-offset_top = 133.0
-offset_right = 446.0
-offset_bottom = 213.0
+offset_left = 165.0
+offset_top = 280.0
+offset_right = 315.0
+offset_bottom = 350.0
 tooltip_text = "Bucle For
 Desbloquea la capacidad de repetir
 comandos un número exacto de veces.
 Ideal para trayectos largos.
 
-Costo: 50 Minerales"
-theme_override_styles/normal = SubResource("StyleBoxFlat_mb57o")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ijldy")
-text = "For"
+Costo: 30 minerales"
+theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tienda_disabled")
+text = "[ BUCLE FOR ]\n30 MINERALES"
 
 [node name="ButtonFor2" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=542620933]
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 0
-offset_left = 197.0
-offset_top = 176.0
-offset_right = 277.0
-offset_bottom = 256.0
+disabled = true
+offset_left = 50.0
+offset_top = 420.0
+offset_right = 200.0
+offset_bottom = 490.0
 tooltip_text = "Bucle For
 Desbloquea la capacidad de repetir
 comandos un número exacto de veces.
 Ideal para trayectos largos.
 
-Costo: 50 Minerales"
-theme_override_styles/normal = SubResource("StyleBoxFlat_mb57o")
-theme_override_styles/hover = SubResource("StyleBoxFlat_2q7jt")
-text = "Minar
-Speed"
+Costo: 30 minerales"
+theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tienda_disabled")
+text = "[ MINERÍA RÁPIDA ]\nPRÓXIMAMENTE"
 
 [node name="ButtonExpansion1" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1665977669]
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 0
-offset_left = 722.0
-offset_top = 153.0
-offset_right = 802.0
-offset_bottom = 233.0
-tooltip_text = "Bucle For
-Desbloquea la capacidad de repetir
-comandos un número exacto de veces.
-Ideal para trayectos largos.
-
-Costo: 50 Minerales"
-theme_override_styles/normal = SubResource("StyleBoxFlat_jh10v")
-theme_override_styles/hover = SubResource("StyleBoxFlat_ry7fl")
-text = "EX Mapa
-1"
+offset_left = 685.0
+offset_top = 280.0
+offset_right = 835.0
+offset_bottom = 350.0
+tooltip_text = "Expande el terreno disponible a una cuadrícula de 3x3.\n\nCosto: 30 minerales"
+theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tienda_disabled")
+text = "[ EXPANDIR MAPA ]\n30 MINERALES"
 
 [node name="ButtonExpansion2" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=448735514]
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 0
-offset_left = 860.0
-offset_top = 287.0
-offset_right = 940.0
-offset_bottom = 367.0
-tooltip_text = "Bucle For
-Desbloquea la capacidad de repetir
-comandos un número exacto de veces.
-Ideal para trayectos largos.
-
-Costo: 50 Minerales"
-theme_override_styles/normal = SubResource("StyleBoxFlat_jh10v")
-theme_override_styles/hover = SubResource("StyleBoxFlat_kxf8l")
-text = "EX Mapa
-2"
+disabled = true
+offset_left = 800.0
+offset_top = 420.0
+offset_right = 950.0
+offset_bottom = 490.0
+tooltip_text = "Segunda expansión del terreno. Disponible en una actualización futura."
+theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tienda_disabled")
+text = "[ MAPA NIVEL 2 ]\nPRÓXIMAMENTE"
 
 [node name="BotonCerrar" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=2013989778]
-layout_mode = 0
-offset_left = 17.0
-offset_top = 12.0
-offset_right = 160.0
-offset_bottom = 50.0
-theme_override_font_sizes/font_size = 20
+offset_left = 875.0
+offset_top = 25.0
+offset_right = 955.0
+offset_bottom = 65.0
+theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_4vydk")
-text = "Cerrar Tienda"
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+text = "CERRAR"
 
 [node name="ContenedorContadores" type="MarginContainer" parent="CanvasLayer" unique_id=549149912]
 anchors_preset = 1

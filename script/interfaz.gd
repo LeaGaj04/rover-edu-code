@@ -47,9 +47,9 @@ func _on_boton_tienda_pressed() -> void:
 	panel_tienda.visible = !panel_tienda.visible
 	
 	if panel_tienda.visible:
-		boton_tienda.text = "Cerrar Árbol"
+		boton_tienda.text = "CERRAR"
 	else:
-		boton_tienda.text = "Abrir Tienda"
+		boton_tienda.text = "MEJORAS"
 
 
 func _input(event: InputEvent) -> void:
@@ -128,8 +128,8 @@ func _on_boton_cerrar_pressed() -> void:
 	# Ocultamos el panel directamente
 	panel_tienda.hide()
 	
-	# Restauramos el texto del botón principal para que vuelva a decir "Abrir Tienda"
-	boton_tienda.text = "Abrir Tienda"
+	# Restauramos el texto compacto del botón principal.
+	boton_tienda.text = "MEJORAS"
 	
 func actualizar_contadores() -> void:
 	if label_nave != null:
