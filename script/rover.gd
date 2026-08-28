@@ -44,12 +44,30 @@ func _intentar_mover() -> void:
 	while cola_instrucciones.size() > 0:
 		var direccion = cola_instrucciones.pop_front()
 		var destino = global_position + (direccion * paso_distancia)
+
+		if not _destino_esta_desbloqueado(destino):
+			print("Movimiento bloqueado: esa casilla todavía no está comprada.")
+			cola_instrucciones.clear()
+			break
 		
 		var tween = create_tween()
 		tween.tween_property(self, "global_position", destino, 0.4)
 		await tween.finished # Espera a que termine cada animación
 		
 	esta_moviendose = false
+
+
+func _destino_esta_desbloqueado(destino_global: Vector3) -> bool:
+	var grid_map := get_parent() as GridMap
+	if grid_map == null:
+		push_warning("El Rover debe ser hijo de un GridMap para validar sus límites.")
+		return false
+
+	var destino_local := grid_map.to_local(destino_global)
+	var casilla := grid_map.local_to_map(destino_local)
+	# El movimiento es horizontal; ignoramos cualquier variación de altura del modelo.
+	casilla.y = 0
+	return grid_map.get_cell_item(casilla) != GridMap.INVALID_CELL_ITEM
 
 
 func minar():
