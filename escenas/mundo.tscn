@@ -490,7 +490,7 @@ layout_mode = 2
 text = "Nave: 0/15"
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=173857337]
-transform = Transform3D(1, 0, 0, 0, 0.9284859, 0.37136787, 0, -0.37136787, 0.9284859, 2.855854, 6.725074, 2.921507)
+transform = Transform3D(1, 0, 0, 0, 0.8558924, 0.517154, 0, -0.517154, 0.8558924, 2.855854, 8.372469, 6.1343126)
 
 [node name="Meshy_AI_Low_Poly_Moon_0820024724_texture" parent="." unique_id=1049214347 instance=ExtResource("4_v12yk")]
 transform = Transform3D(70, 0, 0, 0, 70, 0, 0, 0, 70, 27.699373, -86.83779, -19.231441)
