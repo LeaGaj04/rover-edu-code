@@ -2,8 +2,26 @@ extends CanvasLayer
 
 @export var nodo_nave : Node3D
 
-@onready var caja_codigo = $TextEdit
+@onready var panel_codigo: Panel = $PanelCodigo
+@onready var barra_codigo: Panel = $PanelCodigo/BarraTitulo
+@onready var contenido_codigo: Control = $PanelCodigo/Contenido
+@onready var boton_minimizar: Button = $PanelCodigo/BarraTitulo/BotonMinimizar
+@onready var caja_codigo: TextEdit = $PanelCodigo/Contenido/TextEdit
 @export var mi_rover : CharacterBody3D
+
+const ALTO_PANEL_CODIGO: float = 276.0
+const ALTO_PANEL_MINIMIZADO: float = 60.0
+const MARGEN_PANTALLA: float = 8.0
+const TAMANO_MINIMO_PANEL: Vector2 = Vector2(420.0, 220.0)
+
+var arrastrando_panel: bool = false
+var offset_arrastre: Vector2 = Vector2.ZERO
+var redimensionando_panel: bool = false
+var esquina_redimension: Vector2 = Vector2.ZERO
+var mouse_inicio_redimension: Vector2 = Vector2.ZERO
+var posicion_inicio_redimension: Vector2 = Vector2.ZERO
+var tamano_inicio_redimension: Vector2 = Vector2.ZERO
+var alto_panel_expandido: float = ALTO_PANEL_CODIGO
 
 # --- VARIABLES DE RECURSOS ---
 const CAPACIDAD_ROVER : int = 10
@@ -30,6 +48,13 @@ const PRECIOS = {
 }
 
 func _ready() -> void:
+	barra_codigo.gui_input.connect(_on_barra_codigo_gui_input)
+	$PanelCodigo/EsquinaSuperiorIzquierda.gui_input.connect(_on_esquina_codigo_gui_input.bind(Vector2(-1, -1)))
+	$PanelCodigo/EsquinaSuperiorDerecha.gui_input.connect(_on_esquina_codigo_gui_input.bind(Vector2(1, -1)))
+	$PanelCodigo/EsquinaInferiorIzquierda.gui_input.connect(_on_esquina_codigo_gui_input.bind(Vector2(-1, 1)))
+	$PanelCodigo/EsquinaInferiorDerecha.gui_input.connect(_on_esquina_codigo_gui_input.bind(Vector2(1, 1)))
+	get_viewport().size_changed.connect(_mantener_panel_en_pantalla)
+
 	# Oculta el árbol apenas arranca el juego
 	if panel_tienda != null:
 		panel_tienda.hide()
@@ -53,9 +78,96 @@ func _on_boton_tienda_pressed() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if redimensionando_panel:
+		if event is InputEventMouseMotion:
+			_redimensionar_panel_codigo(get_viewport().get_mouse_position())
+		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+			redimensionando_panel = false
+
+	if arrastrando_panel:
+		if event is InputEventMouseMotion:
+			_mover_panel_codigo(get_viewport().get_mouse_position() - offset_arrastre)
+		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+			arrastrando_panel = false
+
 	if event is InputEventKey and event.pressed and not event.echo and event.ctrl_pressed and event.keycode == KEY_ENTER:
 		get_viewport().set_input_as_handled()
 		_on_button_pressed()
+
+
+func _on_barra_codigo_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		arrastrando_panel = event.pressed
+		if arrastrando_panel:
+			offset_arrastre = get_viewport().get_mouse_position() - panel_codigo.position
+		barra_codigo.accept_event()
+
+
+func _on_esquina_codigo_gui_input(event: InputEvent, esquina: Vector2) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		redimensionando_panel = event.pressed
+		if redimensionando_panel:
+			arrastrando_panel = false
+			esquina_redimension = esquina
+			mouse_inicio_redimension = get_viewport().get_mouse_position()
+			posicion_inicio_redimension = panel_codigo.position
+			tamano_inicio_redimension = panel_codigo.size
+		get_viewport().set_input_as_handled()
+
+
+func _redimensionar_panel_codigo(mouse_actual: Vector2) -> void:
+	var delta: Vector2 = mouse_actual - mouse_inicio_redimension
+	var nueva_posicion: Vector2 = posicion_inicio_redimension
+	var nuevo_tamano: Vector2 = tamano_inicio_redimension
+	var pantalla: Vector2 = get_viewport().get_visible_rect().size
+
+	if esquina_redimension.x > 0:
+		nuevo_tamano.x = clampf(tamano_inicio_redimension.x + delta.x, TAMANO_MINIMO_PANEL.x, pantalla.x - posicion_inicio_redimension.x - MARGEN_PANTALLA)
+	else:
+		nuevo_tamano.x = clampf(tamano_inicio_redimension.x - delta.x, TAMANO_MINIMO_PANEL.x, posicion_inicio_redimension.x + tamano_inicio_redimension.x - MARGEN_PANTALLA)
+		nueva_posicion.x = posicion_inicio_redimension.x + tamano_inicio_redimension.x - nuevo_tamano.x
+
+	if esquina_redimension.y > 0:
+		nuevo_tamano.y = clampf(tamano_inicio_redimension.y + delta.y, TAMANO_MINIMO_PANEL.y, pantalla.y - posicion_inicio_redimension.y - MARGEN_PANTALLA)
+	else:
+		nuevo_tamano.y = clampf(tamano_inicio_redimension.y - delta.y, TAMANO_MINIMO_PANEL.y, posicion_inicio_redimension.y + tamano_inicio_redimension.y - MARGEN_PANTALLA)
+		nueva_posicion.y = posicion_inicio_redimension.y + tamano_inicio_redimension.y - nuevo_tamano.y
+
+	panel_codigo.position = nueva_posicion
+	panel_codigo.size = nuevo_tamano
+
+
+func _mover_panel_codigo(nueva_posicion: Vector2) -> void:
+	var pantalla: Vector2 = get_viewport().get_visible_rect().size
+	var limite: Vector2 = Vector2(
+		maxf(MARGEN_PANTALLA, pantalla.x - panel_codigo.size.x - MARGEN_PANTALLA),
+		maxf(MARGEN_PANTALLA, pantalla.y - panel_codigo.size.y - MARGEN_PANTALLA)
+	)
+	panel_codigo.position = nueva_posicion.clamp(
+		Vector2(MARGEN_PANTALLA, MARGEN_PANTALLA),
+		limite
+	)
+
+
+func _mantener_panel_en_pantalla() -> void:
+	_mover_panel_codigo(panel_codigo.position)
+
+
+func _on_boton_minimizar_pressed() -> void:
+	if contenido_codigo.visible:
+		alto_panel_expandido = panel_codigo.size.y
+	contenido_codigo.visible = not contenido_codigo.visible
+	panel_codigo.size.y = alto_panel_expandido if contenido_codigo.visible else ALTO_PANEL_MINIMIZADO
+	for esquina in [
+		$PanelCodigo/EsquinaSuperiorIzquierda,
+		$PanelCodigo/EsquinaSuperiorDerecha,
+		$PanelCodigo/EsquinaInferiorIzquierda,
+		$PanelCodigo/EsquinaInferiorDerecha
+	]:
+		esquina.visible = contenido_codigo.visible
+	boton_minimizar.text = "_" if contenido_codigo.visible else "+"
+	boton_minimizar.tooltip_text = "Minimizar la consola" if contenido_codigo.visible else "Abrir la consola"
+	_mantener_panel_en_pantalla()
 
 
 func _on_button_pressed() -> void:
