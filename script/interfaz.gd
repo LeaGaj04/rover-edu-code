@@ -6,7 +6,10 @@ extends CanvasLayer
 @export var mi_rover : CharacterBody3D
 
 # --- VARIABLES DE RECURSOS ---
-var minerales_nave : int = 100 
+const CAPACIDAD_ROVER : int = 10
+const CAPACIDAD_NAVE : int = 100
+
+var minerales_nave : int = 0
 var minerales_rover : int = 0
 
 # --- REFERENCIAS A LOS CONTADORES VISUALES ---
@@ -111,6 +114,9 @@ func ejecutar_movimiento_rover(comando: String, pasos: int) -> void:
 	elif comando == "oeste":
 		mi_rover.oeste(pasos)
 	elif comando == "minar":
+		if minerales_rover >= CAPACIDAD_ROVER:
+			print("Inventario lleno: el Rover solo puede transportar ", CAPACIDAD_ROVER, " minerales.")
+			return
 		await mi_rover.minar()
 	elif comando == "transferir":
 		procesar_transferencia()
@@ -127,9 +133,9 @@ func _on_boton_cerrar_pressed() -> void:
 	
 func actualizar_contadores() -> void:
 	if label_nave != null:
-		label_nave.text = "Nave: " + str(minerales_nave)
+		label_nave.text = "Nave: " + str(minerales_nave) + "/" + str(CAPACIDAD_NAVE)
 	if label_rover != null:
-		label_rover.text = "Rover: " + str(minerales_rover)
+		label_rover.text = "Rover: " + str(minerales_rover) + "/" + str(CAPACIDAD_ROVER)
 
 func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem) -> void:
 	# 1. Verificar si ya se compró previamente
@@ -158,7 +164,7 @@ func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem
 		print("Minerales insuficientes para comprar: " + item_id)
 		
 func _sumar_minerales_rover(cantidad: int) -> void:
-	minerales_rover += cantidad
+	minerales_rover = mini(minerales_rover + cantidad, CAPACIDAD_ROVER)
 	actualizar_contadores()
 	
 func procesar_transferencia() -> void:
@@ -169,17 +175,22 @@ func procesar_transferencia() -> void:
 	if minerales_rover == 0:
 		print("El Rover no tiene minerales para transferir.")
 		return
+
+	if minerales_nave >= CAPACIDAD_NAVE:
+		print("La Nave está llena. Capacidad máxima: ", CAPACIDAD_NAVE, " minerales.")
+		return
 		
 	# Calculamos la distancia entre el rover y la nave
 	var distancia = mi_rover.global_position.distance_to(nodo_nave.global_position)
 	
 	# Si la distancia es menor a 2.5 unidades
 	if distancia <= 5.0:
-		print("Iniciando transferencia segura... ", minerales_rover, " minerales enviados a la Nave.")
-		
-		# Pasamos los recursos de una variable a otra
-		minerales_nave += minerales_rover
-		minerales_rover = 0
+		var espacio_disponible = CAPACIDAD_NAVE - minerales_nave
+		var cantidad_transferida = mini(minerales_rover, espacio_disponible)
+		print("Iniciando transferencia segura... ", cantidad_transferida, " minerales enviados a la Nave.")
+
+		minerales_nave += cantidad_transferida
+		minerales_rover -= cantidad_transferida
 		
 		# Actualizamos los números en pantalla
 		actualizar_contadores()
@@ -192,6 +203,25 @@ func _on_button_while_pressed() -> void:
 func _on_button_for_pressed() -> void:
 	intentar_compra("for", boton_for, null)
 
-func _on_button_expansion1_pressed() -> void:
-	intentar_compra("mapa", boton_expansion, null)
+func _on_button_expansion_1_pressed() -> void:
+	var mundo = get_parent()
+	var costo = PRECIOS["mapa"]
+
+	if mundo.mapa_3x3_desbloqueado:
+		print("El Mapa 1 ya está desbloqueado.")
+		return
+
+	if minerales_nave < costo:
+		print("Minerales insuficientes en la Nave. Mapa 1 cuesta ", costo, " minerales.")
+		return
+
+	if mundo.expandir_mapa_3x3():
+		minerales_nave -= costo
+		actualizar_contadores()
+		boton_expansion.disabled = true
+
+
+func _on_button_expansion_2_pressed() -> void:
+	# La segunda expansión queda reservada para una implementación futura.
+	print("EX Mapa 2 todavía no está disponible.")
 	
