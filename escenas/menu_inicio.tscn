@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dorjiuvlmgpes"]
 
 [ext_resource type="Script" uid="uid://xb6duvsny44v" path="res://script/menu_inicio.gd" id="1_leqng"]
-[ext_resource type="Texture2D" uid="uid://dgq285g3xyany" path="res://Fondos/asteroide.jpg" id="2_lkhye"]
+[ext_resource type="Texture2D" uid="uid://cr0vrrguhxwaq" path="res://Fondos/c953830a35438a74a669107d5ea4d326.jpg" id="2_lkhye"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ppgcv"]
 content_margin_left = 16.0
@@ -92,7 +92,7 @@ script = ExtResource("1_leqng")
 [node name="TextureRect" type="TextureRect" parent="." unique_id=1861643503]
 layout_mode = 0
 offset_right = 1153.0
-offset_bottom = 651.0
+offset_bottom = 649.0
 texture = ExtResource("2_lkhye")
 
 [node name="Titulo" type="Label" parent="." unique_id=1829891911]

@@ -10,48 +10,49 @@
 [ext_resource type="PackedScene" uid="uid://b0kuh5v2yxqd7" path="res://escenas/nave.tscn" id="8_txhqv"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_codigo"]
-bg_color = Color(0.075, 0.07, 0.135, 0.76)
+bg_color = Color(4.4370537e-08, 0.067600854, 0.00088399946, 0.7607843)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.55, 0.53, 0.72, 0.85)
-shadow_color = Color(0.018, 0.015, 0.04, 0.65)
+border_color = Color(0.3744904, 0.5937168, 0.41924155, 0.8509804)
+shadow_color = Color(0.005598605, 0.09105549, 0.011137269, 0.6509804)
 shadow_offset = Vector2(6, 6)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_barra_codigo"]
-bg_color = Color(0.13, 0.125, 0.22, 0.78)
+bg_color = Color(0, 0.06666667, 0, 0.7607843)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.55, 0.53, 0.72, 0.85)
+border_color = Color(0.37254903, 0.5921569, 0.41960785, 0.8509804)
+shadow_color = Color(0.003921569, 0.09019608, 0.011764706, 0.6509804)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4vydk"]
 content_margin_left = 5.0
 content_margin_top = 5.0
 content_margin_right = 5.0
 content_margin_bottom = 5.0
-bg_color = Color(0.105, 0.1, 0.18, 0.96)
+bg_color = Color(0, 0.06666667, 0, 0.7607843)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.55, 0.53, 0.72, 1)
+border_color = Color(0.37254903, 0.5921569, 0.41960785, 0.8509804)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
-shadow_color = Color(0.025, 0.02, 0.055, 0.9)
+shadow_color = Color(0.003921569, 0.09019608, 0.011764706, 0.6509804)
 shadow_offset = Vector2(5, 5)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tienda_hover"]
-bg_color = Color(0.27, 0.24, 0.43, 1)
+bg_color = Color(0, 0.06666667, 0, 0.7607843)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.76, 0.73, 0.91, 1)
+border_color = Color(0.37254903, 0.5921569, 0.41960785, 0.8509804)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
@@ -60,7 +61,7 @@ expand_margin_left = 2.0
 expand_margin_top = 2.0
 expand_margin_right = 2.0
 expand_margin_bottom = 2.0
-shadow_color = Color(0.025, 0.02, 0.055, 1)
+shadow_color = Color(0.003921569, 0.09019608, 0.011764706, 0.6509804)
 shadow_offset = Vector2(4, 4)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_editor_codigo"]
@@ -68,25 +69,26 @@ content_margin_left = 12.0
 content_margin_top = 10.0
 content_margin_right = 12.0
 content_margin_bottom = 10.0
-bg_color = Color(0.035, 0.03, 0.075, 0.72)
+bg_color = Color(0, 0.06666667, 0, 0.7607843)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.43, 0.42, 0.59, 0.8)
+border_color = Color(0.37254903, 0.5921569, 0.41960785, 0.8509804)
+shadow_color = Color(0.003921569, 0.09019608, 0.011764706, 0.6509804)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tienda_focus"]
-bg_color = Color(0.13, 0.125, 0.22, 1)
+bg_color = Color(0, 0.06666667, 0, 0.7607843)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.48, 0.47, 0.66, 1)
+border_color = Color(0.37254903, 0.5921569, 0.41960785, 0.8509804)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
-shadow_color = Color(0.025, 0.02, 0.055, 1)
+shadow_color = Color(0.003921569, 0.09019608, 0.011764706, 0.6509804)
 shadow_offset = Vector2(6, 6)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_txhqv"]
@@ -94,7 +96,7 @@ content_margin_left = 0.0
 content_margin_top = 0.0
 content_margin_right = 0.0
 content_margin_bottom = 0.0
-bg_color = Color(0.035, 0.03, 0.075, 0.9)
+bg_color = Color(0, 0.06666667, 0, 0.7607843)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
@@ -180,7 +182,7 @@ offset_left = 14.0
 offset_top = 8.0
 offset_right = 430.0
 offset_bottom = 36.0
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_color = Color(0.7608024, 0.9369633, 0.7753063, 1)
 theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 18
@@ -195,7 +197,7 @@ offset_top = 6.0
 offset_right = -12.0
 offset_bottom = 38.0
 tooltip_text = "Minimizar la consola"
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
 theme_override_font_sizes/font_size = 18
 theme_override_styles/normal = SubResource("StyleBoxFlat_4vydk")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
@@ -215,9 +217,9 @@ layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_bottom = -50.0
-theme_override_colors/caret_color = Color(0.95, 0.91, 1, 1)
-theme_override_colors/selection_color = Color(0.32, 0.29, 0.5, 0.8)
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/caret_color = Color(0, 0.06666667, 0, 0.7607843)
+theme_override_colors/selection_color = Color(0.37254903, 0.5921569, 0.41960785, 0.8509804)
+theme_override_colors/font_color = Color(0.8651328, 0.9999998, 0.866359, 0.6509804)
 theme_override_font_sizes/font_size = 17
 theme_override_styles/normal = SubResource("StyleBoxFlat_editor_codigo")
 
@@ -230,11 +232,11 @@ anchor_bottom = 1.0
 offset_left = -180.0
 offset_top = -42.0
 tooltip_text = "Ejecutar código (Ctrl+Enter)"
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
-text = "[ EJECUTAR ]"
+text = "EJECUTAR"
 
 [node name="EsquinaSuperiorIzquierda" type="Control" parent="CanvasLayer/PanelCodigo" unique_id=1141049694]
 anchors_preset = 0
@@ -280,7 +282,7 @@ theme_override_constants/margin_top = 15
 
 [node name="BotonTienda" type="Button" parent="CanvasLayer/ContenedorTienda" unique_id=1830627710]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
 theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 20
@@ -318,7 +320,7 @@ offset_left = 40.0
 offset_top = 24.0
 offset_right = 500.0
 offset_bottom = 58.0
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
 theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
 theme_override_constants/outline_size = 6
 theme_override_font_sizes/font_size = 26
@@ -330,7 +332,7 @@ offset_left = 42.0
 offset_top = 62.0
 offset_right = 670.0
 offset_bottom = 88.0
-theme_override_colors/font_color = Color(0.58, 0.57, 0.72, 1)
+theme_override_colors/font_color = Color(0.6003543, 0.86491835, 0.62992954, 1)
 theme_override_font_sizes/font_size = 14
 text = "Invierte los minerales de la nave para ampliar las capacidades del rover."
 
