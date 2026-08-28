@@ -67,12 +67,14 @@ func minar():
 	
 	for mineral in minerales_en_mapa:
 		# Si el mineral está muy cerca del rover (en la misma casilla)
-		if global_position.distance_to(mineral.global_position) < 1.0:
-			mineral.queue_free() # Desaparece el cubo
+		if global_position.distance_to(mineral.global_position) < paso_distancia:
+			var nodo_mineral = mineral.get_parent()
+			nodo_mineral.queue_free() # Desaparece el mineral completo
 			mineral_minado = true
 			
-			# Llamamos al mapa para que genere uno nuevo aleatoriamente			get_parent().spawn_mineral_aleatorio()
-			print("¡Diamante recolectado! Reapareciendo en otra coordenada.")
+			# El Mundo es el abuelo del Rover porque este cuelga del GridMap.
+			get_parent().get_parent().spawn_mineral_aleatorio()
+			print("¡Diamante recolectado! Reapareciendo en la casilla inicial.")
 			mineral_recolectado.emit(1) # Aquí le avisa al juego y manda el valor de 10
 			break # Solo minamos uno a la vez
 			

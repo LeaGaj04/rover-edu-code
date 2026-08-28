@@ -3,14 +3,20 @@ extends Node3D
 @export var mineral_scene : PackedScene
 @onready var grid_map = $GridMap
 
+const CASILLA_INICIAL := Vector3i(0, 0, 0)
+
 # Variable que define el tamaño del mapa actual
 # 0 = mapa 1x1 (inicio)
 # 1 = mapa 3x3
 # 2 = mapa 5x5, etc.
-var radio_mapa_desbloqueado : int = 1 
-var max_minerales : int = 4
+var radio_mapa_desbloqueado : int = 0
+var max_minerales : int = 1
+var mapa_3x3_desbloqueado : bool = false
 
 func _ready():
+	# El jugador comienza solamente con la casilla central.
+	grid_map.clear()
+	grid_map.set_cell_item(CASILLA_INICIAL, 1)
 	generar_minerales_iniciales()
 
 func generar_minerales_iniciales():
@@ -22,12 +28,9 @@ func generar_minerales_iniciales():
 		spawn_mineral_aleatorio()
 
 func spawn_mineral_aleatorio():
-   # 1. Elegimos las coordenadas de la cuadrícula (como si fueran casillas)
-	var casilla_x = randi_range(-radio_mapa_desbloqueado, radio_mapa_desbloqueado)
-	var casilla_z = randi_range(-radio_mapa_desbloqueado, radio_mapa_desbloqueado)
-	
-	# 2. Le pedimos al GridMap que nos dé el centro milimétrico de esa casilla
-	var centro_exacto = grid_map.map_to_local(Vector3i(casilla_x, 0, casilla_z))
+	# Mientras el mapa está bloqueado, el mineral reaparece siempre en la
+	# única casilla disponible para que el jugador pueda farmearlo.
+	var centro_exacto = grid_map.map_to_local(CASILLA_INICIAL)
 	
 	# 3. Instanciamos el mineral
 	var nuevo_mineral = mineral_scene.instantiate()
@@ -35,3 +38,18 @@ func spawn_mineral_aleatorio():
 	
 	# 4. Lo posicionamos en ese centro exacto, ajustando solo la altura (Y) a 0.5
 	nuevo_mineral.position = Vector3(centro_exacto.x, 0.5, centro_exacto.z)
+
+
+func expandir_mapa_3x3() -> bool:
+	if mapa_3x3_desbloqueado:
+		return false
+
+	for x in range(-1, 2):
+		for z in range(-1, 2):
+			var tipo_casilla = 1 if (x + z) % 2 == 0 else 2
+			grid_map.set_cell_item(Vector3i(x, 0, z), tipo_casilla)
+
+	radio_mapa_desbloqueado = 1
+	mapa_3x3_desbloqueado = true
+	print("Mapa 1 adquirido: terreno expandido a 3x3.")
+	return true
