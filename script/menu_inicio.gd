@@ -2,9 +2,73 @@ extends Control
 
 # Ruta hacia la escena del juego donde está el asteroide y el Rover
 const ESCENA_MUNDO = "res://escenas/mundo.tscn"
+const ESCENA_AUTH = "res://escenas/auth.tscn"
+const ESCENA_PERFIL = "res://escenas/perfil.tscn"
+@onready var boton_login: Button = $PanelPerfil/HBoxContainer/ButtonLogin
+@onready var dropdown: PanelContainer = $ProfileDropdown
+@onready var boton_ver_perfil: Button = $ProfileDropdown/Options/VerPerfil
+@onready var boton_cerrar_sesion: Button = $ProfileDropdown/Options/CerrarSesion
+var dropdown_abierto := false
 
 func _ready() -> void:
-	pass # Se ejecuta al iniciar el menú
+	boton_login.mouse_entered.connect(_animar_hover.bind(true))
+	boton_login.mouse_exited.connect(_animar_hover.bind(false))
+	boton_ver_perfil.mouse_entered.connect(_animar_opcion_hover.bind(boton_ver_perfil, true))
+	boton_ver_perfil.mouse_exited.connect(_animar_opcion_hover.bind(boton_ver_perfil, false))
+	boton_cerrar_sesion.mouse_entered.connect(_animar_opcion_hover.bind(boton_cerrar_sesion, true))
+	boton_cerrar_sesion.mouse_exited.connect(_animar_opcion_hover.bind(boton_cerrar_sesion, false))
+	actualizar_estado_autenticacion()
+
+func actualizar_estado_autenticacion() -> void:
+	cerrar_dropdown()
+	if Supabase.is_authenticated():
+		boton_login.text = "Perfil ▼"
+	else:
+		boton_login.text = "Iniciar Sesion"
+
+func _on_boton_login_pressed() -> void:
+	if not Supabase.is_authenticated():
+		get_tree().change_scene_to_file(ESCENA_AUTH)
+		return
+	if dropdown_abierto:
+		cerrar_dropdown()
+	else:
+		abrir_dropdown()
+
+func abrir_dropdown() -> void:
+	dropdown_abierto = true
+	dropdown.visible = true
+	dropdown.modulate.a = 0.0
+	dropdown.position.y -= 8.0
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(dropdown, "modulate:a", 1.0, 0.18)
+	tween.tween_property(dropdown, "position:y", dropdown.position.y + 8.0, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func cerrar_dropdown() -> void:
+	if not dropdown_abierto and not dropdown.visible:
+		return
+	dropdown_abierto = false
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(dropdown, "modulate:a", 0.0, 0.15)
+	tween.tween_property(dropdown, "position:y", dropdown.position.y - 8.0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.chain().tween_callback(dropdown.hide)
+
+func _animar_hover(entrando: bool) -> void:
+	var tween := create_tween()
+	tween.tween_property(boton_login, "scale", Vector2.ONE * (1.03 if entrando else 1.0), 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _animar_opcion_hover(boton: Button, entrando: bool) -> void:
+	var tween := create_tween()
+	tween.tween_property(boton, "modulate", Color(1.12, 1.12, 1.12) if entrando else Color.WHITE, 0.14)
+
+func _on_ver_perfil_pressed() -> void:
+	cerrar_dropdown()
+	get_tree().change_scene_to_file(ESCENA_PERFIL)
+
+func _on_cerrar_sesion_pressed() -> void:
+	cerrar_dropdown()
+	Supabase.sign_out()
+	actualizar_estado_autenticacion()
 
 # Se ejecuta al hacer clic en "Jugar"
 func _on_boton_jugar_pressed() -> void:

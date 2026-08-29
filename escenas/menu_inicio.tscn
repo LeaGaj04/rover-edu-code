@@ -165,6 +165,29 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxFlat_g30ce")
 text = "Iniciar Sesion"
+pivot_offset = Vector2(71.5, 20)
+
+[node name="ProfileDropdown" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 986.0
+offset_top = 94.0
+offset_right = 1129.0
+offset_bottom = 174.0
+
+[node name="Options" type="VBoxContainer" parent="ProfileDropdown"]
+layout_mode = 2
+
+[node name="VerPerfil" type="Button" parent="ProfileDropdown/Options"]
+layout_mode = 2
+text = "Ver mi perfil"
+
+[node name="CerrarSesion" type="Button" parent="ProfileDropdown/Options"]
+layout_mode = 2
+text = "Cerrar sesión"
 
 [connection signal="pressed" from="PanelMenu/ContenedorPrincipal/BotonJugar" to="." method="_on_boton_jugar_pressed"]
 [connection signal="pressed" from="PanelMenu/ContenedorPrincipal/BotonSalir" to="." method="_on_boton_salir_pressed"]
+[connection signal="pressed" from="PanelPerfil/HBoxContainer/ButtonLogin" to="." method="_on_boton_login_pressed"]
+[connection signal="pressed" from="ProfileDropdown/Options/VerPerfil" to="." method="_on_ver_perfil_pressed"]
+[connection signal="pressed" from="ProfileDropdown/Options/CerrarSesion" to="." method="_on_cerrar_sesion_pressed"]
