@@ -260,6 +260,20 @@ func aplicar_progreso(progress: Dictionary) -> void:
 	actualizar_mejoras_visual()
 
 
+func get_progress_state() -> Dictionary:
+	var mundo := get_parent()
+	return {
+		"minerals_ship": minerales_nave,
+		"minerals_rover": minerales_rover,
+		"map_tier": mundo.get_map_tier() if mundo != null else 0,
+		"unlocked_syntax": GestorSintaxis.get_sintaxis_desbloqueada(),
+	}
+
+
+func _solicitar_guardado_progreso() -> void:
+	ProgressService.save_progress(get_progress_state())
+
+
 func actualizar_mejoras_visual() -> void:
 	if boton_while != null:
 		boton_while.disabled = GestorSintaxis.esta_desbloqueada("while")
@@ -294,12 +308,14 @@ func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem
 			linea_conectora.modulate = Color(1.0, 0.84, 0.0) 
 			
 		print(item_id + " adquirido exitosamente.")
+		_solicitar_guardado_progreso()
 	else:
 		print("Minerales insuficientes para comprar: " + item_id)
 		
 func _sumar_minerales_rover(cantidad: int) -> void:
 	minerales_rover = mini(minerales_rover + cantidad, CAPACIDAD_ROVER)
 	actualizar_contadores()
+	_solicitar_guardado_progreso()
 	
 func procesar_transferencia() -> void:
 	if nodo_nave == null:
@@ -328,6 +344,7 @@ func procesar_transferencia() -> void:
 		
 		# Actualizamos los números en pantalla
 		actualizar_contadores()
+		_solicitar_guardado_progreso()
 	else:
 		print("Error de transferencia: El Rover está muy lejos de la base.")
 		
@@ -353,6 +370,7 @@ func _on_button_expansion_1_pressed() -> void:
 		minerales_nave -= costo
 		actualizar_contadores()
 		boton_expansion.disabled = true
+		_solicitar_guardado_progreso()
 
 
 func _on_button_expansion_2_pressed() -> void:

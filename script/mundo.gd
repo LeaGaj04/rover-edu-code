@@ -97,3 +97,7 @@ func expandir_mapa_3x3() -> bool:
 	aplicar_progreso_mapa(1)
 	print("Mapa 1 adquirido: terreno expandido a 3x3.")
 	return true
+
+
+func get_map_tier() -> int:
+	return radio_mapa_desbloqueado

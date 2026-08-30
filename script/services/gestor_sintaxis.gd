@@ -55,6 +55,10 @@ func esta_desbloqueada(palabra_clave: String) -> bool:
 	return sintaxis_desbloqueada.get(palabra_normalizada, false)
 
 
+func get_sintaxis_desbloqueada() -> Dictionary:
+	return sintaxis_desbloqueada.duplicate(true)
+
+
 func _contiene_palabra_clave(codigo: String, palabra_clave: String) -> bool:
 	var expresion := RegEx.new()
 	var partes := palabra_clave.split(" ", false)
