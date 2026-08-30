@@ -4,6 +4,8 @@ signal login_succeeded(user: Dictionary)
 signal login_failed(message: String)
 signal signup_succeeded(user: Dictionary, has_session: bool)
 signal signup_failed(message: String)
+signal password_recovery_sent
+signal password_recovery_failed(message: String)
 signal signed_out
 
 const SUPABASE_URL := "https://ulivinilxszdyazignbi.supabase.co"
@@ -24,6 +26,27 @@ func sign_up(email: String, password: String) -> bool:
 
 func sign_in(email: String, password: String) -> bool:
 	return _start_auth_request("login", SUPABASE_URL + "/auth/v1/token?grant_type=password", email, password)
+
+func send_password_recovery(email: String) -> bool:
+	if pending_operation != "":
+		return false
+	pending_operation = "password_recovery"
+	var headers := PackedStringArray([
+		"apikey: " + SUPABASE_KEY,
+		"Content-Type: application/json",
+		"Accept: application/json"
+	])
+	var error := http_request.request(
+		SUPABASE_URL + "/auth/v1/recover",
+		headers,
+		HTTPClient.METHOD_POST,
+		JSON.stringify({"email": email})
+	)
+	if error != OK:
+		pending_operation = ""
+		password_recovery_failed.emit("No se pudo iniciar la conexión con Supabase.")
+		return false
+	return true
 
 func test_connection() -> bool:
 	if pending_operation != "":
@@ -100,6 +123,9 @@ func _on_request_completed(result: int, response_code: int, _headers: PackedStri
 	if operation == "connection_test":
 		print("EduCode conectado correctamente a Supabase.")
 		return
+	if operation == "password_recovery":
+		password_recovery_sent.emit()
+		return
 	var user_data: Dictionary = data.get("user", {})
 	var new_access_token := str(data.get("access_token", ""))
 	if not new_access_token.is_empty():
@@ -121,5 +147,7 @@ func _extract_error_message(data) -> String:
 func _emit_failure(operation: String, message: String) -> void:
 	if operation == "login":
 		login_failed.emit(message)
+	elif operation == "password_recovery":
+		password_recovery_failed.emit(message)
 	else:
 		signup_failed.emit(message)

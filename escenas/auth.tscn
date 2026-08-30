@@ -98,6 +98,10 @@ secret = true
 theme_override_styles/normal = SubResource("InputNormal")
 theme_override_styles/focus = SubResource("InputFocus")
 
+[node name="RecuperarPassword" type="Button" parent="Panel/Contenedor"]
+layout_mode = 2
+text = "¿Olvidaste tu contraseña?"
+
 [node name="IniciarSesion" type="Button" parent="Panel/Contenedor"]
 layout_mode = 2
 text = "Iniciar sesión"
@@ -116,4 +120,5 @@ autowrap_mode = 2
 
 [connection signal="pressed" from="Panel/Contenedor/IniciarSesion" to="." method="_on_iniciar_sesion_pressed"]
 [connection signal="pressed" from="Panel/Contenedor/Registrarse" to="." method="_on_registrarse_pressed"]
+[connection signal="pressed" from="Panel/Contenedor/RecuperarPassword" to="." method="_on_recuperar_password_pressed"]
 [connection signal="pressed" from="Panel/Contenedor/Volver" to="." method="_on_volver_pressed"]
