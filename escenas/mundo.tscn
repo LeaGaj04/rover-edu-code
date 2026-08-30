@@ -217,11 +217,13 @@ layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_bottom = -50.0
-theme_override_colors/caret_color = Color(0, 0.06666667, 0, 0.7607843)
+theme_override_colors/caret_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
 theme_override_colors/selection_color = Color(0.37254903, 0.5921569, 0.41960785, 0.8509804)
 theme_override_colors/font_color = Color(0.8651328, 0.9999998, 0.866359, 0.6509804)
 theme_override_font_sizes/font_size = 17
 theme_override_styles/normal = SubResource("StyleBoxFlat_editor_codigo")
+caret_blink = true
+caret_blink_interval = 0.5
 
 [node name="Button" type="Button" parent="CanvasLayer/PanelCodigo/Contenido" unique_id=1661741592]
 layout_mode = 0
