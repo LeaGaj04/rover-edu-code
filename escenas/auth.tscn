@@ -4,44 +4,106 @@
 [ext_resource type="Texture2D" path="res://Fondos/IMG_20260828_200204_326.jpg" id="2"]
 
 [sub_resource type="StyleBoxFlat" id="PanelAuth"]
-bg_color = Color(0.094, 0.118, 0.298, 0.9)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 1, 1, 0.35)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
+bg_color = Color(0, 0.06666667, 0, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.37254903, 0.5921569, 0.41960785, 0.9)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 content_margin_left = 28.0
 content_margin_top = 28.0
 content_margin_right = 28.0
 content_margin_bottom = 28.0
+shadow_color = Color(0.003921569, 0.09019608, 0.011764706, 0.75)
+shadow_offset = Vector2(8, 8)
 
 [sub_resource type="StyleBoxFlat" id="InputNormal"]
-bg_color = Color(0.02, 0.03, 0.09, 0.72)
+content_margin_left = 12.0
+content_margin_right = 12.0
+bg_color = Color(0.005, 0.035, 0.008, 0.9)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(1, 1, 1, 0.25)
+border_color = Color(0.37254903, 0.5921569, 0.41960785, 0.7)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="InputFocus"]
-bg_color = Color(0.02, 0.03, 0.09, 0.9)
+content_margin_left = 12.0
+content_margin_right = 12.0
+bg_color = Color(0.008, 0.055, 0.012, 0.98)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.35, 0.75, 1, 0.9)
+border_color = Color(0.48, 0.76, 0.54, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="ButtonNormal"]
+content_margin_left = 14.0
+content_margin_top = 9.0
+content_margin_right = 14.0
+content_margin_bottom = 9.0
+bg_color = Color(0, 0.06666667, 0, 0.7607843)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.37254903, 0.5921569, 0.41960785, 0.8509804)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.003921569, 0.09019608, 0.011764706, 0.6509804)
+shadow_offset = Vector2(5, 5)
+
+[sub_resource type="StyleBoxFlat" id="ButtonHover"]
+content_margin_left = 14.0
+content_margin_top = 9.0
+content_margin_right = 14.0
+content_margin_bottom = 9.0
+bg_color = Color(0.015, 0.12, 0.025, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.48, 0.76, 0.54, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+shadow_color = Color(0.003921569, 0.09019608, 0.011764706, 0.6509804)
+shadow_offset = Vector2(4, 4)
+
+[sub_resource type="StyleBoxFlat" id="ButtonPressed"]
+content_margin_left = 14.0
+content_margin_top = 9.0
+content_margin_right = 14.0
+content_margin_bottom = 9.0
+bg_color = Color(0.01, 0.045, 0.015, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.3, 0.5, 0.35, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [node name="Auth" type="Control"]
 layout_mode = 3
@@ -82,17 +144,29 @@ theme_override_constants/separation = 14
 
 [node name="Subtitulo" type="Label" parent="Panel/Contenedor"]
 layout_mode = 2
-text = "Inicia sesión o crea tu cuenta"
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
+theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 20
+text = "◆ INICIA SESIÓN O CREA TU CUENTA ◆"
 horizontal_alignment = 1
 
 [node name="Email" type="LineEdit" parent="Panel/Contenedor"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8651328, 1, 0.866359, 0.95)
+theme_override_colors/font_placeholder_color = Color(0.6003543, 0.86491835, 0.62992954, 0.7)
+theme_override_colors/caret_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
+theme_override_font_sizes/font_size = 17
 placeholder_text = "Email"
 theme_override_styles/normal = SubResource("InputNormal")
 theme_override_styles/focus = SubResource("InputFocus")
 
 [node name="Password" type="LineEdit" parent="Panel/Contenedor"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8651328, 1, 0.866359, 0.95)
+theme_override_colors/font_placeholder_color = Color(0.6003543, 0.86491835, 0.62992954, 0.7)
+theme_override_colors/caret_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
+theme_override_font_sizes/font_size = 17
 placeholder_text = "Contraseña"
 secret = true
 theme_override_styles/normal = SubResource("InputNormal")
@@ -100,18 +174,40 @@ theme_override_styles/focus = SubResource("InputFocus")
 
 [node name="IniciarSesion" type="Button" parent="Panel/Contenedor"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
+theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("ButtonNormal")
+theme_override_styles/hover = SubResource("ButtonHover")
+theme_override_styles/pressed = SubResource("ButtonPressed")
 text = "Iniciar sesión"
 
 [node name="Registrarse" type="Button" parent="Panel/Contenedor"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
+theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("ButtonNormal")
+theme_override_styles/hover = SubResource("ButtonHover")
+theme_override_styles/pressed = SubResource("ButtonPressed")
 text = "Registrarse"
 
 [node name="Volver" type="Button" parent="Panel/Contenedor"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
+theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("ButtonNormal")
+theme_override_styles/hover = SubResource("ButtonHover")
+theme_override_styles/pressed = SubResource("ButtonPressed")
 text = "Volver"
 
 [node name="Mensaje" type="Label" parent="Panel/Contenedor"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
 autowrap_mode = 2
 
 [connection signal="pressed" from="Panel/Contenedor/IniciarSesion" to="." method="_on_iniciar_sesion_pressed"]
