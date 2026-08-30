@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://dxhwjk03om5sy" path="res://escenas/Asteroide.tscn" id="4_v12yk"]
 [ext_resource type="Script" uid="uid://dqmlj1jkvco4u" path="res://script/ciclo_solar.gd" id="5_16hu1"]
 [ext_resource type="PackedScene" uid="uid://b0kuh5v2yxqd7" path="res://escenas/nave.tscn" id="8_txhqv"]
+[ext_resource type="Texture2D" uid="uid://njub7ajny3gy" path="res://assets/sky/cielo_espacial_4k.png" id="9_cielo"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_codigo"]
 bg_color = Color(4.4370537e-08, 0.067600854, 0.00088399946, 0.7607843)
@@ -129,10 +130,12 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_3rgfu"]
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_espacio"]
+panorama = ExtResource("9_cielo")
+energy_multiplier = 0.8
 
 [sub_resource type="Sky" id="Sky_x6etp"]
-sky_material = SubResource("ProceduralSkyMaterial_3rgfu")
+sky_material = SubResource("PanoramaSkyMaterial_espacio")
 
 [sub_resource type="Environment" id="Environment_v88e1"]
 background_mode = 2
