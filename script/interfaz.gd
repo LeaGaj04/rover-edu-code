@@ -39,6 +39,7 @@ var minerales_rover : int = 0
 @onready var boton_tienda = $ContenedorTienda/BotonTienda
 @onready var boton_while = $PanelTienda/LienzoArbol/ButtonWhile
 @onready var boton_for = $PanelTienda/LienzoArbol/ButtonFor
+@onready var boton_if = $PanelTienda/LienzoArbol/ButtonIf
 @onready var boton_expansion = $PanelTienda/LienzoArbol/ButtonExpansion1
 
 const PRECIOS = {
@@ -61,6 +62,7 @@ func _ready() -> void:
 	
 	# Actualizamos los textos al iniciar
 	actualizar_contadores()
+	actualizar_mejoras_visual()
 	# Conectamos la señal del rover a una nueva función de la interfaz
 	if mi_rover != null:
 		mi_rover.mineral_recolectado.connect(_sumar_minerales_rover)
@@ -249,6 +251,40 @@ func actualizar_contadores() -> void:
 	if label_rover != null:
 		label_rover.text = "Rover: " + str(minerales_rover) + "/" + str(CAPACIDAD_ROVER)
 
+
+# Aplica solamente el estado persistente que corresponde a la interfaz.
+func aplicar_progreso(progress: Dictionary) -> void:
+	minerales_nave = maxi(0, int(progress.get("minerals_ship", 0)))
+	minerales_rover = maxi(0, int(progress.get("minerals_rover", 0)))
+	actualizar_contadores()
+	actualizar_mejoras_visual()
+
+
+func get_progress_state() -> Dictionary:
+	var mundo := get_parent()
+	return {
+		"minerals_ship": minerales_nave,
+		"minerals_rover": minerales_rover,
+		"map_tier": mundo.get_map_tier() if mundo != null else 0,
+		"unlocked_syntax": GestorSintaxis.get_sintaxis_desbloqueada(),
+	}
+
+
+func _solicitar_guardado_progreso() -> void:
+	ProgressService.save_progress(get_progress_state())
+
+
+func actualizar_mejoras_visual() -> void:
+	if boton_while != null:
+		boton_while.disabled = GestorSintaxis.esta_desbloqueada("while")
+	if boton_for != null:
+		boton_for.disabled = GestorSintaxis.esta_desbloqueada("for")
+	if boton_if != null:
+		boton_if.disabled = GestorSintaxis.esta_desbloqueada("if")
+	if boton_expansion != null:
+		var mundo := get_parent()
+		boton_expansion.disabled = mundo != null and mundo.mapa_3x3_desbloqueado
+
 func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem) -> void:
 	# 1. Verificar si ya se compró previamente
 	if GestorSintaxis.esta_desbloqueada(item_id):
@@ -272,12 +308,14 @@ func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem
 			linea_conectora.modulate = Color(1.0, 0.84, 0.0) 
 			
 		print(item_id + " adquirido exitosamente.")
+		_solicitar_guardado_progreso()
 	else:
 		print("Minerales insuficientes para comprar: " + item_id)
 		
 func _sumar_minerales_rover(cantidad: int) -> void:
 	minerales_rover = mini(minerales_rover + cantidad, CAPACIDAD_ROVER)
 	actualizar_contadores()
+	_solicitar_guardado_progreso()
 	
 func procesar_transferencia() -> void:
 	if nodo_nave == null:
@@ -306,6 +344,7 @@ func procesar_transferencia() -> void:
 		
 		# Actualizamos los números en pantalla
 		actualizar_contadores()
+		_solicitar_guardado_progreso()
 	else:
 		print("Error de transferencia: El Rover está muy lejos de la base.")
 		
@@ -331,6 +370,7 @@ func _on_button_expansion_1_pressed() -> void:
 		minerales_nave -= costo
 		actualizar_contadores()
 		boton_expansion.disabled = true
+		_solicitar_guardado_progreso()
 
 
 func _on_button_expansion_2_pressed() -> void:
