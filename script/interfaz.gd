@@ -39,6 +39,7 @@ var minerales_rover : int = 0
 @onready var boton_tienda = $ContenedorTienda/BotonTienda
 @onready var boton_while = $PanelTienda/LienzoArbol/ButtonWhile
 @onready var boton_for = $PanelTienda/LienzoArbol/ButtonFor
+@onready var boton_if = $PanelTienda/LienzoArbol/ButtonIf
 @onready var boton_expansion = $PanelTienda/LienzoArbol/ButtonExpansion1
 
 const PRECIOS = {
@@ -61,6 +62,7 @@ func _ready() -> void:
 	
 	# Actualizamos los textos al iniciar
 	actualizar_contadores()
+	actualizar_mejoras_visual()
 	# Conectamos la señal del rover a una nueva función de la interfaz
 	if mi_rover != null:
 		mi_rover.mineral_recolectado.connect(_sumar_minerales_rover)
@@ -248,6 +250,26 @@ func actualizar_contadores() -> void:
 		label_nave.text = "Nave: " + str(minerales_nave) + "/" + str(CAPACIDAD_NAVE)
 	if label_rover != null:
 		label_rover.text = "Rover: " + str(minerales_rover) + "/" + str(CAPACIDAD_ROVER)
+
+
+# Aplica solamente el estado persistente que corresponde a la interfaz.
+func aplicar_progreso(progress: Dictionary) -> void:
+	minerales_nave = maxi(0, int(progress.get("minerals_ship", 0)))
+	minerales_rover = maxi(0, int(progress.get("minerals_rover", 0)))
+	actualizar_contadores()
+	actualizar_mejoras_visual()
+
+
+func actualizar_mejoras_visual() -> void:
+	if boton_while != null:
+		boton_while.disabled = GestorSintaxis.esta_desbloqueada("while")
+	if boton_for != null:
+		boton_for.disabled = GestorSintaxis.esta_desbloqueada("for")
+	if boton_if != null:
+		boton_if.disabled = GestorSintaxis.esta_desbloqueada("if")
+	if boton_expansion != null:
+		var mundo := get_parent()
+		boton_expansion.disabled = mundo != null and mundo.mapa_3x3_desbloqueado
 
 func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem) -> void:
 	# 1. Verificar si ya se compró previamente
