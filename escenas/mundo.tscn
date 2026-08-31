@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://dqmlj1jkvco4u" path="res://script/ciclo_solar.gd" id="5_16hu1"]
 [ext_resource type="PackedScene" uid="uid://b0kuh5v2yxqd7" path="res://escenas/nave.tscn" id="8_txhqv"]
 [ext_resource type="Texture2D" uid="uid://njub7ajny3gy" path="res://assets/sky/cielo_espacial_4k.png" id="9_cielo"]
+[ext_resource type="Script" uid="uid://chr26du17u3ol" path="res://script/menu_pausa.gd" id="10_pausa"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_codigo"]
 bg_color = Color(4.4370537e-08, 0.067600854, 0.00088399946, 0.7607843)
@@ -105,30 +106,48 @@ corner_radius_bottom_left = 3
 corner_detail = 5
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tienda_panel"]
-bg_color = Color(0.075, 0.07, 0.135, 0.99)
+bg_color = Color(0.11, 0.11, 0.12, 0.98)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(0.43, 0.42, 0.59, 1)
+border_color = Color(0.58, 0.58, 0.61, 1)
 corner_radius_top_left = 20
 corner_radius_top_right = 20
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
-shadow_color = Color(0.018, 0.015, 0.04, 0.95)
+shadow_color = Color(0.015, 0.015, 0.018, 0.95)
 shadow_offset = Vector2(10, 10)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tienda_disabled"]
-bg_color = Color(0.085, 0.08, 0.13, 0.9)
+bg_color = Color(0.09, 0.09, 0.1, 0.9)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.27, 0.26, 0.36, 1)
+border_color = Color(0.34, 0.34, 0.37, 1)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pausa_panel"]
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+bg_color = Color(0.11, 0.11, 0.12, 0.98)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.58, 0.58, 0.61, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0.015, 0.015, 0.018, 0.95)
+shadow_offset = Vector2(10, 10)
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_espacio"]
 panorama = ExtResource("9_cielo")
@@ -344,22 +363,22 @@ text = "Invierte los minerales de la nave para ampliar las capacidades del rover
 [node name="Line2D" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=256662853]
 points = PackedVector2Array(500, 205, 500, 245, 240, 245, 240, 315, 125, 315, 125, 455)
 width = 4.0
-default_color = Color(0.42, 0.41, 0.58, 1)
+default_color = Color(0.58, 0.58, 0.61, 1)
 
 [node name="Line2D2" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1749080935]
 points = PackedVector2Array(500, 205, 500, 245, 760, 245, 760, 315)
 width = 4.0
-default_color = Color(0.42, 0.41, 0.58, 1)
+default_color = Color(0.58, 0.58, 0.61, 1)
 
 [node name="Line2D3" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1908208215]
 points = PackedVector2Array(500, 205, 500, 315)
 width = 4.0
-default_color = Color(0.42, 0.41, 0.58, 1)
+default_color = Color(0.58, 0.58, 0.61, 1)
 
 [node name="Line2D4" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=849995506]
 points = PackedVector2Array(760, 315, 875, 315, 875, 455)
 width = 4.0
-default_color = Color(0.42, 0.41, 0.58, 1)
+default_color = Color(0.58, 0.58, 0.61, 1)
 
 [node name="ButtonWhile" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1074921425]
 layout_mode = 0
@@ -367,7 +386,8 @@ offset_left = 425.0
 offset_top = 155.0
 offset_right = 575.0
 offset_bottom = 225.0
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
+theme_override_colors/font_disabled_color = Color(0.55, 0.55, 0.58, 1)
 theme_override_font_sizes/font_size = 17
 theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
@@ -381,7 +401,8 @@ offset_left = 425.0
 offset_top = 280.0
 offset_right = 575.0
 offset_bottom = 350.0
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
+theme_override_colors/font_disabled_color = Color(0.55, 0.55, 0.58, 1)
 theme_override_font_sizes/font_size = 17
 theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
@@ -401,7 +422,8 @@ comandos un número exacto de veces.
 Ideal para trayectos largos.
 
 Costo: 30 minerales"
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
+theme_override_colors/font_disabled_color = Color(0.55, 0.55, 0.58, 1)
 theme_override_font_sizes/font_size = 17
 theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
@@ -421,7 +443,8 @@ comandos un número exacto de veces.
 Ideal para trayectos largos.
 
 Costo: 30 minerales"
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
+theme_override_colors/font_disabled_color = Color(0.55, 0.55, 0.58, 1)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
@@ -439,7 +462,8 @@ offset_bottom = 350.0
 tooltip_text = "Expande el terreno disponible a una cuadrícula de 3x3.
 
 Costo: 30 minerales"
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
+theme_override_colors/font_disabled_color = Color(0.55, 0.55, 0.58, 1)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
@@ -454,7 +478,8 @@ offset_top = 420.0
 offset_right = 950.0
 offset_bottom = 490.0
 tooltip_text = "Segunda expansión del terreno. Disponible en una actualización futura."
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
+theme_override_colors/font_disabled_color = Color(0.55, 0.55, 0.58, 1)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
@@ -469,7 +494,7 @@ offset_left = 875.0
 offset_top = 25.0
 offset_right = 955.0
 offset_bottom = 65.0
-theme_override_colors/font_color = Color(0.79, 0.77, 0.92, 1)
+theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
 theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_4vydk")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
@@ -496,6 +521,83 @@ text = "Rover: 0/5"
 layout_mode = 2
 text = "Nave: 0/15"
 
+[node name="MenuPausa" type="Control" parent="CanvasLayer" unique_id=1223488192]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("10_pausa")
+
+[node name="OscurecerFondo" type="ColorRect" parent="CanvasLayer/MenuPausa" unique_id=666744865]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.68)
+
+[node name="Centro" type="CenterContainer" parent="CanvasLayer/MenuPausa" unique_id=415574917]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="CanvasLayer/MenuPausa/Centro" unique_id=911668578]
+custom_minimum_size = Vector2(360, 245)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pausa_panel")
+
+[node name="Contenido" type="VBoxContainer" parent="CanvasLayer/MenuPausa/Centro/Panel" unique_id=1602645326]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Titulo" type="Label" parent="CanvasLayer/MenuPausa/Centro/Panel/Contenido" unique_id=820133862]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
+theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 26
+text = "◆ JUEGO EN PAUSA ◆"
+horizontal_alignment = 1
+
+[node name="Separador" type="HSeparator" parent="CanvasLayer/MenuPausa/Centro/Panel/Contenido" unique_id=2029083768]
+layout_mode = 2
+
+[node name="BotonConfiguracion" type="Button" parent="CanvasLayer/MenuPausa/Centro/Panel/Contenido" unique_id=2063336936]
+layout_mode = 2
+tooltip_text = "Disponible próximamente"
+theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
+theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 19
+theme_override_styles/normal = SubResource("StyleBoxFlat_4vydk")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+text = "CONFIGURACIÓN"
+
+[node name="BotonSalirMenu" type="Button" parent="CanvasLayer/MenuPausa/Centro/Panel/Contenido" unique_id=845092181]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
+theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 19
+theme_override_styles/normal = SubResource("StyleBoxFlat_4vydk")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+text = "SALIR AL MENÚ"
+
+[node name="Ayuda" type="Label" parent="CanvasLayer/MenuPausa/Centro/Panel/Contenido" unique_id=170534780]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.62, 0.65, 1)
+theme_override_font_sizes/font_size = 13
+text = "Presiona ESC para continuar"
+horizontal_alignment = 1
+
 [node name="Camera3D" type="Camera3D" parent="." unique_id=173857337]
 transform = Transform3D(1, 0, 0, 0, 0.8558924, 0.517154, 0, -0.517154, 0.8558924, 2.855854, 8.372469, 6.1343126)
 
@@ -521,3 +623,4 @@ transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 3.0179539, 4.0494704, -
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonExpansion1" to="CanvasLayer" method="_on_button_expansion_1_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonExpansion2" to="CanvasLayer" method="_on_button_expansion_2_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/BotonCerrar" to="CanvasLayer" method="_on_boton_cerrar_pressed"]
+[connection signal="pressed" from="CanvasLayer/MenuPausa/Centro/Panel/Contenido/BotonSalirMenu" to="CanvasLayer/MenuPausa" method="_on_boton_salir_menu_pressed"]
