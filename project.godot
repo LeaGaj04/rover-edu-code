@@ -20,6 +20,14 @@ Supabase="*uid://8fusfri8k4ft"
 GestorSintaxis="*res://script/services/gestor_sintaxis.gd"
 ProgressService="*res://script/services/progress_service.gd"
 
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/mode=2
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
 [dotnet]
 
 project/assembly_name="RoverEduCode"
