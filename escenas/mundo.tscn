@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://dxhwjk03om5sy" path="res://escenas/Asteroide.tscn" id="4_v12yk"]
 [ext_resource type="Script" uid="uid://dqmlj1jkvco4u" path="res://script/ciclo_solar.gd" id="5_16hu1"]
 [ext_resource type="PackedScene" uid="uid://b0kuh5v2yxqd7" path="res://escenas/nave.tscn" id="8_txhqv"]
-[ext_resource type="Texture2D" uid="uid://njub7ajny3gy" path="res://assets/sky/cielo_espacial_4k.png" id="9_cielo"]
+[ext_resource type="Texture2D" uid="uid://mk4i0achjumg" path="res://assets/sky/cielo_espacial_suave_4k.png" id="9_cielo"]
 [ext_resource type="Script" uid="uid://chr26du17u3ol" path="res://script/menu_pausa.gd" id="10_pausa"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_codigo"]
@@ -149,16 +149,24 @@ corner_radius_bottom_left = 20
 shadow_color = Color(0.015, 0.015, 0.018, 0.95)
 shadow_offset = Vector2(10, 10)
 
-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_espacio"]
-panorama = ExtResource("9_cielo")
-energy_multiplier = 0.8
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fondo_camara"]
+cull_mode = 2
+shading_mode = 0
+albedo_texture = ExtResource("9_cielo")
+uv1_scale = Vector3(0.888889, 1, 1)
+uv1_offset = Vector3(0.055556, 0, 0)
 
-[sub_resource type="Sky" id="Sky_x6etp"]
-sky_material = SubResource("PanoramaSkyMaterial_espacio")
+[sub_resource type="QuadMesh" id="QuadMesh_fondo_camara"]
+material = SubResource("StandardMaterial3D_fondo_camara")
+size = Vector2(3400, 1900)
 
 [sub_resource type="Environment" id="Environment_v88e1"]
-background_mode = 2
-sky = SubResource("Sky_x6etp")
+background_mode = 1
+background_color = Color(0.002, 0.004, 0.012, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.22, 0.3, 0.48, 1)
+ambient_light_energy = 0.45
+reflected_light_source = 1
 
 [node name="Mundo" type="Node3D" unique_id=661431235]
 script = ExtResource("1_7oex1")
@@ -600,6 +608,11 @@ horizontal_alignment = 1
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=173857337]
 transform = Transform3D(1, 0, 0, 0, 0.8558924, 0.517154, 0, -0.517154, 0.8558924, 2.855854, 8.372469, 6.1343126)
+
+[node name="FondoEspacial" type="MeshInstance3D" parent="Camera3D" unique_id=1920698278]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.449585, 188.1646, -1011.3086)
+cast_shadow = 0
+mesh = SubResource("QuadMesh_fondo_camara")
 
 [node name="Meshy_AI_Low_Poly_Moon_0820024724_texture" parent="." unique_id=1049214347 instance=ExtResource("4_v12yk")]
 transform = Transform3D(70, 0, 0, 0, 70, 0, 0, 0, 70, 27.699373, -86.83779, -19.231441)
