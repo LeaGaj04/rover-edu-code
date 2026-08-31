@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dorjiuvlmgpes"]
 
 [ext_resource type="Script" uid="uid://xb6duvsny44v" path="res://script/menu_inicio.gd" id="1_leqng"]
-[ext_resource type="Texture2D" uid="uid://kmvtsuxbj037" path="res://Fondos/IMG_20260828_200204_326.jpg" id="2_lkhye"]
+[ext_resource type="Texture2D" uid="uid://b5w5jm2fwjj3f" path="res://Fondos/fondo prueba 1.png" id="2_lkhye"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ppgcv"]
 content_margin_left = 16.0

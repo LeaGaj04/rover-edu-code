@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dyhy7jwkqhw2o"]
 
 [ext_resource type="Script" uid="uid://ct48y8s8ntq7e" path="res://script/auth.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://kmvtsuxbj037" path="res://Fondos/IMG_20260828_200204_326.jpg" id="2"]
+[ext_resource type="Texture2D" uid="uid://b5w5jm2fwjj3f" path="res://Fondos/fondo prueba 1.png" id="2_fkd26"]
 
 [sub_resource type="StyleBoxFlat" id="PanelAuth"]
 content_margin_left = 28.0
@@ -121,7 +121,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2")
+texture = ExtResource("2_fkd26")
 expand_mode = 1
 stretch_mode = 6
 
