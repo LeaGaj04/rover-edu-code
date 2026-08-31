@@ -38,6 +38,22 @@ corner_radius_bottom_left = 12
 shadow_color = Color(0.003921569, 0.09019608, 0.011764706, 0.6509804)
 shadow_offset = Vector2(6, 6)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_pressed"]
+content_margin_left = 14.0
+content_margin_top = 9.0
+content_margin_right = 14.0
+content_margin_bottom = 9.0
+bg_color = Color(0.01, 0.045, 0.015, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.3, 0.5, 0.35, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_hover"]
 content_margin_left = 14.0
 content_margin_top = 9.0
@@ -60,22 +76,6 @@ expand_margin_bottom = 2.0
 shadow_color = Color(0.003921569, 0.09019608, 0.011764706, 0.6509804)
 shadow_offset = Vector2(4, 4)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_menu_pressed"]
-content_margin_left = 14.0
-content_margin_top = 9.0
-content_margin_right = 14.0
-content_margin_bottom = 9.0
-bg_color = Color(0.01, 0.045, 0.015, 0.95)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.3, 0.5, 0.35, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f382d"]
 content_margin_left = 20.0
 content_margin_top = 20.0
@@ -91,17 +91,6 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 shadow_size = 12
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g30ce"]
-content_margin_left = 5.0
-content_margin_top = 5.0
-content_margin_right = 5.0
-content_margin_bottom = 5.0
-bg_color = Color(1, 1, 1, 0.15686275)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
 
 [node name="MenuInicio" type="Control" unique_id=528121207]
 layout_mode = 3
@@ -156,8 +145,8 @@ theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxFlat_jc06o")
-theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_menu_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
 text = "Continuar Partida"
 
 [node name="BotonConfiguracion" type="Button" parent="PanelMenu/ContenedorPrincipal" unique_id=126250605]
@@ -167,8 +156,8 @@ theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxFlat_jc06o")
-theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_menu_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
 text = "Configuración"
 
 [node name="BotonSalir" type="Button" parent="PanelMenu/ContenedorPrincipal" unique_id=469375245]
@@ -178,8 +167,8 @@ theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxFlat_jc06o")
-theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_menu_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
 text = "Salir"
 
 [node name="PanelPerfil" type="PanelContainer" parent="." unique_id=915649287]
@@ -205,12 +194,11 @@ theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 20
 theme_override_styles/normal = SubResource("StyleBoxFlat_jc06o")
-theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_menu_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
 text = "Iniciar Sesion"
-pivot_offset = Vector2(71.5, 20)
 
-[node name="ProfileDropdown" type="PanelContainer" parent="."]
+[node name="ProfileDropdown" type="PanelContainer" parent="." unique_id=299738788]
 visible = false
 layout_mode = 0
 offset_left = 986.0
@@ -218,27 +206,27 @@ offset_top = 94.0
 offset_right = 1129.0
 offset_bottom = 174.0
 
-[node name="Options" type="VBoxContainer" parent="ProfileDropdown"]
+[node name="Options" type="VBoxContainer" parent="ProfileDropdown" unique_id=319979401]
 layout_mode = 2
 
-[node name="VerPerfil" type="Button" parent="ProfileDropdown/Options"]
+[node name="VerPerfil" type="Button" parent="ProfileDropdown/Options" unique_id=1002788772]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
 theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
 theme_override_constants/outline_size = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_jc06o")
-theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_menu_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
 text = "Ver mi perfil"
 
-[node name="CerrarSesion" type="Button" parent="ProfileDropdown/Options"]
+[node name="CerrarSesion" type="Button" parent="ProfileDropdown/Options" unique_id=1966962885]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
 theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
 theme_override_constants/outline_size = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_jc06o")
-theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_menu_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_menu_hover")
 text = "Cerrar sesión"
 
 [connection signal="pressed" from="PanelMenu/ContenedorPrincipal/BotonJugar" to="." method="_on_boton_jugar_pressed"]
