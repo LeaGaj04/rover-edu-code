@@ -624,7 +624,7 @@ environment = SubResource("Environment_v88e1")
 script = ExtResource("5_16hu1")
 
 [node name="Nave" parent="." unique_id=955676958 instance=ExtResource("8_txhqv")]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 3.0179539, 4.0494704, -11.095957)
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 3.0179539, 1.2233245, -11.095957)
 
 [connection signal="pressed" from="CanvasLayer/PanelCodigo/BarraTitulo/BotonMinimizar" to="CanvasLayer" method="_on_boton_minimizar_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelCodigo/Contenido/Button" to="CanvasLayer" method="_on_button_pressed"]

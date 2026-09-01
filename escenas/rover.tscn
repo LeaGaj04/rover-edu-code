@@ -1,17 +1,19 @@
 [gd_scene format=3 uid="uid://dgngl5x1t4er7"]
 
 [ext_resource type="Script" uid="uid://grkn58ugprsn" path="res://script/rover.gd" id="1_il8ej"]
-[ext_resource type="PackedScene" uid="uid://cot8m35kjbv5q" path="res://Modelado_Rover/Rover.glb" id="2_c6mxy"]
+[ext_resource type="PackedScene" uid="uid://ofeow1hg3mg4" path="res://Modelados3D/Rover.glb" id="2_c6mxy"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_d4gi6"]
+size = Vector3(1.2236328, 1, 1.5952148)
 
 [node name="Rover" type="CharacterBody3D" unique_id=771188890]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 script = ExtResource("1_il8ej")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=927511492]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.111816406, 0, 0.29760742)
 shape = SubResource("BoxShape3D_d4gi6")
 debug_color = Color(0.4057711, 0.5572366, 0.6652401, 0.41960785)
 
-[node name="Rover" parent="." unique_id=1780725569 instance=ExtResource("2_c6mxy")]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, -0.0006167479, -0.6285205, -5.391781e-11)
+[node name="Rover" parent="CollisionShape3D" unique_id=1980978573 instance=ExtResource("2_c6mxy")]
+transform = Transform3D(0.15, 0, 0, 0, 0.15, 0, 0, 0, 0.15, -0.03525424, -0.42255735, -3.0820235e-09)

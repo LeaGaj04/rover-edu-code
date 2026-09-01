@@ -1,15 +1,14 @@
 [gd_scene format=3 uid="uid://b0kuh5v2yxqd7"]
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_njpgc"]
+[ext_resource type="PackedScene" uid="uid://n7enibs6yxj7" path="res://Modelados3D/Nave_Server.glb" id="1_0j810"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_mb57o"]
 
 [node name="Nave" type="StaticBody3D" unique_id=411070578]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1210209429]
-transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0.5294356, 0)
-mesh = SubResource("CapsuleMesh_njpgc")
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=833374680]
-transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0.5294356, 0)
+transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 2.6318684, 0)
 shape = SubResource("CapsuleShape3D_mb57o")
+
+[node name="Nave_Server" parent="." unique_id=102086204 instance=ExtResource("1_0j810")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)

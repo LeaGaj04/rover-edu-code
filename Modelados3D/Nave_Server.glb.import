@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://cot8m35kjbv5q"
-path="res://.godot/imported/Rover.glb-0d44603c8b099f39abe9ed0ef2157a76.scn"
+uid="uid://n7enibs6yxj7"
+path="res://.godot/imported/Nave_Server.glb-5f835daa1394cf0d0dc9eba5134cc616.scn"
 
 [deps]
 
-source_file="res://Modelado_Rover/Rover.glb"
-dest_files=["res://.godot/imported/Rover.glb-0d44603c8b099f39abe9ed0ef2157a76.scn"]
+source_file="res://Modelados3D/Nave_Server.glb"
+dest_files=["res://.godot/imported/Nave_Server.glb-5f835daa1394cf0d0dc9eba5134cc616.scn"]
 
 [params]
 
