@@ -5,6 +5,7 @@ const ESCENA_MUNDO = "res://escenas/mundo.tscn"
 const ESCENA_AUTH = "res://escenas/auth.tscn"
 const ESCENA_PERFIL = "res://escenas/perfil.tscn"
 @onready var boton_login: Button = $PanelPerfil/HBoxContainer/ButtonLogin
+@onready var panel_perfil: PanelContainer = $PanelPerfil
 @onready var boton_jugar: Button = $PanelMenu/ContenedorPrincipal/BotonJugar
 @onready var dropdown: PanelContainer = $ProfileDropdown
 @onready var boton_ver_perfil: Button = $ProfileDropdown/Options/VerPerfil
@@ -43,20 +44,22 @@ func _on_boton_login_pressed() -> void:
 
 func abrir_dropdown() -> void:
 	dropdown_abierto = true
+	dropdown.position = Vector2(
+		panel_perfil.position.x,
+		panel_perfil.position.y + panel_perfil.size.y + 12.0
+	)
+	dropdown.size.x = panel_perfil.size.x
 	dropdown.visible = true
 	dropdown.modulate.a = 0.0
-	dropdown.position.y -= 8.0
-	var tween := create_tween().set_parallel(true)
+	var tween := create_tween()
 	tween.tween_property(dropdown, "modulate:a", 1.0, 0.18)
-	tween.tween_property(dropdown, "position:y", dropdown.position.y + 8.0, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func cerrar_dropdown() -> void:
 	if not dropdown_abierto and not dropdown.visible:
 		return
 	dropdown_abierto = false
-	var tween := create_tween().set_parallel(true)
+	var tween := create_tween()
 	tween.tween_property(dropdown, "modulate:a", 0.0, 0.15)
-	tween.tween_property(dropdown, "position:y", dropdown.position.y - 8.0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.chain().tween_callback(dropdown.hide)
 
 func _animar_hover(entrando: bool) -> void:

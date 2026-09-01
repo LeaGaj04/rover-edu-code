@@ -203,11 +203,15 @@ text = "Iniciar Sesion"
 
 [node name="ProfileDropdown" type="PanelContainer" parent="." unique_id=299738788]
 visible = false
-layout_mode = 0
-offset_left = 986.0
-offset_top = 94.0
-offset_right = 1129.0
-offset_bottom = 174.0
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -167.0
+offset_top = 99.0
+offset_right = -24.0
+offset_bottom = 179.0
+grow_horizontal = 0
 
 [node name="Options" type="VBoxContainer" parent="ProfileDropdown" unique_id=319979401]
 layout_mode = 2
