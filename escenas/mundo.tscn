@@ -7,6 +7,8 @@
 [ext_resource type="Script" uid="uid://br4t1ndl8asky" path="res://script/interfaz.gd" id="2_6wjgb"]
 [ext_resource type="PackedScene" uid="uid://dxhwjk03om5sy" path="res://escenas/Asteroide.tscn" id="4_v12yk"]
 [ext_resource type="Script" uid="uid://dqmlj1jkvco4u" path="res://script/ciclo_solar.gd" id="5_16hu1"]
+[ext_resource type="Texture2D" uid="uid://debjkdltq8c76" path="res://Minerales/MineralRover.png" id="6_kckb2"]
+[ext_resource type="Texture2D" uid="uid://ehjvumyqcfbr" path="res://Minerales/MineraNave.png" id="7_ijldy"]
 [ext_resource type="PackedScene" uid="uid://b0kuh5v2yxqd7" path="res://escenas/nave.tscn" id="8_txhqv"]
 [ext_resource type="Texture2D" uid="uid://mk4i0achjumg" path="res://assets/sky/cielo_espacial_suave_4k.png" id="9_cielo"]
 [ext_resource type="Script" uid="uid://chr26du17u3ol" path="res://script/menu_pausa.gd" id="10_pausa"]
@@ -190,10 +192,10 @@ label_nave = NodePath("ContenedorContadores/HBoxContainer/LabelNave")
 label_rover = NodePath("ContenedorContadores/HBoxContainer/LabelRover")
 
 [node name="PanelCodigo" type="Panel" parent="CanvasLayer" unique_id=1087549051]
-offset_left = 24.0
-offset_top = 350.0
-offset_right = 654.0
-offset_bottom = 626.0
+offset_left = 13.0
+offset_top = 784.0
+offset_right = 643.0
+offset_bottom = 1060.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel_codigo")
 
 [node name="BarraTitulo" type="Panel" parent="CanvasLayer/PanelCodigo" unique_id=1061368720]
@@ -216,7 +218,7 @@ theme_override_colors/font_color = Color(0.7608024, 0.9369633, 0.7753063, 1)
 theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 18
-text = "◆ CONSOLA DEL ROVER"
+text = "◆ CONSOLA ROVER"
 
 [node name="BotonMinimizar" type="Button" parent="CanvasLayer/PanelCodigo/BarraTitulo" unique_id=1342243606]
 layout_mode = 0
@@ -512,8 +514,10 @@ text = "CERRAR"
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -179.0
-offset_bottom = 40.0
+offset_left = -229.0
+offset_top = -7.0
+offset_right = -50.0
+offset_bottom = 33.0
 grow_horizontal = 0
 theme_override_constants/margin_top = 15
 theme_override_constants/margin_right = 15
@@ -521,13 +525,25 @@ theme_override_constants/margin_right = 15
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/ContenedorContadores" unique_id=1782200164]
 layout_mode = 2
 
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/ContenedorContadores/HBoxContainer" unique_id=1979789161]
+custom_minimum_size = Vector2(65, 65)
+layout_mode = 2
+texture = ExtResource("6_kckb2")
+expand_mode = 1
+
 [node name="LabelRover" type="Label" parent="CanvasLayer/ContenedorContadores/HBoxContainer" unique_id=1773966557]
 layout_mode = 2
-text = "Rover: 0/5"
+text = "0/10"
+
+[node name="TextureRect2" type="TextureRect" parent="CanvasLayer/ContenedorContadores/HBoxContainer" unique_id=1827506586]
+custom_minimum_size = Vector2(65, 65)
+layout_mode = 2
+texture = ExtResource("7_ijldy")
+expand_mode = 1
 
 [node name="LabelNave" type="Label" parent="CanvasLayer/ContenedorContadores/HBoxContainer" unique_id=896875989]
 layout_mode = 2
-text = "Nave: 0/15"
+text = "0/100"
 
 [node name="MenuPausa" type="Control" parent="CanvasLayer" unique_id=1223488192]
 process_mode = 3

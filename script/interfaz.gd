@@ -244,9 +244,11 @@ func _on_boton_cerrar_pressed() -> void:
 	
 func actualizar_contadores() -> void:
 	if label_nave != null:
-		label_nave.text = "Nave: " + str(minerales_nave) + "/" + str(CAPACIDAD_NAVE)
+		#Nave
+		label_nave.text = ": " + str(minerales_nave) + "/" + str(CAPACIDAD_NAVE)
 	if label_rover != null:
-		label_rover.text = "Rover: " + str(minerales_rover) + "/" + str(CAPACIDAD_ROVER)
+		#Rover
+		label_rover.text = ": " + str(minerales_rover) + "/" + str(CAPACIDAD_ROVER)
 
 
 # Aplica solamente el estado persistente que corresponde a la interfaz.
