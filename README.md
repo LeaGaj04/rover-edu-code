@@ -1,5 +1,6 @@
 <img width="1920" height="1021" alt="image" src="https://github.com/user-attachments/assets/d6100085-377e-4cf8-a454-2ce147ed9e77" />
 
+<img width="1920" height="1039" alt="Educode" src="https://github.com/user-attachments/assets/34b3facc-bd29-45d0-9deb-be397d7b284f" />
 
 
 # rover-edu-code
