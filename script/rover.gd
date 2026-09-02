@@ -15,22 +15,22 @@ var esta_moviendose: bool = false
 func norte(pasos: int = 1) -> void:
 	for i in range(pasos):
 		cola_instrucciones.append(Vector3.FORWARD)
-	_intentar_mover()
+	await _intentar_mover()
 
 func sur(pasos: int = 1) -> void:
 	for i in range(pasos):
 		cola_instrucciones.append(Vector3.BACK)
-	_intentar_mover()
+	await _intentar_mover()
 
 func oeste(pasos: int = 1) -> void:
 	for i in range(pasos):
 		cola_instrucciones.append(Vector3.LEFT)
-	_intentar_mover()
+	await _intentar_mover()
 
 func este(pasos: int = 1) -> void:
 	for i in range(pasos):
 		cola_instrucciones.append(Vector3.RIGHT)
-	_intentar_mover()
+	await _intentar_mover()
 
 
 # --- PROCESADOR AUTOMÁTICO EN SEGUNDO PLANO ---

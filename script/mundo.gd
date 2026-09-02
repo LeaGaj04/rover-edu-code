@@ -5,6 +5,7 @@ extends Node3D
 
 # Esta es la casilla cuyo centro queda junto a la nave.
 const CASILLA_INICIAL := Vector3i(1, 0, -4)
+const CASILLA_TRANSFERENCIA := CASILLA_INICIAL
 
 # Variable que define el tamaño del mapa actual
 # 0 = mapa 1x1 (inicio)
@@ -89,6 +90,17 @@ func spawn_mineral_aleatorio():
 	# 4. Lo posicionamos en ese centro exacto, ajustando solo la altura (Y) a 0.5
 	nuevo_mineral.position = Vector3(centro_exacto.x, 0.5, centro_exacto.z)
 
+func rover_esta_en_casilla_transferencia(rover: Node3D) -> bool:
+	if rover == null:
+		return false
+
+	var posicion_local := grid_map.to_local(rover.global_position)
+	var casilla_actual := grid_map.local_to_map(posicion_local)
+
+	# El movimiento ocurre horizontalmente.
+	casilla_actual.y = CASILLA_TRANSFERENCIA.y
+
+	return casilla_actual == CASILLA_TRANSFERENCIA
 
 func expandir_mapa_3x3() -> bool:
 	if mapa_3x3_desbloqueado:
