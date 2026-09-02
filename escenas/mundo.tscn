@@ -181,9 +181,8 @@ metadata/_editor_floor_ = Vector3(0, 0, 0)
 [node name="Rover" parent="GridMap" unique_id=771188890 instance=ExtResource("1_cdbbl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0728207, 1.6373665, -8.629317)
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=879746297 node_paths=PackedStringArray("nodo_nave", "mi_rover", "label_nave", "label_rover")]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=879746297 node_paths=PackedStringArray("mi_rover", "label_nave", "label_rover")]
 script = ExtResource("2_6wjgb")
-nodo_nave = NodePath("../Nave")
 mi_rover = NodePath("../GridMap/Rover")
 label_nave = NodePath("ContenedorContadores/HBoxContainer/LabelNave")
 label_rover = NodePath("ContenedorContadores/HBoxContainer/LabelRover")

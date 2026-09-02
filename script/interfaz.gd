@@ -1,7 +1,5 @@
 extends CanvasLayer
 
-@export var nodo_nave : Node3D
-
 @onready var panel_codigo: Panel = $PanelCodigo
 @onready var barra_codigo: Panel = $PanelCodigo/BarraTitulo
 @onready var contenido_codigo: Control = $PanelCodigo/Contenido
@@ -66,8 +64,6 @@ func _ready() -> void:
 	# Conectamos la señal del rover a una nueva función de la interfaz
 	if mi_rover != null:
 		mi_rover.mineral_recolectado.connect(_sumar_minerales_rover)
-	# Como ya conectaste la señal desde el editor (el ícono de wifi en la foto),
-	# NO necesitamos conectarla por código aquí. ¡Así que lo dejamos limpio!
 
 
 func _on_boton_tienda_pressed() -> void:
@@ -205,7 +201,7 @@ func _on_button_pressed() -> void:
 		if dentro_parentesis.is_valid_int():
 			pasos = int(dentro_parentesis)
 		
-		ejecutar_movimiento_rover(comando, pasos)
+		await ejecutar_movimiento_rover(comando, pasos)
 
 
 func ejecutar_movimiento_rover(comando: String, pasos: int) -> void:
@@ -216,13 +212,13 @@ func ejecutar_movimiento_rover(comando: String, pasos: int) -> void:
 	print("Ejecutando: ", comando, " (", pasos, " pasos)")
 	
 	if comando == "norte":
-		mi_rover.norte(pasos)
+		await mi_rover.norte(pasos)
 	elif comando == "sur":
-		mi_rover.sur(pasos)
+		await mi_rover.sur(pasos)
 	elif comando == "este":
-		mi_rover.este(pasos)
+		await mi_rover.este(pasos)
 	elif comando == "oeste":
-		mi_rover.oeste(pasos)
+		await mi_rover.oeste(pasos)
 	elif comando == "minar":
 		if minerales_rover >= CAPACIDAD_ROVER:
 			print("Inventario lleno: el Rover solo puede transportar ", CAPACIDAD_ROVER, " minerales.")
@@ -317,35 +313,42 @@ func _sumar_minerales_rover(cantidad: int) -> void:
 	_solicitar_guardado_progreso()
 	
 func procesar_transferencia() -> void:
-	if nodo_nave == null:
-		print("Error: La Nave no está asignada en el Inspector.")
+	if mi_rover == null:
+		print("Error: El Rover no está asignado.")
 		return
-		
+
 	if minerales_rover == 0:
 		print("El Rover no tiene minerales para transferir.")
 		return
 
 	if minerales_nave >= CAPACIDAD_NAVE:
-		print("La Nave está llena. Capacidad máxima: ", CAPACIDAD_NAVE, " minerales.")
+		print("La Nave está llena. Capacidad máxima: ", CAPACIDAD_NAVE)
 		return
-		
-	# Calculamos la distancia entre el rover y la nave
-	var distancia = mi_rover.global_position.distance_to(nodo_nave.global_position)
-	
-	# Si la distancia es menor a 2.5 unidades
-	if distancia <= 5.0:
-		var espacio_disponible = CAPACIDAD_NAVE - minerales_nave
-		var cantidad_transferida = mini(minerales_rover, espacio_disponible)
-		print("Iniciando transferencia segura... ", cantidad_transferida, " minerales enviados a la Nave.")
 
-		minerales_nave += cantidad_transferida
-		minerales_rover -= cantidad_transferida
-		
-		# Actualizamos los números en pantalla
-		actualizar_contadores()
-		_solicitar_guardado_progreso()
-	else:
-		print("Error de transferencia: El Rover está muy lejos de la base.")
+	var mundo := get_parent()
+
+	if mundo == null or not mundo.has_method("rover_esta_en_casilla_transferencia"):
+		print("Error: No se pudo comprobar la casilla de transferencia.")
+		return
+
+	if not mundo.rover_esta_en_casilla_transferencia(mi_rover):
+		print("Transferencia rechazada: lleva el Rover a la casilla inicial.")
+		return
+
+	var espacio_disponible := CAPACIDAD_NAVE - minerales_nave
+	var cantidad_transferida := mini(minerales_rover, espacio_disponible)
+
+	print(
+		"Transferencia completada: ",
+		cantidad_transferida,
+		" minerales enviados a la Nave."
+	)
+
+	minerales_nave += cantidad_transferida
+	minerales_rover -= cantidad_transferida
+
+	actualizar_contadores()
+	_solicitar_guardado_progreso()
 		
 func _on_button_while_pressed() -> void:
 	intentar_compra("while", boton_while, null)
