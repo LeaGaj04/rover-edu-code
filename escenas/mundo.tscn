@@ -5,13 +5,13 @@
 [ext_resource type="MeshLibrary" uid="uid://be0yvkqbcvra0" path="res://bloques.tres" id="1_glrvs"]
 [ext_resource type="PackedScene" uid="uid://dfvy6lib4ga2h" path="res://escenas/mineral.tscn" id="2_4vydk"]
 [ext_resource type="Script" uid="uid://br4t1ndl8asky" path="res://script/interfaz.gd" id="2_6wjgb"]
-[ext_resource type="PackedScene" uid="uid://dxhwjk03om5sy" path="res://escenas/Asteroide.tscn" id="4_v12yk"]
 [ext_resource type="Script" uid="uid://dqmlj1jkvco4u" path="res://script/ciclo_solar.gd" id="5_16hu1"]
 [ext_resource type="Texture2D" uid="uid://debjkdltq8c76" path="res://Minerales/MineralRover.png" id="6_kckb2"]
 [ext_resource type="Texture2D" uid="uid://ehjvumyqcfbr" path="res://Minerales/MineraNave.png" id="7_ijldy"]
 [ext_resource type="PackedScene" uid="uid://b0kuh5v2yxqd7" path="res://escenas/nave.tscn" id="8_txhqv"]
 [ext_resource type="Texture2D" uid="uid://mk4i0achjumg" path="res://assets/sky/cielo_espacial_suave_4k.png" id="9_cielo"]
 [ext_resource type="Script" uid="uid://chr26du17u3ol" path="res://script/menu_pausa.gd" id="10_pausa"]
+[ext_resource type="PackedScene" uid="uid://wgb3qc1i2srg" path="res://escenas/mapa.tscn" id="12_kckb2"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_codigo"]
 bg_color = Color(4.4370537e-08, 0.067600854, 0.00088399946, 0.7607843)
@@ -179,7 +179,7 @@ mesh_library = ExtResource("1_glrvs")
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
 [node name="Rover" parent="GridMap" unique_id=771188890 instance=ExtResource("1_cdbbl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.6373665, -7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0728207, 1.6373665, -8.629317)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=879746297 node_paths=PackedStringArray("nodo_nave", "mi_rover", "label_nave", "label_rover")]
 script = ExtResource("2_6wjgb")
@@ -620,15 +620,12 @@ text = "Presiona ESC para continuar"
 horizontal_alignment = 1
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=173857337]
-transform = Transform3D(1, 0, 0, 0, 0.8558924, 0.517154, 0, -0.517154, 0.8558924, 2.855854, 8.372469, 6.1343126)
+transform = Transform3D(1, 0, 0, 0, 0.8558924, 0.517154, 0, -0.517154, 0.8558924, 2.855854, 8.553883, 8.1447935)
 
 [node name="FondoEspacial" type="MeshInstance3D" parent="Camera3D" unique_id=1920698278]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.449585, 188.1646, -1011.3086)
+transform = Transform3D(0.9995616, -0.029166063, -0.005099421, 0.029163238, 0.9995746, -0.00062829256, 0.005115577, 0.00047934055, 0.99998695, -14.467957, 190.64882, -1010.8731)
 cast_shadow = 0
 mesh = SubResource("QuadMesh_fondo_camara")
-
-[node name="Meshy_AI_Low_Poly_Moon_0820024724_texture" parent="." unique_id=1049214347 instance=ExtResource("4_v12yk")]
-transform = Transform3D(70, 0, 0, 0, 70, 0, 0, 0, 70, 27.699373, -86.83779, -19.231441)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1866343555]
 environment = SubResource("Environment_v88e1")
@@ -638,6 +635,9 @@ script = ExtResource("5_16hu1")
 
 [node name="Nave" parent="." unique_id=955676958 instance=ExtResource("8_txhqv")]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 3.0179539, 1.2233245, -14.095957)
+
+[node name="Mapa" parent="." unique_id=1100740313 instance=ExtResource("12_kckb2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.692646, -3.315782, -6.873)
 
 [connection signal="pressed" from="CanvasLayer/PanelCodigo/BarraTitulo/BotonMinimizar" to="CanvasLayer" method="_on_boton_minimizar_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelCodigo/Contenido/Button" to="CanvasLayer" method="_on_button_pressed"]

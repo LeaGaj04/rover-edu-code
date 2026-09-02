@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bxn2jawvk5xif"
-path="res://.godot/imported/Asteroide.glb-70eb245b5b6d72cc83485b73d4c3c033.scn"
+uid="uid://bsrsg8okeph44"
+path="res://.godot/imported/Mateo2.glb-5448d94ef223768cf4223cb991b41df6.scn"
 
 [deps]
 
-source_file="res://Asteroide/Asteroide.glb"
-dest_files=["res://.godot/imported/Asteroide.glb-70eb245b5b6d72cc83485b73d4c3c033.scn"]
+source_file="res://Modelados3D/Mapa/Mateo2.glb"
+dest_files=["res://.godot/imported/Mateo2.glb-5448d94ef223768cf4223cb991b41df6.scn"]
 
 [params]
 
