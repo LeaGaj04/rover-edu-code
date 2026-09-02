@@ -4,7 +4,7 @@ extends Node3D
 @onready var grid_map: GridMap = $GridMap
 
 # Esta es la casilla cuyo centro queda junto a la nave.
-const CASILLA_INICIAL := Vector3i(1, 0, -4)
+const CASILLA_INICIAL := Vector3i.ZERO
 const CASILLA_TRANSFERENCIA := CASILLA_INICIAL
 
 # Variable que define el tamaño del mapa actual
@@ -81,14 +81,13 @@ func generar_minerales_iniciales():
 func spawn_mineral_aleatorio():
 	# Mientras el mapa está bloqueado, el mineral reaparece siempre en la
 	# única casilla disponible para que el jugador pueda farmearlo.
-	var centro_exacto = grid_map.map_to_local(CASILLA_INICIAL)
-	
-	# 3. Instanciamos el mineral
+	var centro_local := grid_map.map_to_local(CASILLA_INICIAL)
+	var centro_global := grid_map.to_global(centro_local)
+
 	var nuevo_mineral = mineral_scene.instantiate()
 	add_child(nuevo_mineral)
-	
-	# 4. Lo posicionamos en ese centro exacto, ajustando solo la altura (Y) a 0.5
-	nuevo_mineral.position = Vector3(centro_exacto.x, 0.5, centro_exacto.z)
+
+	nuevo_mineral.global_position = centro_global + Vector3(0, -0.4, 0.3)
 
 func rover_esta_en_casilla_transferencia(rover: Node3D) -> bool:
 	if rover == null:
