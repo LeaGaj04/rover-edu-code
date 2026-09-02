@@ -176,9 +176,6 @@ mineral_scene = ExtResource("2_4vydk")
 
 [node name="GridMap" type="GridMap" parent="." unique_id=647921843]
 mesh_library = ExtResource("1_glrvs")
-data = {
-"cells": PackedInt32Array(0, 1, 2, 0, 3, 2, 0, 0, 1, 0, 2, 1, 1, 3, 1, 1, 1, 1, 1, 2, 2, 1, 0, 2, 2, 0, 1, 2, 2, 1, 3, 3, 1, 3, 1, 1, 65535, 1, 1, 65535, 3, 1, 65535, 65535, 1, 1, 65535, 1, 3, 65535, 1, 2, 65534, 1, 0, 65534, 1, 65534, 0, 1, 65534, 2, 1, 0, 4, 1, 2, 4, 1, 2, 3, 2, 1, 4, 2, 65535, 2, 2, 65535, 4, 2, 65534, 3, 2, 65534, 1, 2, 65535, 0, 2, 65534, 65535, 2, 65535, 65534, 2, 0, 65535, 2, 1, 65534, 2, 2, 65535, 2, 2, 1, 2, 3, 0, 2, 3, 65534, 2, 3, 2, 2, 65534, 65534, 1, 65534, 4, 1, 3, 4, 2)
-}
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
 [node name="Rover" parent="GridMap" unique_id=771188890 instance=ExtResource("1_cdbbl")]
@@ -640,7 +637,7 @@ environment = SubResource("Environment_v88e1")
 script = ExtResource("5_16hu1")
 
 [node name="Nave" parent="." unique_id=955676958 instance=ExtResource("8_txhqv")]
-transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 3.0179539, 1.2233245, -11.095957)
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 3.0179539, 1.2233245, -14.095957)
 
 [connection signal="pressed" from="CanvasLayer/PanelCodigo/BarraTitulo/BotonMinimizar" to="CanvasLayer" method="_on_boton_minimizar_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelCodigo/Contenido/Button" to="CanvasLayer" method="_on_button_pressed"]

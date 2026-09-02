@@ -19,6 +19,6 @@ mesh = SubResource("BoxMesh_07tbp")
 surface_material_override/0 = SubResource("StandardMaterial3D_po8bs")
 
 [node name="CasillaOscura" type="MeshInstance3D" parent="." unique_id=1308928118]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0101617575, -0.002142787, 1.0217474)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0101617575, -0.002142787, 1.9860632)
 mesh = SubResource("BoxMesh_2wfvv")
 surface_material_override/0 = SubResource("StandardMaterial3D_w5nvr")
