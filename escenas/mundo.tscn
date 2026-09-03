@@ -175,11 +175,12 @@ script = ExtResource("1_7oex1")
 mineral_scene = ExtResource("2_4vydk")
 
 [node name="GridMap" type="GridMap" parent="." unique_id=647921843]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.459, 0.419, -2.619)
 mesh_library = ExtResource("1_glrvs")
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
 [node name="Rover" parent="GridMap" unique_id=771188890 instance=ExtResource("1_cdbbl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0728207, 1.6373665, -8.629317)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.637, 0)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=879746297 node_paths=PackedStringArray("mi_rover", "label_nave", "label_rover")]
 script = ExtResource("2_6wjgb")
@@ -619,7 +620,7 @@ text = "Presiona ESC para continuar"
 horizontal_alignment = 1
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=173857337]
-transform = Transform3D(1, 0, 0, 0, 0.8558924, 0.517154, 0, -0.517154, 0.8558924, 2.855854, 8.553883, 8.1447935)
+transform = Transform3D(1, 0, 0, 0, 0.8405977, 0.54165995, 0, -0.54165995, 0.8405977, 2.855854, 7.4273777, 10.389794)
 
 [node name="FondoEspacial" type="MeshInstance3D" parent="Camera3D" unique_id=1920698278]
 transform = Transform3D(0.9995616, -0.029166063, -0.005099421, 0.029163238, 0.9995746, -0.00062829256, 0.005115577, 0.00047934055, 0.99998695, -14.467957, 190.64882, -1010.8731)
@@ -637,6 +638,9 @@ transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 3.0179539, 1.2233245, -
 
 [node name="Mapa" parent="." unique_id=1100740313 instance=ExtResource("12_kckb2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.692646, -3.315782, -6.873)
+
+[node name="CentroJugable" type="Marker3D" parent="." unique_id=53366813]
+transform = Transform3D(1, 0, 0, 0, 0.9998309, -0.018388607, 0, 0.018388607, 0.9998309, 2.4590905, 0.4190023, -2.6192255)
 
 [connection signal="pressed" from="CanvasLayer/PanelCodigo/BarraTitulo/BotonMinimizar" to="CanvasLayer" method="_on_boton_minimizar_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelCodigo/Contenido/Button" to="CanvasLayer" method="_on_button_pressed"]
