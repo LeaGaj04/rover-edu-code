@@ -20,6 +20,7 @@ Supabase="*uid://8fusfri8k4ft"
 GestorSintaxis="*res://script/services/gestor_sintaxis.gd"
 ProgressService="*res://script/services/progress_service.gd"
 CursorManager="*res://script/services/cursor_manager.gd"
+CodeExecutor="*uid://dt8p6vupo2s3k"
 
 [display]
 
