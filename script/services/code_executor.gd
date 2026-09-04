@@ -7,12 +7,14 @@ signal error_detectado(error: Dictionary)
 signal ejecucion_finalizada(resultado: Dictionary)
 
 var ejecutando: bool = false
+var _tiempo_inicio_msec : float = 0.0
 
 
 func ejecutar_codigo(
 	codigo: String,
 	ejecutar_comando: Callable
 ) -> Dictionary:
+	_tiempo_inicio_msec = Time.get_ticks_msec()
 	var resultado := _crear_resultado(codigo)
 
 	if ejecutando:
@@ -201,7 +203,10 @@ func _crear_resultado(codigo: String) -> Dictionary:
 		"errors": [],
 		"commands_used": [],
 		"command_count": 0,
-		"movement_count": 0
+		"movement_count": 0,
+		"duration_seconds": 0.0,
+		"objective_id": MissionService.objective_id,
+		"objective_completed": MissionService.objective_completed
 	}
 
 
@@ -222,5 +227,7 @@ func _error_de_linea(
 
 
 func _finalizar(resultado: Dictionary) -> void:
+	resultado["duration_seconds"] = (Time.get_ticks_msec() - _tiempo_inicio_msec) / 1000.0
 	ejecutando = false
-	ejecucion_finalizada.emit(resultado)
+	print("Misión: ", resultado["objective_id"], " | Completada: ", resultado["objective_completed"])
+	emit_signal("ejecucion_finalizada", resultado)

@@ -139,6 +139,7 @@ func minar() -> Dictionary:
 				nodo_mineral.queue_free()
 			get_parent().get_parent().spawn_mineral_aleatorio()
 			mineral_recolectado.emit(1)
+			MissionService.evaluar_objetivo(1)
 
 			print("Mineral recolectado correctamente.")
 
