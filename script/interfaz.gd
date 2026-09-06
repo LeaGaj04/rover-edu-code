@@ -1,7 +1,5 @@
 extends CanvasLayer
 
-@export var nodo_nave : Node3D
-
 @onready var panel_codigo: Panel = $PanelCodigo
 @onready var barra_codigo: Panel = $PanelCodigo/BarraTitulo
 @onready var contenido_codigo: Control = $PanelCodigo/Contenido
@@ -39,12 +37,13 @@ var minerales_rover : int = 0
 @onready var boton_tienda = $ContenedorTienda/BotonTienda
 @onready var boton_while = $PanelTienda/LienzoArbol/ButtonWhile
 @onready var boton_for = $PanelTienda/LienzoArbol/ButtonFor
+@onready var boton_if = $PanelTienda/LienzoArbol/ButtonIf
 @onready var boton_expansion = $PanelTienda/LienzoArbol/ButtonExpansion1
 
 const PRECIOS = {
 	"while": 15,
 	"for": 30,
-	"mapa": 30
+	"mapa": 1
 }
 
 func _ready() -> void:
@@ -53,7 +52,11 @@ func _ready() -> void:
 	$PanelCodigo/EsquinaSuperiorDerecha.gui_input.connect(_on_esquina_codigo_gui_input.bind(Vector2(1, -1)))
 	$PanelCodigo/EsquinaInferiorIzquierda.gui_input.connect(_on_esquina_codigo_gui_input.bind(Vector2(-1, 1)))
 	$PanelCodigo/EsquinaInferiorDerecha.gui_input.connect(_on_esquina_codigo_gui_input.bind(Vector2(1, 1)))
+	CodeExecutor.linea_iniciada.connect(_on_linea_iniciada)
+	CodeExecutor.error_detectado.connect(_on_error_detectado)
+	CodeExecutor.ejecucion_finalizada.connect(_on_ejecucion_finalizada)
 	get_viewport().size_changed.connect(_mantener_panel_en_pantalla)
+	
 
 	# Oculta el árbol apenas arranca el juego
 	if panel_tienda != null:
@@ -61,20 +64,15 @@ func _ready() -> void:
 	
 	# Actualizamos los textos al iniciar
 	actualizar_contadores()
+	actualizar_mejoras_visual()
 	# Conectamos la señal del rover a una nueva función de la interfaz
 	if mi_rover != null:
 		mi_rover.mineral_recolectado.connect(_sumar_minerales_rover)
-	# Como ya conectaste la señal desde el editor (el ícono de wifi en la foto),
-	# NO necesitamos conectarla por código aquí. ¡Así que lo dejamos limpio!
 
 
 func _on_boton_tienda_pressed() -> void:
-	panel_tienda.visible = !panel_tienda.visible
-	
-	if panel_tienda.visible:
-		boton_tienda.text = "CERRAR"
-	else:
-		boton_tienda.text = "MEJORAS"
+	panel_tienda.show()
+	boton_tienda.hide()
 
 
 func _input(event: InputEvent) -> void:
@@ -171,83 +169,117 @@ func _on_boton_minimizar_pressed() -> void:
 
 
 func _on_button_pressed() -> void:
-	# Validamos todas las mejoras antes de procesar cualquier linea.
-	# Si hay sintaxis no adquirida, se aborta la ejecucion completa.
-	if not GestorSintaxis.validar_codigo(caja_codigo.text):
-		return
+	var resultado: Dictionary = await CodeExecutor.ejecutar_codigo(
+		caja_codigo.text,
+		ejecutar_movimiento_rover
+	)
 
-	var lineas = caja_codigo.text.split("\n")
-	
-	for linea in lineas:
-		linea = linea.strip_edges()
-		if linea == "":
-			continue # Salta líneas vacías
-			
-		# Verificación básica
-		if not linea.begins_with("rover."):
-			print("Error de Sintaxis A.D.A en '", linea, "': Debe empezar con 'rover.'")
-			continue
-			
-		# Ubicamos los límites de la sintaxis: rover.comando(pasos)
-		var pos_punto = linea.find(".")
-		var pos_par_izq = linea.find("(")
-		var pos_par_der = linea.rfind(")")
-		
-		if pos_punto == -1 or pos_par_izq == -1 or pos_par_der == -1:
-			print("Error de Sintaxis A.D.A en '", linea, "': Falta punto o paréntesis.")
-			continue
-			
-		# Extraemos el comando y lo que está dentro de los paréntesis
-		var comando = linea.substr(pos_punto + 1, pos_par_izq - pos_punto - 1).strip_edges()
-		var dentro_parentesis = linea.substr(pos_par_izq + 1, pos_par_der - pos_par_izq - 1).strip_edges()
-		
-		var pasos = 1 # Pasos por defecto (ej: rover.sur())
-		
-		# Si hay un número válido dentro de (), lo convertimos a entero
-		if dentro_parentesis.is_valid_int():
-			pasos = int(dentro_parentesis)
-		
-		ejecutar_movimiento_rover(comando, pasos)
-
-
-func ejecutar_movimiento_rover(comando: String, pasos: int) -> void:
-	if mi_rover == null:
-		print("Error: El Rover no está asignado en el Inspector.")
-		return
-		
-	print("Ejecutando: ", comando, " (", pasos, " pasos)")
-	
-	if comando == "norte":
-		mi_rover.norte(pasos)
-	elif comando == "sur":
-		mi_rover.sur(pasos)
-	elif comando == "este":
-		mi_rover.este(pasos)
-	elif comando == "oeste":
-		mi_rover.oeste(pasos)
-	elif comando == "minar":
-		if minerales_rover >= CAPACIDAD_ROVER:
-			print("Inventario lleno: el Rover solo puede transportar ", CAPACIDAD_ROVER, " minerales.")
-			return
-		await mi_rover.minar()
-	elif comando == "transferir":
-		procesar_transferencia()
+	if resultado["success"]:
+		print("Programa completado correctamente.")
 	else:
-		print("Error A.D.A: El rover no conoce el comando '", comando, "'")
+		print(
+			"Error A.D.A: ",
+			resultado["error_message"]
+		)
+
+
+func ejecutar_movimiento_rover(
+	comando: String,
+	pasos: int
+) -> Dictionary:
+	if mi_rover == null:
+		return _crear_error_comando(
+			"ejecucion",
+			"El rover no está asignado en el Inspector."
+		)
+
+	print(
+		"Ejecutando: ",
+		comando,
+		" (",
+		pasos,
+		" pasos)"
+	)
+
+	if comando == "norte":
+		return await mi_rover.norte(pasos)
+
+	if comando == "sur":
+		return await mi_rover.sur(pasos)
+
+	if comando == "este":
+		return await mi_rover.este(pasos)
+
+	if comando == "oeste":
+		return await mi_rover.oeste(pasos)
+
+	if comando == "minar":
+		if minerales_rover >= CAPACIDAD_ROVER:
+			return _crear_error_comando(
+				"ejecucion",
+				"El inventario del rover está lleno."
+			)
+
+		return await mi_rover.minar()
+
+	if comando == "transferir":
+		return procesar_transferencia()
+
+	return _crear_error_comando(
+		"ejecucion",
+		"El rover no conoce el comando '" + comando + "'."
+	)
 
 
 func _on_boton_cerrar_pressed() -> void:
 	# Ocultamos el panel directamente
 	panel_tienda.hide()
 	
-	# Restauramos el texto compacto del botón principal.
+	# Restauramos el botón principal para poder volver a abrir la tienda.
 	boton_tienda.text = "MEJORAS"
+	boton_tienda.show()
 	
 func actualizar_contadores() -> void:
 	if label_nave != null:
-		label_nave.text = "Nave: " + str(minerales_nave) + "/" + str(CAPACIDAD_NAVE)
+		#Nave
+		label_nave.text = ": " + str(minerales_nave) + "/" + str(CAPACIDAD_NAVE)
 	if label_rover != null:
-		label_rover.text = "Rover: " + str(minerales_rover) + "/" + str(CAPACIDAD_ROVER)
+		#Rover
+		label_rover.text = ": " + str(minerales_rover) + "/" + str(CAPACIDAD_ROVER)
+
+
+# Aplica solamente el estado persistente que corresponde a la interfaz.
+func aplicar_progreso(progress: Dictionary) -> void:
+	minerales_nave = maxi(0, int(progress.get("minerals_ship", 0)))
+	minerales_rover = maxi(0, int(progress.get("minerals_rover", 0)))
+	actualizar_contadores()
+	actualizar_mejoras_visual()
+
+
+func get_progress_state() -> Dictionary:
+	var mundo := get_parent()
+	return {
+		"minerals_ship": minerales_nave,
+		"minerals_rover": minerales_rover,
+		"map_tier": mundo.get_map_tier() if mundo != null else 0,
+		"unlocked_syntax": GestorSintaxis.get_sintaxis_desbloqueada(),
+	}
+
+
+func _solicitar_guardado_progreso() -> void:
+	ProgressService.save_progress(get_progress_state())
+
+
+func actualizar_mejoras_visual() -> void:
+	if boton_while != null:
+		boton_while.disabled = GestorSintaxis.esta_desbloqueada("while")
+	if boton_for != null:
+		boton_for.disabled = GestorSintaxis.esta_desbloqueada("for")
+	if boton_if != null:
+		boton_if.disabled = GestorSintaxis.esta_desbloqueada("if")
+	if boton_expansion != null:
+		var mundo := get_parent()
+		boton_expansion.disabled = mundo != null and mundo.mapa_3x3_desbloqueado
 
 func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem) -> void:
 	# 1. Verificar si ya se compró previamente
@@ -272,42 +304,89 @@ func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem
 			linea_conectora.modulate = Color(1.0, 0.84, 0.0) 
 			
 		print(item_id + " adquirido exitosamente.")
+		_solicitar_guardado_progreso()
 	else:
 		print("Minerales insuficientes para comprar: " + item_id)
 		
 func _sumar_minerales_rover(cantidad: int) -> void:
 	minerales_rover = mini(minerales_rover + cantidad, CAPACIDAD_ROVER)
 	actualizar_contadores()
+	_solicitar_guardado_progreso()
 	
-func procesar_transferencia() -> void:
-	if nodo_nave == null:
-		print("Error: La Nave no está asignada en el Inspector.")
-		return
-		
+func procesar_transferencia() -> Dictionary:
+	if mi_rover == null:
+		return _crear_error_comando(
+			"ejecucion",
+			"No se encontró el rover."
+		)
+
 	if minerales_rover == 0:
-		print("El Rover no tiene minerales para transferir.")
-		return
+		return _crear_error_comando(
+			"ejecucion",
+			"El rover no tiene minerales para transferir."
+		)
 
 	if minerales_nave >= CAPACIDAD_NAVE:
-		print("La Nave está llena. Capacidad máxima: ", CAPACIDAD_NAVE, " minerales.")
-		return
-		
-	# Calculamos la distancia entre el rover y la nave
-	var distancia = mi_rover.global_position.distance_to(nodo_nave.global_position)
-	
-	# Si la distancia es menor a 2.5 unidades
-	if distancia <= 5.0:
-		var espacio_disponible = CAPACIDAD_NAVE - minerales_nave
-		var cantidad_transferida = mini(minerales_rover, espacio_disponible)
-		print("Iniciando transferencia segura... ", cantidad_transferida, " minerales enviados a la Nave.")
+		return _crear_error_comando(
+			"ejecucion",
+			"La nave alcanzó su capacidad máxima."
+		)
 
-		minerales_nave += cantidad_transferida
-		minerales_rover -= cantidad_transferida
-		
-		# Actualizamos los números en pantalla
-		actualizar_contadores()
-	else:
-		print("Error de transferencia: El Rover está muy lejos de la base.")
+	var mundo := get_parent()
+
+	if (
+		mundo == null
+		or not mundo.has_method("rover_esta_en_casilla_transferencia")
+	):
+		return _crear_error_comando(
+			"ejecucion",
+			"No se pudo comprobar la casilla de transferencia."
+		)
+
+	if not mundo.rover_esta_en_casilla_transferencia(mi_rover):
+		return _crear_error_comando(
+			"ejecucion",
+			"Debes llevar el rover a la casilla inicial para transferir."
+		)
+
+	var espacio_disponible := CAPACIDAD_NAVE - minerales_nave
+	var cantidad_transferida := mini(
+		minerales_rover,
+		espacio_disponible
+	)
+
+	minerales_nave += cantidad_transferida
+	minerales_rover -= cantidad_transferida
+
+	actualizar_contadores()
+	_solicitar_guardado_progreso()
+
+	print(
+		"Transferencia completada: ",
+		cantidad_transferida,
+		" minerales."
+	)
+
+	return {
+		"ok": true,
+		"error_type": "",
+		"message": "",
+		"minerals_transferred": cantidad_transferida,
+		"steps_completed": 0
+	}
+
+func _crear_error_comando(
+	tipo: String,
+	mensaje: String
+) -> Dictionary:
+	print("Error A.D.A: ", mensaje)
+
+	return {
+		"ok": false,
+		"error_type": tipo,
+		"message": mensaje,
+		"steps_completed": 0
+	}
 		
 func _on_button_while_pressed() -> void:
 	intentar_compra("while", boton_while, null)
@@ -331,9 +410,25 @@ func _on_button_expansion_1_pressed() -> void:
 		minerales_nave -= costo
 		actualizar_contadores()
 		boton_expansion.disabled = true
+		_solicitar_guardado_progreso()
 
 
 func _on_button_expansion_2_pressed() -> void:
 	# La segunda expansión queda reservada para una implementación futura.
 	print("EX Mapa 2 todavía no está disponible.")
 	
+func _on_linea_iniciada(numero: int, contenido: String) -> void:
+	print("Ejecutando línea ", numero, ": ", contenido)
+
+
+func _on_error_detectado(error: Dictionary) -> void:
+	print(
+		"Error en línea ",
+		error.get("line", 0),
+		": ",
+		error.get("message", "Error desconocido")
+	)
+
+
+func _on_ejecucion_finalizada(resultado: Dictionary) -> void:
+	print("Resultado de ejecución: ", resultado)

@@ -70,6 +70,21 @@ func get_current_user_id() -> String:
 func is_authenticated() -> bool:
 	return not access_token.is_empty() and not current_user.is_empty()
 
+func get_rest_url(resource: String) -> String:
+	return SUPABASE_URL + "/rest/v1/" + resource
+
+func get_authenticated_headers(additional_headers: PackedStringArray = PackedStringArray()) -> PackedStringArray:
+	if not is_authenticated():
+		return PackedStringArray()
+	var headers := PackedStringArray([
+		"apikey: " + SUPABASE_KEY,
+		"Authorization: Bearer " + access_token,
+		"Content-Type: application/json",
+		"Accept: application/json"
+	])
+	headers.append_array(additional_headers)
+	return headers
+
 func sign_out() -> void:
 	var token := access_token
 	access_token = ""

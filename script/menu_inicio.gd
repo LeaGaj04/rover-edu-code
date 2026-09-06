@@ -5,10 +5,13 @@ const ESCENA_MUNDO = "res://escenas/mundo.tscn"
 const ESCENA_AUTH = "res://escenas/auth.tscn"
 const ESCENA_PERFIL = "res://escenas/perfil.tscn"
 @onready var boton_login: Button = $PanelPerfil/HBoxContainer/ButtonLogin
+@onready var panel_perfil: PanelContainer = $PanelPerfil
+@onready var boton_jugar: Button = $PanelMenu/ContenedorPrincipal/BotonJugar
 @onready var dropdown: PanelContainer = $ProfileDropdown
 @onready var boton_ver_perfil: Button = $ProfileDropdown/Options/VerPerfil
 @onready var boton_cerrar_sesion: Button = $ProfileDropdown/Options/CerrarSesion
 var dropdown_abierto := false
+var cargando_progreso := false
 
 func _ready() -> void:
 	boton_login.mouse_entered.connect(_animar_hover.bind(true))
@@ -17,14 +20,18 @@ func _ready() -> void:
 	boton_ver_perfil.mouse_exited.connect(_animar_opcion_hover.bind(boton_ver_perfil, false))
 	boton_cerrar_sesion.mouse_entered.connect(_animar_opcion_hover.bind(boton_cerrar_sesion, true))
 	boton_cerrar_sesion.mouse_exited.connect(_animar_opcion_hover.bind(boton_cerrar_sesion, false))
+	ProgressService.progress_loaded.connect(_on_progress_loaded)
+	ProgressService.progress_load_failed.connect(_on_progress_load_failed)
 	actualizar_estado_autenticacion()
 
 func actualizar_estado_autenticacion() -> void:
 	cerrar_dropdown()
 	if Supabase.is_authenticated():
 		boton_login.text = "Perfil ▼"
+		boton_jugar.text = "Continuar Partida"
 	else:
 		boton_login.text = "Iniciar Sesion"
+		boton_jugar.text = "Nueva Partida"
 
 func _on_boton_login_pressed() -> void:
 	if not Supabase.is_authenticated():
@@ -37,20 +44,22 @@ func _on_boton_login_pressed() -> void:
 
 func abrir_dropdown() -> void:
 	dropdown_abierto = true
+	dropdown.position = Vector2(
+		panel_perfil.position.x,
+		panel_perfil.position.y + panel_perfil.size.y + 12.0
+	)
+	dropdown.size.x = panel_perfil.size.x
 	dropdown.visible = true
 	dropdown.modulate.a = 0.0
-	dropdown.position.y -= 8.0
-	var tween := create_tween().set_parallel(true)
+	var tween := create_tween()
 	tween.tween_property(dropdown, "modulate:a", 1.0, 0.18)
-	tween.tween_property(dropdown, "position:y", dropdown.position.y + 8.0, 0.18).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 func cerrar_dropdown() -> void:
 	if not dropdown_abierto and not dropdown.visible:
 		return
 	dropdown_abierto = false
-	var tween := create_tween().set_parallel(true)
+	var tween := create_tween()
 	tween.tween_property(dropdown, "modulate:a", 0.0, 0.15)
-	tween.tween_property(dropdown, "position:y", dropdown.position.y - 8.0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	tween.chain().tween_callback(dropdown.hide)
 
 func _animar_hover(entrando: bool) -> void:
@@ -70,8 +79,35 @@ func _on_cerrar_sesion_pressed() -> void:
 	Supabase.sign_out()
 	actualizar_estado_autenticacion()
 
-# Se ejecuta al hacer clic en "Jugar"
 func _on_boton_jugar_pressed() -> void:
+	if Supabase.is_authenticated():
+		_continuar_partida_autenticada()
+	else:
+		_iniciar_partida_invitado()
+
+func _iniciar_partida_invitado() -> void:
+	_abrir_mundo()
+
+func _continuar_partida_autenticada() -> void:
+	if cargando_progreso:
+		return
+	cargando_progreso = true
+	boton_jugar.disabled = true
+	if not ProgressService.load_progress():
+		cargando_progreso = false
+		boton_jugar.disabled = false
+
+func _on_progress_loaded(_progress: Dictionary) -> void:
+	cargando_progreso = false
+	boton_jugar.disabled = false
+	_abrir_mundo()
+
+func _on_progress_load_failed(message: String) -> void:
+	cargando_progreso = false
+	boton_jugar.disabled = false
+	push_error("No se pudo cargar el progreso: " + message)
+
+func _abrir_mundo() -> void:
 	if ResourceLoader.exists(ESCENA_MUNDO):
 		get_tree().change_scene_to_file(ESCENA_MUNDO)
 	else:

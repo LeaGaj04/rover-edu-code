@@ -12,6 +12,15 @@ var sintaxis_desbloqueada: Dictionary = {
 	"in range": false,
 }
 
+const CLAVES_CONOCIDAS := ["for", "while", "if", "else", "in range"]
+
+
+# Restaura únicamente las mejoras de sintaxis que conoce el juego. Las claves
+# ausentes conservan un valor seguro: bloqueadas.
+func aplicar_sintaxis_desbloqueada(data: Dictionary) -> void:
+	for palabra_clave in CLAVES_CONOCIDAS:
+		sintaxis_desbloqueada[palabra_clave] = data.get(palabra_clave, false) == true
+
 
 # Se ejecuta antes del parser actual. Si encuentra una mejora bloqueada,
 # detiene el procesamiento completo del codigo ingresado.
@@ -44,6 +53,10 @@ func desbloquear_sintaxis(palabra_clave: String) -> bool:
 func esta_desbloqueada(palabra_clave: String) -> bool:
 	var palabra_normalizada := _normalizar_palabra_clave(palabra_clave)
 	return sintaxis_desbloqueada.get(palabra_normalizada, false)
+
+
+func get_sintaxis_desbloqueada() -> Dictionary:
+	return sintaxis_desbloqueada.duplicate(true)
 
 
 func _contiene_palabra_clave(codigo: String, palabra_clave: String) -> bool:
