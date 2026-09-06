@@ -36,8 +36,10 @@ func send_password_recovery(email: String) -> bool:
 		"Content-Type: application/json",
 		"Accept: application/json"
 	])
+	var redirect_to := "https://educode-web-amber.vercel.app/reset-password".uri_encode()
+	var recover_url := SUPABASE_URL + "/auth/v1/recover?redirect_to=" + redirect_to
 	var error := http_request.request(
-		SUPABASE_URL + "/auth/v1/recover",
+		recover_url,
 		headers,
 		HTTPClient.METHOD_POST,
 		JSON.stringify({"email": email})
