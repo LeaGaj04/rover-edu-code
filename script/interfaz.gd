@@ -72,13 +72,6 @@ func _ready() -> void:
 	if mi_rover != null:
 		mi_rover.mineral_recolectado.connect(_sumar_minerales_rover)
 
-	transmision_ada.mostrar_mensaje(
-		"Unidad Rover, enlace establecido. Soy A.D.A., la inteligencia de la nave. " +
-		"Para extraer la primera muestra utiliza rover.minar().",
-		"objetivo",
-		8.0
-	)
-
 
 func _on_boton_tienda_pressed() -> void:
 	panel_tienda.show()
@@ -260,19 +253,34 @@ func actualizar_contadores() -> void:
 
 # Aplica solamente el estado persistente que corresponde a la interfaz.
 func aplicar_progreso(progress: Dictionary) -> void:
-	minerales_nave = maxi(0, int(progress.get("minerals_ship", 0)))
-	minerales_rover = maxi(0, int(progress.get("minerals_rover", 0)))
+	MissionService.aplicar_progreso(progress)
+
+	minerales_nave = maxi(
+		0,
+		int(progress.get("minerals_ship", 0))
+	)
+
+	minerales_rover = maxi(
+		0,
+		int(progress.get("minerals_rover", 0))
+	)
+
 	actualizar_contadores()
 	actualizar_mejoras_visual()
+	_mostrar_mensaje_inicial_ada()
 
 
 func get_progress_state() -> Dictionary:
 	var mundo := get_parent()
+
 	return {
 		"minerals_ship": minerales_nave,
 		"minerals_rover": minerales_rover,
 		"map_tier": mundo.get_map_tier() if mundo != null else 0,
 		"unlocked_syntax": GestorSintaxis.get_sintaxis_desbloqueada(),
+		"current_mission_id": MissionService.objective_id,
+		"completed_missions": MissionService.get_completed_missions(),
+		"unlocked_knowledge": MissionService.get_unlocked_knowledge(),
 	}
 
 
@@ -289,7 +297,10 @@ func actualizar_mejoras_visual() -> void:
 		boton_if.disabled = GestorSintaxis.esta_desbloqueada("if")
 	if boton_expansion != null:
 		var mundo := get_parent()
-		boton_expansion.disabled = mundo != null and mundo.mapa_3x3_desbloqueado
+		boton_expansion.disabled = (
+	mundo != null
+	and mundo.corredor_1x3_desbloqueado
+)
 
 func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem) -> void:
 	# 1. Verificar si ya se compró previamente
@@ -410,15 +421,15 @@ func _on_button_expansion_1_pressed() -> void:
 	var mundo = get_parent()
 	var costo = PRECIOS["mapa"]
 
-	if mundo.mapa_3x3_desbloqueado:
-		print("El Mapa 1 ya está desbloqueado.")
+	if mundo.corredor_1x3_desbloqueado:
+		print("El corredor 1x3 ya está desbloqueado.")
 		return
 
 	if minerales_nave < costo:
 		print("Minerales insuficientes en la Nave. Mapa 1 cuesta ", costo, " minerales.")
 		return
 
-	if mundo.expandir_mapa_3x3():
+	if mundo.expandir_corredor_1x3():
 		minerales_nave -= costo
 		actualizar_contadores()
 		boton_expansion.disabled = true
@@ -463,3 +474,30 @@ func _on_mision_completada(_mision_id: String) -> void:
 		"completado",
 		10.0
 	)
+	
+func _mostrar_mensaje_inicial_ada() -> void:
+	if MissionService.objective_completed:
+		transmision_ada.mostrar_mensaje(
+			"Bienvenido nuevamente, unidad Rover. La primera muestra ya fue procesada. " +
+			"El siguiente paso es ampliar la zona de exploracion desde el arbol de mejoras.",
+			"objetivo",
+			9.0
+		)
+		return
+
+	match MissionService.estado_actual:
+		MissionService.EstadoMision.TRANSFERIR_MINERAL:
+			transmision_ada.mostrar_mensaje(
+				"La muestra sigue almacenada en tu inventario. " +
+				"Ejecuta rover.transferir() para enviarla a la nave.",
+				"objetivo",
+				8.0
+			)
+
+		_:
+			transmision_ada.mostrar_mensaje(
+				"Unidad Rover, enlace establecido. Soy A.D.A., la inteligencia de la nave. " +
+				"Para extraer la primera muestra utiliza rover.minar().",
+				"objetivo",
+				8.0
+			)

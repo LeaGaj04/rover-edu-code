@@ -7,13 +7,14 @@ extends Node3D
 const CASILLA_INICIAL := Vector3i.ZERO
 const CASILLA_TRANSFERENCIA := CASILLA_INICIAL
 
-# Variable que define el tamaño del mapa actual
-# 0 = mapa 1x1 (inicio)
-# 1 = mapa 3x3
-# 2 = mapa 5x5, etc.
-var radio_mapa_desbloqueado : int = 0
-var max_minerales : int = 1
-var mapa_3x3_desbloqueado : bool = false
+# Nivel de expansión del mismo mapa.
+# 0 = zona inicial 1x1
+# 1 = corredor 1x3
+# 2 = sector 3x3
+var radio_mapa_desbloqueado: int = 0
+var max_minerales: int = 1
+var corredor_1x3_desbloqueado: bool = false
+var mapa_3x3_desbloqueado: bool = false
 
 func _ready():
 	var map_tier := 0
@@ -51,15 +52,68 @@ func _ready():
 # efectos de compra, por lo que también se puede usar al restaurar progreso.
 func aplicar_progreso_mapa(map_tier: int) -> void:
 	radio_mapa_desbloqueado = maxi(0, map_tier)
-	mapa_3x3_desbloqueado = radio_mapa_desbloqueado >= 1
-	grid_map.clear()
-	grid_map.set_cell_item(CASILLA_INICIAL, 1)
 
+	corredor_1x3_desbloqueado = (
+		radio_mapa_desbloqueado >= 1
+	)
+
+	mapa_3x3_desbloqueado = (
+		radio_mapa_desbloqueado >= 2
+	)
+
+	grid_map.clear()
+
+	# Sector 3x3: tres columnas y tres filas.
 	if mapa_3x3_desbloqueado:
-		for x in range(CASILLA_INICIAL.x - 1, CASILLA_INICIAL.x + 2):
-			for z in range(CASILLA_INICIAL.z - 1, CASILLA_INICIAL.z + 2):
-				var tipo_casilla = 1 if (x + z) % 2 == 0 else 2
-				grid_map.set_cell_item(Vector3i(x, 0, z), tipo_casilla)
+		for x in range(
+			CASILLA_INICIAL.x - 1,
+			CASILLA_INICIAL.x + 2
+		):
+			for z in range(
+				CASILLA_INICIAL.z - 1,
+				CASILLA_INICIAL.z + 2
+			):
+				var tipo_casilla := (
+					1 if (x + z) % 2 == 0 else 2
+				)
+
+				grid_map.set_cell_item(
+					Vector3i(x, 0, z),
+					tipo_casilla
+				)
+
+		return
+
+	# Corredor 1x3: comienza en la nave y avanza hacia el norte.
+	if corredor_1x3_desbloqueado:
+		for z in range(
+			CASILLA_INICIAL.z - 1,
+			CASILLA_INICIAL.z + 2
+		):
+			var posicion := Vector3i(
+				CASILLA_INICIAL.x,
+				0,
+				z
+			)
+
+			var tipo_casilla := (
+				1 if (
+				posicion.x + posicion.z
+				) % 2 == 0 else 2
+			)
+
+			grid_map.set_cell_item(
+				posicion,
+				tipo_casilla
+			)
+
+		return
+
+	# Nivel inicial: solamente la casilla de transferencia.
+	grid_map.set_cell_item(
+			CASILLA_INICIAL,
+			1
+		)
 
 func _posicionar_rover_en_casilla_inicial() -> void:
 	var rover := grid_map.get_node_or_null("Rover") as Node3D
@@ -78,16 +132,45 @@ func generar_minerales_iniciales():
 	for i in range(max_minerales):
 		spawn_mineral_aleatorio()
 
-func spawn_mineral_aleatorio():
-	# Mientras el mapa está bloqueado, el mineral reaparece siempre en la
-	# única casilla disponible para que el jugador pueda farmearlo.
-	var centro_local := grid_map.map_to_local(CASILLA_INICIAL)
+func spawn_mineral_aleatorio() -> void:
+	var casilla_mineral := CASILLA_INICIAL
+
+	# Con el corredor desbloqueado, aparece en el extremo norte.
+	if corredor_1x3_desbloqueado:
+		casilla_mineral = (
+			CASILLA_INICIAL + Vector3i(0, 0, -1)
+		)
+
+	var centro_local := grid_map.map_to_local(casilla_mineral)
 	var centro_global := grid_map.to_global(centro_local)
 
 	var nuevo_mineral = mineral_scene.instantiate()
 	add_child(nuevo_mineral)
 
-	nuevo_mineral.global_position = centro_global + Vector3(0, -0.4, 0.3)
+	nuevo_mineral.global_position = (
+		centro_global + Vector3(0, -0.4, 0.3)
+	)
+
+func reubicar_mineral_para_corredor() -> void:
+	var minerales := get_tree().get_nodes_in_group("minerales")
+	var padres_eliminados: Dictionary = {}
+
+	for mineral in minerales:
+		var objeto_mineral := mineral.get_parent() as Node
+
+		if objeto_mineral == null:
+			continue
+
+		var id_objeto := objeto_mineral.get_instance_id()
+
+		if padres_eliminados.has(id_objeto):
+			continue
+
+		padres_eliminados[id_objeto] = true
+		objeto_mineral.queue_free()
+
+	# Esperamos a que Godot elimine el mineral anterior.
+	call_deferred("spawn_mineral_aleatorio")
 
 func rover_esta_en_casilla_transferencia(rover: Node3D) -> bool:
 	if rover == null:
@@ -101,14 +184,34 @@ func rover_esta_en_casilla_transferencia(rover: Node3D) -> bool:
 
 	return casilla_actual == CASILLA_TRANSFERENCIA
 
+func expandir_corredor_1x3() -> bool:
+	if corredor_1x3_desbloqueado:
+		return false
+
+	aplicar_progreso_mapa(1)
+	reubicar_mineral_para_corredor()
+
+	print(
+		"Corredor adquirido: terreno expandido a 1x3."
+	)
+
+	return true
+
+
 func expandir_mapa_3x3() -> bool:
 	if mapa_3x3_desbloqueado:
 		return false
 
-	aplicar_progreso_mapa(1)
-	print("Mapa 1 adquirido: terreno expandido a 3x3.")
-	return true
+	if not corredor_1x3_desbloqueado:
+		return false
 
+	aplicar_progreso_mapa(2)
+
+	print(
+		"Sector adquirido: terreno expandido a 3x3."
+	)
+
+	return true
 
 func get_map_tier() -> int:
 	return radio_mapa_desbloqueado
