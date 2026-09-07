@@ -227,7 +227,21 @@ func _error_de_linea(
 
 
 func _finalizar(resultado: Dictionary) -> void:
-	resultado["duration_seconds"] = (Time.get_ticks_msec() - _tiempo_inicio_msec) / 1000.0
+	resultado["duration_seconds"] = (
+		Time.get_ticks_msec() - _tiempo_inicio_msec
+	) / 1000.0
+
+	# Captura el estado real después de ejecutar todos los comandos.
+	resultado["objective_id"] = MissionService.objective_id
+	resultado["objective_completed"] = MissionService.objective_completed
+
 	ejecutando = false
-	print("Misión: ", resultado["objective_id"], " | Completada: ", resultado["objective_completed"])
-	emit_signal("ejecucion_finalizada", resultado)
+
+	print(
+		"Misión: ",
+		resultado["objective_id"],
+		" | Completada: ",
+		resultado["objective_completed"]
+	)
+
+	ejecucion_finalizada.emit(resultado)

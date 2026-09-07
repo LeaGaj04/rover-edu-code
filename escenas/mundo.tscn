@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://mk4i0achjumg" path="res://assets/sky/cielo_espacial_suave_4k.png" id="9_cielo"]
 [ext_resource type="Script" uid="uid://chr26du17u3ol" path="res://script/menu_pausa.gd" id="10_pausa"]
 [ext_resource type="PackedScene" uid="uid://wgb3qc1i2srg" path="res://escenas/mapa.tscn" id="12_kckb2"]
+[ext_resource type="PackedScene" path="res://escenas/transmision_ada.tscn" id="13_ada"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_codigo"]
 bg_color = Color(4.4370537e-08, 0.067600854, 0.00088399946, 0.7607843)
@@ -187,6 +188,8 @@ script = ExtResource("2_6wjgb")
 mi_rover = NodePath("../GridMap/Rover")
 label_nave = NodePath("ContenedorContadores/HBoxContainer/LabelNave")
 label_rover = NodePath("ContenedorContadores/HBoxContainer/LabelRover")
+
+[node name="TransmisionADA" parent="CanvasLayer" instance=ExtResource("13_ada")]
 
 [node name="PanelCodigo" type="Panel" parent="CanvasLayer" unique_id=1087549051]
 offset_left = 13.0

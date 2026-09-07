@@ -5,6 +5,7 @@ extends CanvasLayer
 @onready var contenido_codigo: Control = $PanelCodigo/Contenido
 @onready var boton_minimizar: Button = $PanelCodigo/BarraTitulo/BotonMinimizar
 @onready var caja_codigo: TextEdit = $PanelCodigo/Contenido/TextEdit
+@onready var transmision_ada = $TransmisionADA
 @export var mi_rover : CharacterBody3D
 
 const ALTO_PANEL_CODIGO: float = 276.0
@@ -55,6 +56,8 @@ func _ready() -> void:
 	CodeExecutor.linea_iniciada.connect(_on_linea_iniciada)
 	CodeExecutor.error_detectado.connect(_on_error_detectado)
 	CodeExecutor.ejecucion_finalizada.connect(_on_ejecucion_finalizada)
+	MissionService.objetivo_actualizado.connect(_on_objetivo_actualizado)
+	MissionService.mision_completada.connect(_on_mision_completada)
 	get_viewport().size_changed.connect(_mantener_panel_en_pantalla)
 	
 
@@ -68,6 +71,13 @@ func _ready() -> void:
 	# Conectamos la señal del rover a una nueva función de la interfaz
 	if mi_rover != null:
 		mi_rover.mineral_recolectado.connect(_sumar_minerales_rover)
+
+	transmision_ada.mostrar_mensaje(
+		"Unidad Rover, enlace establecido. Soy A.D.A., la inteligencia de la nave. " +
+		"Para extraer la primera muestra utiliza rover.minar().",
+		"objetivo",
+		8.0
+	)
 
 
 func _on_boton_tienda_pressed() -> void:
@@ -358,6 +368,8 @@ func procesar_transferencia() -> Dictionary:
 	minerales_nave += cantidad_transferida
 	minerales_rover -= cantidad_transferida
 
+	MissionService.registrar_transferencia(cantidad_transferida)
+
 	actualizar_contadores()
 	_solicitar_guardado_progreso()
 
@@ -428,7 +440,26 @@ func _on_error_detectado(error: Dictionary) -> void:
 		": ",
 		error.get("message", "Error desconocido")
 	)
+	transmision_ada.mostrar_mensaje(
+		"Detecte un problema en la instruccion: " +
+		str(error.get("message", "Error desconocido")),
+		"error",
+		8.0
+	)
 
 
 func _on_ejecucion_finalizada(resultado: Dictionary) -> void:
 	print("Resultado de ejecución: ", resultado)
+
+
+func _on_objetivo_actualizado(_mision_id: String, objetivo: String) -> void:
+	transmision_ada.mostrar_mensaje(objetivo, "progreso", 8.0)
+
+
+func _on_mision_completada(_mision_id: String) -> void:
+	transmision_ada.mostrar_mensaje(
+		"Excelente trabajo. Muestra recibida y almacenada en la nave. Progreso 2 de 2: " +
+		"completaste la primera mision utilizando los metodos minar y transferir.",
+		"completado",
+		10.0
+	)
