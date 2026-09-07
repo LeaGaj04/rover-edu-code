@@ -6,9 +6,39 @@ signal progress_saved(progress: Dictionary)
 signal progress_save_failed(message: String)
 
 const RESOURCE := "player_progress"
-const SELECT_FIELDS := "user_id,minerals_ship,minerals_rover,map_tier,unlocked_syntax,created_at,updated_at"
+const SELECT_FIELDS := (
+	"user_id," +
+	"minerals_ship," +
+	"minerals_rover," +
+	"map_tier," +
+	"unlocked_syntax," +
+	"current_mission_id," +
+	"completed_missions," +
+	"unlocked_knowledge," +
+	"hardware_upgrades," +
+	"created_at," +
+	"updated_at"
+)
 const SAVE_DEBOUNCE_SECONDS := 0.75
 const SINTAXIS_CONOCIDAS := ["for", "while", "if", "else", "in range"]
+const CONOCIMIENTOS_CONOCIDOS := [
+	"objeto",
+	"metodo",
+	"secuencia",
+	"parametro",
+	"bucle_for",
+	"condicional_if",
+	"bucle_while",
+	"variable",
+	"funcion"
+]
+
+const MEJORAS_HARDWARE_CONOCIDAS := [
+	"drill_speed",
+	"cargo_capacity",
+	"movement_speed",
+	"scanner"
+]
 
 var current_progress: Dictionary = {}
 var http_request: HTTPRequest
@@ -203,15 +233,119 @@ func _fail_save(message: String) -> void:
 
 
 func _normalizar_progreso(progress: Dictionary) -> Dictionary:
-	var sintaxis = progress.get("unlocked_syntax", {})
+	var progreso_base: Dictionary = current_progress
+
+	# Normalizar sintaxis desbloqueada.
+	var sintaxis = progress.get(
+		"unlocked_syntax",
+		progreso_base.get("unlocked_syntax", {})
+	)
+
 	if typeof(sintaxis) != TYPE_DICTIONARY:
 		return {}
-	var sintaxis_normalizada := {}
+
+	var sintaxis_normalizada: Dictionary = {}
+
 	for clave in SINTAXIS_CONOCIDAS:
 		sintaxis_normalizada[clave] = sintaxis.get(clave, false) == true
+
+	# Normalizar misiones completadas.
+	var misiones = progress.get(
+			"completed_missions",
+		progreso_base.get("completed_missions", [])
+	)
+
+	if typeof(misiones) != TYPE_ARRAY:
+		return {}
+
+	var misiones_normalizadas: Array = []
+
+	for mision in misiones:
+		if (
+			typeof(mision) == TYPE_STRING
+			and not mision.is_empty()
+			and mision not in misiones_normalizadas
+		):
+			misiones_normalizadas.append(mision)
+
+	# Normalizar conocimientos desbloqueados.
+	var conocimientos = progress.get(
+		"unlocked_knowledge",
+		progreso_base.get(
+			"unlocked_knowledge",
+			["objeto", "metodo"]
+		)
+	)
+
+	if typeof(conocimientos) != TYPE_ARRAY:
+		return {}
+
+	var conocimientos_normalizados: Array = []
+
+	for conocimiento in conocimientos:
+		if (
+			typeof(conocimiento) == TYPE_STRING
+			and conocimiento in CONOCIMIENTOS_CONOCIDOS
+			and conocimiento not in conocimientos_normalizados
+		):
+			conocimientos_normalizados.append(conocimiento)
+
+	# Normalizar mejoras de hardware.
+	var mejoras = progress.get(
+		"hardware_upgrades",
+		progreso_base.get("hardware_upgrades", {})
+	)
+
+	if typeof(mejoras) != TYPE_DICTIONARY:
+		return {}
+
+	var mejoras_normalizadas: Dictionary = {}
+
+	for mejora in MEJORAS_HARDWARE_CONOCIDAS:
+				mejoras_normalizadas[mejora] = maxi(
+			0,
+			int(mejoras.get(mejora, 0))
+		)
+
+	# Normalizar misión actual.
+	var mision_actual: String = str(
+		progress.get(
+			"current_mission_id",
+			progreso_base.get(
+				"current_mission_id",
+				"recolectar_primer_mineral"
+			)
+		)
+	).strip_edges()
+
+	if mision_actual.is_empty():
+		mision_actual = "recolectar_primer_mineral"
+
 	return {
-		"minerals_ship": maxi(0, int(progress.get("minerals_ship", 0))),
-		"minerals_rover": maxi(0, int(progress.get("minerals_rover", 0))),
-		"map_tier": maxi(0, int(progress.get("map_tier", 0))),
+		"minerals_ship": maxi(
+			0,
+			int(progress.get(
+				"minerals_ship",
+				progreso_base.get("minerals_ship", 0)
+			))
+		),
+		"minerals_rover": maxi(
+			0,
+			int(progress.get(
+				"minerals_rover",
+				progreso_base.get("minerals_rover", 0)
+			))
+		),
+		"map_tier": maxi(
+			0,
+			int(progress.get(
+				"map_tier",
+				progreso_base.get("map_tier", 0)
+			))
+		),
 		"unlocked_syntax": sintaxis_normalizada,
+		"current_mission_id": mision_actual,
+		"completed_missions": misiones_normalizadas,
+		"unlocked_knowledge": conocimientos_normalizados,
+		"hardware_upgrades": mejoras_normalizadas,
 	}

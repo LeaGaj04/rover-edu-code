@@ -189,7 +189,7 @@ mi_rover = NodePath("../GridMap/Rover")
 label_nave = NodePath("ContenedorContadores/HBoxContainer/LabelNave")
 label_rover = NodePath("ContenedorContadores/HBoxContainer/LabelRover")
 
-[node name="TransmisionADA" parent="CanvasLayer" instance=ExtResource("13_ada")]
+[node name="TransmisionADA" parent="CanvasLayer" unique_id=1467148888 instance=ExtResource("13_ada")]
 
 [node name="PanelCodigo" type="Panel" parent="CanvasLayer" unique_id=1087549051]
 offset_left = 13.0
@@ -469,17 +469,17 @@ offset_left = 685.0
 offset_top = 280.0
 offset_right = 835.0
 offset_bottom = 350.0
-tooltip_text = "Expande el terreno disponible a una cuadrícula de 3x3.
+tooltip_text = "Desbloquea un corredor de tres casillas para aprender secuencias.
 
-Costo: 30 minerales"
+Costo: 1 mineral"
 theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
 theme_override_colors/font_disabled_color = Color(0.55, 0.55, 0.58, 1)
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_tienda_disabled")
-text = "[ EXPANDIR MAPA ]
-30 MINERALES"
+text = "[ CORREDOR 1X3 ]
+1 MINERAL"
 
 [node name="ButtonExpansion2" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=448735514]
 layout_mode = 0
