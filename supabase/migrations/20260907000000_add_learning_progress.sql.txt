@@ -1,0 +1,36 @@
+begin;
+
+alter table public.player_progress
+add column current_mission_id text not null
+default 'recolectar_primer_mineral';
+
+alter table public.player_progress
+add column completed_missions jsonb not null
+default '[]'::jsonb;
+
+alter table public.player_progress
+add column unlocked_knowledge jsonb not null
+default '["objeto", "metodo"]'::jsonb;
+
+alter table public.player_progress
+add column hardware_upgrades jsonb not null
+default '{
+    "drill_speed": 0,
+    "cargo_capacity": 0,
+    "movement_speed": 0,
+    "scanner": 0
+}'::jsonb;
+
+alter table public.player_progress
+add constraint player_progress_completed_missions_array
+check (jsonb_typeof(completed_missions) = 'array');
+
+alter table public.player_progress
+add constraint player_progress_unlocked_knowledge_array
+check (jsonb_typeof(unlocked_knowledge) = 'array');
+
+alter table public.player_progress
+add constraint player_progress_hardware_upgrades_object
+check (jsonb_typeof(hardware_upgrades) = 'object');
+
+commit;

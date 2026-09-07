@@ -1,0 +1,125 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://script/transmision_ada.gd" id="1_transmision"]
+[ext_resource type="Script" path="res://script/ada_avatar.gd" id="2_avatar"]
+
+[sub_resource type="StyleBoxFlat" id="StylePanelADA"]
+content_margin_left = 18.0
+content_margin_top = 14.0
+content_margin_right = 18.0
+content_margin_bottom = 14.0
+bg_color = Color(0.008, 0.055, 0.075, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.24, 0.95, 0.78, 0.86)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0.05, 0.9, 0.75, 0.22)
+shadow_size = 12
+
+[sub_resource type="StyleBoxLine" id="StyleSeparadorADA"]
+color = Color(0.25, 1, 0.85, 0.35)
+thickness = 1
+
+[node name="TransmisionADA" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_transmision")
+
+[node name="PanelTransmision" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -475.0
+offset_top = -155.0
+offset_right = -25.0
+offset_bottom = 155.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StylePanelADA")
+
+[node name="Margen" type="MarginContainer" parent="PanelTransmision"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 2
+
+[node name="Contenido" type="VBoxContainer" parent="PanelTransmision/Margen"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Cabecera" type="HBoxContainer" parent="PanelTransmision/Margen/Contenido"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="Indicador" type="ColorRect" parent="PanelTransmision/Margen/Contenido/Cabecera"]
+custom_minimum_size = Vector2(9, 9)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.35, 1, 0.7, 1)
+
+[node name="Nombre" type="Label" parent="PanelTransmision/Margen/Contenido/Cabecera"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.46, 1, 0.86, 1)
+theme_override_font_sizes/font_size = 23
+text = "A.D.A."
+
+[node name="Estado" type="Label" parent="PanelTransmision/Margen/Contenido/Cabecera"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.78, 0.85, 0.9)
+theme_override_font_sizes/font_size = 14
+text = "● TRANSMISION"
+horizontal_alignment = 2
+
+[node name="Separador" type="HSeparator" parent="PanelTransmision/Margen/Contenido"]
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleSeparadorADA")
+
+[node name="Cuerpo" type="HBoxContainer" parent="PanelTransmision/Margen/Contenido"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="AvatarADA" type="Control" parent="PanelTransmision/Margen/Contenido/Cuerpo"]
+custom_minimum_size = Vector2(125, 190)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("2_avatar")
+
+[node name="Mensaje" type="RichTextLabel" parent="PanelTransmision/Margen/Contenido/Cuerpo"]
+custom_minimum_size = Vector2(265, 175)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.78, 1, 0.93, 1)
+theme_override_font_sizes/normal_font_size = 18
+text = "Unidad Rover, conexion establecida."
+fit_content = true
+scroll_active = false
+
+[node name="Canal" type="Label" parent="PanelTransmision/Margen/Contenido"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.32, 0.73, 0.68, 0.8)
+theme_override_font_sizes/font_size = 12
+text = "CANAL NAVE 01  //  SEÑAL ESTABLE"
+horizontal_alignment = 2
