@@ -433,6 +433,7 @@ func _on_button_expansion_1_pressed() -> void:
 		minerales_nave -= costo
 		actualizar_contadores()
 		boton_expansion.disabled = true
+		MissionService.iniciar_ruta_calibracion()
 		_solicitar_guardado_progreso()
 
 
@@ -467,13 +468,34 @@ func _on_objetivo_actualizado(_mision_id: String, objetivo: String) -> void:
 	transmision_ada.mostrar_mensaje(objetivo, "progreso", 8.0)
 
 
-func _on_mision_completada(_mision_id: String) -> void:
-	transmision_ada.mostrar_mensaje(
-		"Excelente trabajo. Muestra recibida y almacenada en la nave. Progreso 2 de 2: " +
-		"completaste la primera mision utilizando los metodos minar y transferir.",
-		"completado",
-		10.0
-	)
+func _on_mision_completada(mision_id: String) -> void:
+	match mision_id:
+		"recolectar_primer_mineral":
+			transmision_ada.mostrar_mensaje(
+				"Excelente trabajo. Muestra recibida y almacenada. " +
+				"Completaste la primera mision utilizando los metodos " +
+				"minar y transferir.",
+				"completado",
+				10.0
+			)
+
+		"ruta_calibracion":
+			transmision_ada.mostrar_mensaje(
+				"Ruta de calibracion completada. Organizaste varias " +
+				"instrucciones en el orden correcto para resolver una tarea. " +
+				"Esto se conoce como una secuencia.",
+				"completado",
+				11.0
+			)
+		_:
+			transmision_ada.mostrar_mensaje(
+				"Mision completada correctamente.",
+				"completado",
+				8.0
+			)
+
+	# Guarda después de que MissionService marque la misión como completada.
+	_solicitar_guardado_progreso()
 	
 func _mostrar_mensaje_inicial_ada() -> void:
 	if MissionService.objective_completed:

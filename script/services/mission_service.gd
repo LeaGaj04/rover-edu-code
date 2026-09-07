@@ -37,6 +37,22 @@ func iniciar_mision() -> void:
 		objective_id,
 		"Encuentra una muestra y ejecuta rover.minar()."
 	)
+	
+func iniciar_ruta_calibracion() -> void:
+	objective_id = "ruta_calibracion"
+	objective_completed = false
+	estado_actual = EstadoMision.BUSCAR_MINERAL
+
+	mision_iniciada.emit(objective_id)
+
+	objetivo_actualizado.emit(
+		objective_id,
+		"RUTA DE CALIBRACION\n" +
+		"Programa una secuencia para avanzar al mineral, " +
+        "extraerlo, regresar a la casilla inicial y transferirlo."
+	)
+
+	print("Mision iniciada: ruta_calibracion")
 
 
 func reiniciar_mision() -> void:
@@ -71,6 +87,10 @@ func registrar_transferencia(cantidad: int) -> void:
 		return
 
 	if cantidad <= 0:
+		
+		return
+	if objective_id == "ruta_calibracion":
+		
 		return
 
 	estado_actual = EstadoMision.COMPLETADA
@@ -101,7 +121,7 @@ func aplicar_progreso(progress: Dictionary) -> void:
 			"recolectar_primer_mineral"
 		)
 	)
-
+	
 	var misiones_guardadas = progress.get(
 		"completed_missions",
 		[]
@@ -126,7 +146,13 @@ func aplicar_progreso(progress: Dictionary) -> void:
 		]
 
 	objective_completed = objective_id in completed_missions
-
+	if (
+		objective_id == "recolectar_primer_mineral"
+		and objective_completed
+		and int(progress.get("map_tier", 0)) >= 1
+	):
+		iniciar_ruta_calibracion()
+		return
 	if objective_completed:
 		estado_actual = EstadoMision.COMPLETADA
 	elif int(progress.get("minerals_rover", 0)) > 0:
@@ -164,3 +190,44 @@ func get_completed_missions() -> Array:
 
 func get_unlocked_knowledge() -> Array:
 	return unlocked_knowledge.duplicate()
+
+func evaluar_programa(resultado: Dictionary) -> void:
+	if objective_id != "ruta_calibracion":
+		return
+
+	if objective_completed:
+		return
+
+	if not resultado.get("success", false):
+		return
+
+	var comandos: Array = resultado.get("commands_used", [])
+	var secuencia_esperada: Array = [
+		"norte",
+		"minar",
+		"sur",
+        "transferir"
+	]
+
+	if comandos == secuencia_esperada:
+		estado_actual = EstadoMision.COMPLETADA
+		objective_completed = true
+
+		if objective_id not in completed_missions:
+			completed_missions.append(objective_id)
+
+			mision_completada.emit(objective_id)
+
+			print("Mision completada con la secuencia correcta.")
+			return
+
+	elif "transferir" in comandos:
+		estado_actual = EstadoMision.BUSCAR_MINERAL
+
+		objetivo_actualizado.emit(
+			objective_id,
+			"La ruta fue recorrida, pero las instrucciones deben formar " +
+            "un solo programa. Intenta escribirlas juntas y en orden."
+		)
+
+		print("Ruta incompleta: la secuencia debe ejecutarse en un solo programa.")

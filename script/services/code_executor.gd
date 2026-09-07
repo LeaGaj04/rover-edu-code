@@ -232,6 +232,7 @@ func _finalizar(resultado: Dictionary) -> void:
 	) / 1000.0
 
 	# Captura el estado real después de ejecutar todos los comandos.
+	MissionService.evaluar_programa(resultado)
 	resultado["objective_id"] = MissionService.objective_id
 	resultado["objective_completed"] = MissionService.objective_completed
 
