@@ -12,6 +12,7 @@ enum EstadoMision {
 	COMPLETADA,
 	COMPRAR_CASILLAS,
 	CICLO_RECOLECCION,
+	CAMINO_LARGO,
 }
 
 var objective_id: String = "recolectar_primer_mineral"
@@ -90,6 +91,7 @@ func registrar_compra_casillas() -> void:
 	estado_actual = EstadoMision.COMPLETADA
 	completed_missions.append(objective_id)
 	mision_completada.emit(objective_id)
+	iniciar_camino_largo()
 
 
 func evaluar_objetivo(minerales_recolectados: int) -> void:
@@ -201,6 +203,15 @@ func aplicar_progreso(progress: Dictionary) -> void:
 	if objective_id == "ciclo_recoleccion":
 		estado_actual = EstadoMision.CICLO_RECOLECCION
 		return
+	if (
+		(objective_id == "comprar_casillas" and objective_completed)
+		or (objective_id == "comprar_casillas" and "comprar_casillas" in completed_missions)
+	):
+		iniciar_camino_largo()
+		return
+	if objective_id == "camino_largo":
+		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.CAMINO_LARGO
+		return
 	if objective_id == "comprar_casillas":
 		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.COMPRAR_CASILLAS
 		return
@@ -230,7 +241,14 @@ func aplicar_progreso(progress: Dictionary) -> void:
 func get_objetivo_actual() -> String:
 	if objective_completed:
 		return "Misión completada."
-
+	if objective_id == "camino_largo":
+		return (
+			"CAMINO LARGO (PARÁMETROS)\n" +
+			"Los métodos pueden recibir números para indicar cuántos pasos dar.\n" +
+			"Por ejemplo: rover.norte(2) o rover.sur(2) avanzan dos casillas.\n" +
+			"Tu desafío: navega usando al menos un parámetro mayor a 1, " +
+			"extrae una muestra y transfiérela a la nave."
+		)
 	if objective_id == "ciclo_recoleccion":
 		return (
 			"CICLO DE RECOLECCIÓN\n" +
@@ -275,6 +293,10 @@ func evaluar_programa(resultado: Dictionary) -> void:
 		return
 
 	if not resultado.get("success", false):
+		return
+
+	if objective_id == "camino_largo":
+		_evaluar_camino_largo(resultado)
 		return
 
 	if objective_id == "ciclo_recoleccion":
@@ -373,3 +395,52 @@ func iniciar_ciclo_recoleccion() -> void:
 	mision_iniciada.emit(objective_id)
 
 	print("Misión iniciada: ciclo_recoleccion")
+
+func iniciar_camino_largo() -> void:
+	objective_id = "camino_largo"
+	objective_completed = "camino_largo" in completed_missions
+	estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.CAMINO_LARGO
+
+	mision_iniciada.emit(objective_id)
+	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
+	print("Misión iniciada: camino_largo")
+
+
+func _evaluar_camino_largo(resultado: Dictionary) -> void:
+	var comandos_data: Array = resultado.get("commands_data", [])
+	var recolectados: int = int(resultado.get("minerals_collected", 0))
+	var transferidos: int = int(resultado.get("minerals_transferred", 0))
+
+	# 1. Comprobar si usó al menos un parámetro numérico > 1
+	var uso_parametro := false
+	for cmd in comandos_data:
+		if int(cmd.get("steps", 1)) > 1:
+			uso_parametro = true
+			break
+
+	if not uso_parametro:
+		objetivo_actualizado.emit(
+			objective_id,
+			"Para completar esta misión debes usar parámetros numéricos mayores a 1. " +
+			"Por ejemplo: rover.norte(2) o rover.sur(2) en lugar de dar pasos individuales."
+		)
+		return
+
+	# 2. Comprobar que haya minado y transferido
+	if recolectados < 1 or transferidos < 1:
+		objetivo_actualizado.emit(
+			objective_id,
+			"Buen uso de parámetros, pero debes extraer al menos 1 mineral " +
+			"y transferirlo a la nave en la casilla inicial para completar la misión."
+		)
+		return
+
+	objective_completed = true
+	estado_actual = EstadoMision.COMPLETADA
+
+	if objective_id not in completed_missions:
+		completed_missions.append(objective_id)
+
+	desbloquear_conocimiento("parametro")
+	mision_completada.emit(objective_id)
+	print("Misión camino_largo completada!")
