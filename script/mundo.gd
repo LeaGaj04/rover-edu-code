@@ -17,6 +17,7 @@ var max_minerales: int = 1
 var corredor_1x3_desbloqueado: bool = false
 var mapa_3x3_desbloqueado: bool = false
 var casillas_extra_desbloqueadas: bool = false
+var ultima_celda_minada: Vector3i = Vector3i(9999, 9999, 9999)
 
 func _ready():
 	var map_tier := 0
@@ -37,6 +38,9 @@ func _ready():
 	aplicar_progreso_mapa(map_tier)
 	_posicionar_rover_en_casilla_inicial()
 	generar_minerales_iniciales()
+	var rover := grid_map.get_node_or_null("Rover")
+	if rover != null and rover.has_signal("mineral_minado"):
+		rover.mineral_minado.connect(_on_mineral_minado)
 
 	if restaurar_progreso:
 		var sintaxis = progreso.get("unlocked_syntax", {})
@@ -48,6 +52,10 @@ func _ready():
 	var interfaz := get_node_or_null("CanvasLayer")
 	if interfaz != null:
 		interfaz.aplicar_progreso(progreso)
+
+func _on_mineral_minado(celda: Vector3i) -> void:
+	ultima_celda_minada = celda
+	spawn_mineral_aleatorio()
 
 # Reconstruye el mapa desde el tier persistido. No valida costos ni emite
 # efectos de compra, por lo que también se puede usar al restaurar progreso.
@@ -143,7 +151,6 @@ func generar_minerales_iniciales():
 		spawn_mineral_aleatorio()
 
 func spawn_mineral_aleatorio() -> void:
-	var casilla_mineral := CASILLA_INICIAL
 	var ocupadas: Array[Vector3i] = []
 	for mineral in get_tree().get_nodes_in_group("minerales"):
 		var objeto := mineral.get_parent() as Node3D
@@ -152,32 +159,55 @@ func spawn_mineral_aleatorio() -> void:
 		var celda := grid_map.local_to_map(grid_map.to_local(objeto.global_position))
 		celda.y = 0
 		ocupadas.append(celda)
+
 	if ocupadas.size() >= max_minerales:
 		return
 
-	# Con el corredor desbloqueado, aparece en el extremo norte.
-	if casillas_extra_desbloqueadas:
-		var disponibles: Array[Vector3i] = []
-		for celda in grid_map.get_used_cells():
-			if celda not in ocupadas:
-				disponibles.append(celda)
-		if disponibles.is_empty():
-			return
-		casilla_mineral = disponibles.pick_random()
-	elif corredor_1x3_desbloqueado:
-		casilla_mineral = (
-			CASILLA_INICIAL + Vector3i(0, 0, -1)
-		)
+	var casilla_mineral := CASILLA_INICIAL
 
+	# 1. Sector expandido 2x3 (map_tier >= 2)
+	if casillas_extra_desbloqueadas:
+		var candidatas: Array[Vector3i] = []
+		for celda in grid_map.get_used_cells():
+			var celda_2d := Vector3i(celda.x, 0, celda.z)
+			# REGLA A: Nunca en la casilla de transferencia / nave (0, 0, 0)
+			if celda_2d == CASILLA_TRANSFERENCIA:
+				continue
+			# REGLA B: Nunca en una celda que ya tenga mineral
+			if celda_2d in ocupadas:
+				continue
+			candidatas.append(celda_2d)
+
+		if candidatas.is_empty():
+			return
+
+		# REGLA C: Evitar la última celda minada si hay otra alternativa disponible
+		var candidatas_sin_repetir: Array[Vector3i] = []
+		for c in candidatas:
+			if c != ultima_celda_minada:
+				candidatas_sin_repetir.append(c)
+
+		if not candidatas_sin_repetir.is_empty():
+			casilla_mineral = candidatas_sin_repetir.pick_random()
+		else:
+			# Si no hay alternativa, permitimos repetir
+			casilla_mineral = candidatas.pick_random()
+
+	# 2. Corredor 1x3 (map_tier 1)
+	elif corredor_1x3_desbloqueado:
+		casilla_mineral = CASILLA_INICIAL + Vector3i(0, 0, -1)
+
+	# 3. Zona inicial 1x1 (map_tier 0)
+	else:
+		casilla_mineral = CASILLA_INICIAL
+
+	# Instanciar el mineral visualmente centrado en la casilla elegida
 	var centro_local := grid_map.map_to_local(casilla_mineral)
 	var centro_global := grid_map.to_global(centro_local)
 
 	var nuevo_mineral = mineral_scene.instantiate()
 	add_child(nuevo_mineral)
-
-	nuevo_mineral.global_position = (
-		centro_global + Vector3(0, -0.4, 0.3)
-	)
+	nuevo_mineral.global_position = centro_global + Vector3(0, -0.4, 0.3)
 
 func reubicar_mineral_para_corredor() -> void:
 	var minerales := get_tree().get_nodes_in_group("minerales")

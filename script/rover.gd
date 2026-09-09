@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 signal mineral_recolectado(cantidad)
+signal mineral_minado(celda: Vector3i)
 
 # Distancia de cada paso en unidades 3D (el tamaño de tu casilla)
 var paso_distancia: float = 2.0
@@ -137,7 +138,7 @@ func minar() -> Dictionary:
 
 			if is_instance_valid(nodo_mineral):
 				nodo_mineral.queue_free()
-			get_parent().get_parent().spawn_mineral_aleatorio()
+			mineral_minado.emit(casilla_rover)
 			mineral_recolectado.emit(1)
 			MissionService.evaluar_objetivo(1)
 
