@@ -439,7 +439,9 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_tienda_disabled")
 text = "[ BUCLE FOR ]
-30 MINERALES"
+Se desbloquea
+ al completar 
+la Ruta de calibración."
 
 [node name="ButtonFor2" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=542620933]
 layout_mode = 0

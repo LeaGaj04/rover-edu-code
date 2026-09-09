@@ -49,7 +49,6 @@ func _ready():
 	if interfaz != null:
 		interfaz.aplicar_progreso(progreso)
 
-
 # Reconstruye el mapa desde el tier persistido. No valida costos ni emite
 # efectos de compra, por lo que también se puede usar al restaurar progreso.
 func aplicar_progreso_mapa(map_tier: int) -> void:
