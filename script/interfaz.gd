@@ -549,17 +549,32 @@ func _on_mision_completada(mision_id: String) -> void:
 				"Expansión completada. Compraste tres casillas y ahora hay dos depósitos de mineral distribuidos aleatoriamente en el mapa.",
 				"completado", 10.0
 			)
+		"camino_largo":
+			transmision_ada.mostrar_mensaje(
+				"¡Excelente navegación! Has dominado el uso de parámetros.\n" +
+				"Ahora puedes controlar la cantidad exacta de pasos en tus métodos " +
+				"sin necesidad de repetir instrucciones innecesarias.\n" +
+				"Conocimiento desbloqueado: PARÁMETROS.",
+				"completado",
+				15.0
+			)
 		_:
 			transmision_ada.mostrar_mensaje(
 				"Mision completada correctamente.",
 				"completado",
 				8.0
 			)
-
 	# Guarda después de que MissionService marque la misión como completada.
 	_solicitar_guardado_progreso()
 	
 func _mostrar_mensaje_inicial_ada() -> void:
+	if MissionService.objective_id == "camino_largo" and not MissionService.objective_completed:
+		transmision_ada.mostrar_mensaje(
+			MissionService.get_objetivo_actual(),
+			"objetivo",
+			15.0
+		)
+		return
 	if MissionService.objective_id == "ciclo_recoleccion":
 		transmision_ada.mostrar_mensaje(
 			MissionService.get_objetivo_actual(),

@@ -77,6 +77,10 @@ func ejecutar_codigo(
 		resultado["commands_used"].append(
 			instruccion["command"]
 		)
+		resultado["commands_data"].append({
+			"command": instruccion["command"],
+			"steps": instruccion["steps"]
+		})
 		resultado["command_count"] += 1
 		resultado["movement_count"] += int(
 			resultado_comando.get("steps_completed", 0)
@@ -369,6 +373,7 @@ func _crear_resultado(codigo: String) -> Dictionary:
 		"error_message": "",
 		"errors": [],
 		"commands_used": [],
+		"commands_data": [],
 		"command_count": 0,
 		"movement_count": 0,
 		"loop_count": 0,
