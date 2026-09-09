@@ -40,34 +40,43 @@ func ejecutar_codigo(
 		_finalizar(resultado)
 		return resultado
 
-	var lineas := codigo.split("\n")
+	var compilacion: Dictionary = compilar_programa(codigo)
 
-	for indice in range(lineas.size()):
-		var numero_linea := indice + 1
-		var contenido := lineas[indice].strip_edges()
+	if not compilacion["ok"]:
+		var error: Dictionary = compilacion["error"]
 
-		if contenido.is_empty():
-			continue
+		resultado["error_type"] = error["type"]
+		resultado["error_message"] = error["message"]
+		resultado["errors"].append(error)
 
-		var analisis := analizar_linea(contenido, numero_linea)
+		error_detectado.emit(error)
+		_finalizar(resultado)
+		return resultado
 
-		if not analisis["ok"]:
-			resultado["error_type"] = analisis["error"]["type"]
-			resultado["error_message"] = analisis["error"]["message"]
-			resultado["errors"].append(analisis["error"])
+	var instrucciones: Array = compilacion["instrucciones"]
+	if "for " in codigo:
+		resultado["loop_count"] = 1
 
-			error_detectado.emit(analisis["error"])
-			_finalizar(resultado)
-			return resultado
+		for instruccion in instrucciones:
+			resultado["loop_iterations"] = maxi(
+				resultado["loop_iterations"],
+				int(instruccion.get("loop_iteration", 0))
+			)
+
+	for instruccion in instrucciones:
+		var numero_linea: int = instruccion["numero"]
+		var contenido: String = instruccion["contenido"]
 
 		linea_iniciada.emit(numero_linea, contenido)
 
 		var resultado_comando: Dictionary = await ejecutar_comando.call(
-			analisis["command"],
-			analisis["steps"]
+			instruccion["command"],
+			instruccion["steps"]
 		)
 
-		resultado["commands_used"].append(analisis["command"])
+		resultado["commands_used"].append(
+			instruccion["command"]
+		)
 		resultado["command_count"] += 1
 		resultado["movement_count"] += int(
 			resultado_comando.get("steps_completed", 0)
@@ -94,6 +103,19 @@ func ejecutar_codigo(
 			error_detectado.emit(error_comando)
 			_finalizar(resultado)
 			return resultado
+
+		var recolectados: int = int(
+			resultado_comando.get("minerals_collected", 0)
+		)
+		var transferidos: int = int(
+			resultado_comando.get("minerals_transferred", 0)
+		)
+
+		resultado["minerals_collected"] += recolectados
+		resultado["minerals_transferred"] += transferidos
+
+		if int(instruccion.get("loop_iteration", 0)) > 0:
+			resultado["loop_minerals_collected"] += recolectados
 
 		linea_finalizada.emit(numero_linea, contenido)
 
@@ -193,6 +215,151 @@ func analizar_linea(contenido: String, numero_linea: int) -> Dictionary:
 		"steps": pasos
 	}
 
+func compilar_programa(codigo: String) -> Dictionary:
+	var instrucciones: Array = []
+	var lineas := codigo.split("\n")
+	var indice := 0
+
+	while indice < lineas.size():
+		var linea_original: String = lineas[indice]
+		var contenido := linea_original.strip_edges()
+		var numero_linea := indice + 1
+
+		if contenido.is_empty():
+			indice += 1
+			continue
+
+		if contenido.begins_with("for "):
+			var resultado_for: Dictionary = _analizar_for(
+				contenido,
+				numero_linea
+			)
+
+			if not resultado_for["ok"]:
+				return resultado_for
+
+			var repeticiones: int = resultado_for["repeticiones"]
+			var cuerpo: Array = []
+			indice += 1
+
+			while indice < lineas.size():
+				var linea_cuerpo: String = lineas[indice]
+
+				if linea_cuerpo.strip_edges().is_empty():
+					indice += 1
+					continue
+
+				var tiene_sangria := (
+					linea_cuerpo.begins_with("\t")
+					or linea_cuerpo.begins_with("    ")
+				)
+
+				if not tiene_sangria:
+					break
+
+				var contenido_cuerpo := linea_cuerpo.strip_edges()
+				var analisis: Dictionary = analizar_linea(
+					contenido_cuerpo,
+					indice + 1
+				)
+
+				if not analisis["ok"]:
+					return analisis
+
+				cuerpo.append({
+					"numero": indice + 1,
+					"contenido": contenido_cuerpo,
+					"command": analisis["command"],
+					"steps": analisis["steps"]
+				})
+
+				indice += 1
+
+			if cuerpo.is_empty():
+				return _error_de_linea(
+					numero_linea,
+					contenido,
+					"El bucle necesita al menos una instrucción con sangría."
+				)
+
+			for iteracion in range(repeticiones):
+				for instruccion in cuerpo:
+					var copia: Dictionary = instruccion.duplicate()
+					copia["loop_iteration"] = iteracion + 1
+					instrucciones.append(copia)
+
+			continue
+
+		var analisis: Dictionary = analizar_linea(
+			contenido,
+			numero_linea
+		)
+
+		if not analisis["ok"]:
+			return analisis
+
+		instrucciones.append({
+			"numero": numero_linea,
+			"contenido": contenido,
+			"command": analisis["command"],
+			"steps": analisis["steps"],
+			"loop_iteration": 0
+		})
+
+		indice += 1
+
+	return {
+		"ok": true,
+		"instrucciones": instrucciones
+	}
+
+func _analizar_for(
+	contenido: String,
+	numero_linea: int
+) -> Dictionary:
+	var expresion := RegEx.new()
+	var patron := (
+		"^for\\s+([A-Za-z_][A-Za-z0-9_]*)"
+		+ "\\s+in\\s+range\\((\\d+)\\):$"
+	)
+
+	if expresion.compile(patron) != OK:
+		return _error_de_linea(
+			numero_linea,
+			contenido,
+			"No se pudo preparar el analizador del bucle."
+		)
+
+	var coincidencia := expresion.search(contenido)
+
+	if coincidencia == null:
+		return _error_de_linea(
+			numero_linea,
+			contenido,
+			"Usa el formato: for ciclo in range(10):"
+		)
+
+	var repeticiones := int(coincidencia.get_string(2))
+
+	if repeticiones <= 0:
+		return _error_de_linea(
+			numero_linea,
+			contenido,
+			"range() debe contener un número mayor que cero."
+		)
+
+	if repeticiones > 50:
+		return _error_de_linea(
+			numero_linea,
+			contenido,
+			"Por seguridad, el bucle no puede superar 50 repeticiones."
+		)
+
+	return {
+		"ok": true,
+		"repeticiones": repeticiones
+	}
+
 
 func _crear_resultado(codigo: String) -> Dictionary:
 	return {
@@ -204,6 +371,11 @@ func _crear_resultado(codigo: String) -> Dictionary:
 		"commands_used": [],
 		"command_count": 0,
 		"movement_count": 0,
+		"loop_count": 0,
+		"loop_iterations": 0,
+		"minerals_collected": 0,
+		"minerals_transferred": 0,
+		"loop_minerals_collected": 0,
 		"duration_seconds": 0.0,
 		"objective_id": MissionService.objective_id,
 		"objective_completed": MissionService.objective_completed

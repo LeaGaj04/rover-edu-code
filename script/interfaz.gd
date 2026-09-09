@@ -419,7 +419,12 @@ func _on_button_while_pressed() -> void:
 	intentar_compra("while", boton_while, null)
 
 func _on_button_for_pressed() -> void:
-	intentar_compra("for", boton_for, null)
+	transmision_ada.mostrar_mensaje(
+		"El módulo for se desbloquea gratuitamente " +
+		"al completar la Ruta de calibración.",
+		"objetivo",
+		8.0
+	)
 
 func _on_button_expansion_1_pressed() -> void:
 	var mundo = get_parent()
@@ -480,7 +485,14 @@ func _on_error_detectado(error: Dictionary) -> void:
 
 func _on_ejecucion_finalizada(resultado: Dictionary) -> void:
 	print("Resultado de ejecución: ", resultado)
-	if MissionService.objective_id == "ruta_calibracion" and MissionService.objective_completed:
+
+	if (
+		MissionService.objective_completed
+		and MissionService.objective_id in [
+			"ruta_calibracion",
+			"ciclo_recoleccion"
+		]
+	):
 		MissionService.preparar_mision_expansion()
 		actualizar_mejoras_visual()
 		_solicitar_guardado_progreso()
@@ -503,11 +515,25 @@ func _on_mision_completada(mision_id: String) -> void:
 
 		"ruta_calibracion":
 			transmision_ada.mostrar_mensaje(
-				"Ruta de calibracion completada. Organizaste varias " +
-				"instrucciones en el orden correcto para resolver una tarea. " +
-				"Esto se conoce como una secuencia. Siguiente misión: reúne 10 minerales en la nave y compra +3 CASILLAS en Mejoras.",
+				"Ruta calibrada. Módulo for desbloqueado.\n" +
+				"Un bucle repite un grupo de instrucciones. " +
+				"Por ejemplo, for ciclo in range(2): repite dos veces " +
+				"las instrucciones con sangría que aparecen debajo.\n" +
+				"Ahora automatiza la recolección de 10 minerales " +
+				"y transfiérelos una sola vez al final. " +
+				"Deja la transferencia fuera del bucle.",
 				"completado",
-				11.0
+				25.0
+			)
+
+		"ciclo_recoleccion":
+			transmision_ada.mostrar_mensaje(
+				"Diez minerales recibidos. Automatizaste la recolección " +
+				"utilizando un bucle y ejecutaste la transferencia al final.\n" +
+				"Ahora puedes comprar +3 CASILLAS en Mejoras " +
+				"con 10 minerales de la nave.",
+				"completado",
+				16.0
 			)
 		"comprar_casillas":
 			transmision_ada.mostrar_mensaje(
@@ -525,6 +551,13 @@ func _on_mision_completada(mision_id: String) -> void:
 	_solicitar_guardado_progreso()
 	
 func _mostrar_mensaje_inicial_ada() -> void:
+	if MissionService.objective_id == "ciclo_recoleccion":
+		transmision_ada.mostrar_mensaje(
+			MissionService.get_objetivo_actual(),
+			"objetivo",
+			25.0
+		)
+		return
 	if MissionService.objective_id == "comprar_casillas":
 		transmision_ada.mostrar_mensaje(MissionService.get_objetivo_actual(), "objetivo", 10.0)
 		return
