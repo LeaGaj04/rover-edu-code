@@ -29,9 +29,9 @@ func mostrar_mensaje(texto: String, tipo: String = "objetivo", duracion: float =
 	if tipo == "error":
 		estado.text = "● ALERTA"
 	elif tipo == "progreso":
-		estado.text = "● PROGRESO 1/2"
+		estado.text = "● EN CURSO"
 	elif tipo == "completado":
-		estado.text = "● PROGRESO 2/2"
+		estado.text = "● MISION CUMPLIDA"
 
 	mensaje.text = texto
 	mensaje.visible_characters = 0

@@ -414,16 +414,25 @@ func _crear_error_comando(
 		"message": mensaje,
 		"steps_completed": 0
 	}
-		
-func _on_button_while_pressed() -> void:
-	intentar_compra("while", boton_while, null)
-
+	
 func _on_button_for_pressed() -> void:
 	transmision_ada.mostrar_mensaje(
 		"El módulo for se desbloquea gratuitamente " +
 		"al completar la Ruta de calibración.",
 		"objetivo",
 		8.0
+	)
+func _on_button_while_pressed() -> void:
+	transmision_ada.mostrar_mensaje(
+		"El bucle while está en desarrollo para futuras misiones de automatización.",
+		"objetivo",
+		6.0
+	)
+func _on_button_if_pressed() -> void:
+	transmision_ada.mostrar_mensaje(
+		"El condicional if está en desarrollo para futuras misiones con sensores.",
+		"objetivo",
+		6.0
 	)
 
 func _on_button_expansion_1_pressed() -> void:

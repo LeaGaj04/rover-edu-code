@@ -489,7 +489,7 @@ offset_left = 800.0
 offset_top = 420.0
 offset_right = 950.0
 offset_bottom = 490.0
-tooltip_text = "Agrega tres casillas y habilita dos depósitos aleatorios. Requiere completar Ruta de calibración. Cuesta 10 minerales de la nave."
+tooltip_text = "Agrega tres casillas y habilita dos depósitos aleatorios. Requiere completar Ciclo de recolección. Cuesta 10 minerales de la nave."
 theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
 theme_override_colors/font_disabled_color = Color(0.55, 0.55, 0.58, 1)
 theme_override_font_sizes/font_size = 16
@@ -651,7 +651,7 @@ transform = Transform3D(1, 0, 0, 0, 0.9998309, -0.018388607, 0, 0.018388607, 0.9
 [connection signal="pressed" from="CanvasLayer/PanelCodigo/Contenido/Button" to="CanvasLayer" method="_on_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/ContenedorTienda/BotonTienda" to="CanvasLayer" method="_on_boton_tienda_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonWhile" to="CanvasLayer" method="_on_button_while_pressed"]
-[connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonIf" to="CanvasLayer" method="_on_button_while_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonIf" to="CanvasLayer" method="_on_button_if_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonFor" to="CanvasLayer" method="_on_button_for_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonFor2" to="CanvasLayer" method="_on_button_for_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonExpansion1" to="CanvasLayer" method="_on_button_expansion_1_pressed"]
