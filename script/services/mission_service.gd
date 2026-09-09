@@ -10,6 +10,7 @@ enum EstadoMision {
 	BUSCAR_MINERAL,
 	TRANSFERIR_MINERAL,
 	COMPLETADA,
+	COMPRAR_CASILLAS,
 }
 
 var objective_id: String = "recolectar_primer_mineral"
@@ -57,6 +58,24 @@ func iniciar_ruta_calibracion() -> void:
 
 func reiniciar_mision() -> void:
 	iniciar_mision()
+
+
+func preparar_mision_expansion() -> void:
+	if objective_id != "ruta_calibracion" or not objective_completed:
+		return
+	objective_id = "comprar_casillas"
+	objective_completed = "comprar_casillas" in completed_missions
+	estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.COMPRAR_CASILLAS
+	mision_iniciada.emit(objective_id)
+
+
+func registrar_compra_casillas() -> void:
+	if objective_id != "comprar_casillas" or objective_completed:
+		return
+	objective_completed = true
+	estado_actual = EstadoMision.COMPLETADA
+	completed_missions.append(objective_id)
+	mision_completada.emit(objective_id)
 
 
 func evaluar_objetivo(minerales_recolectados: int) -> void:
@@ -146,6 +165,10 @@ func aplicar_progreso(progress: Dictionary) -> void:
 		]
 
 	objective_completed = objective_id in completed_missions
+	preparar_mision_expansion()
+	if objective_id == "comprar_casillas":
+		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.COMPRAR_CASILLAS
+		return
 	if (
 		objective_id == "recolectar_primer_mineral"
 		and objective_completed
@@ -170,6 +193,8 @@ func aplicar_progreso(progress: Dictionary) -> void:
 
 
 func get_objetivo_actual() -> String:
+	if objective_id == "comprar_casillas":
+		return "Expansión completada: tres casillas nuevas." if objective_completed else "Reúne 10 minerales en la nave y compra +3 CASILLAS en Mejoras."
 	match estado_actual:
 		EstadoMision.BUSCAR_MINERAL:
 			return "Minar la primera muestra."
