@@ -10,11 +10,13 @@ const CASILLA_TRANSFERENCIA := CASILLA_INICIAL
 # Nivel de expansión del mismo mapa.
 # 0 = zona inicial 1x1
 # 1 = corredor 1x3
-# 2 = sector 3x3
+# 2 = sector 2x3 (tres casillas adicionales)
+# 3 = sector 3x3, reservado para una expansión futura
 var radio_mapa_desbloqueado: int = 0
 var max_minerales: int = 1
 var corredor_1x3_desbloqueado: bool = false
 var mapa_3x3_desbloqueado: bool = false
+var casillas_extra_desbloqueadas: bool = false
 
 func _ready():
 	var map_tier := 0
@@ -58,8 +60,10 @@ func aplicar_progreso_mapa(map_tier: int) -> void:
 	)
 
 	mapa_3x3_desbloqueado = (
-		radio_mapa_desbloqueado >= 2
+		radio_mapa_desbloqueado >= 3
 	)
+	casillas_extra_desbloqueadas = radio_mapa_desbloqueado >= 2
+	max_minerales = 2 if casillas_extra_desbloqueadas else 1
 
 	grid_map.clear()
 
@@ -82,6 +86,13 @@ func aplicar_progreso_mapa(map_tier: int) -> void:
 					tipo_casilla
 				)
 
+		return
+
+	if casillas_extra_desbloqueadas:
+		for x in range(0, 2):
+			for z in range(-1, 2):
+				var casilla := CASILLA_INICIAL + Vector3i(x, 0, z)
+				grid_map.set_cell_item(casilla, 1 if (x + z) % 2 == 0 else 2)
 		return
 
 	# Corredor 1x3: comienza en la nave y avanza hacia el norte.
@@ -134,9 +145,27 @@ func generar_minerales_iniciales():
 
 func spawn_mineral_aleatorio() -> void:
 	var casilla_mineral := CASILLA_INICIAL
+	var ocupadas: Array[Vector3i] = []
+	for mineral in get_tree().get_nodes_in_group("minerales"):
+		var objeto := mineral.get_parent() as Node3D
+		if objeto == null or objeto.get_parent() != self or objeto.is_queued_for_deletion():
+			continue
+		var celda := grid_map.local_to_map(grid_map.to_local(objeto.global_position))
+		celda.y = 0
+		ocupadas.append(celda)
+	if ocupadas.size() >= max_minerales:
+		return
 
 	# Con el corredor desbloqueado, aparece en el extremo norte.
-	if corredor_1x3_desbloqueado:
+	if casillas_extra_desbloqueadas:
+		var disponibles: Array[Vector3i] = []
+		for celda in grid_map.get_used_cells():
+			if celda not in ocupadas:
+				disponibles.append(celda)
+		if disponibles.is_empty():
+			return
+		casilla_mineral = disponibles.pick_random()
+	elif corredor_1x3_desbloqueado:
 		casilla_mineral = (
 			CASILLA_INICIAL + Vector3i(0, 0, -1)
 		)
@@ -170,7 +199,7 @@ func reubicar_mineral_para_corredor() -> void:
 		objeto_mineral.queue_free()
 
 	# Esperamos a que Godot elimine el mineral anterior.
-	call_deferred("spawn_mineral_aleatorio")
+	call_deferred("generar_minerales_iniciales")
 
 func rover_esta_en_casilla_transferencia(rover: Node3D) -> bool:
 	if rover == null:
@@ -198,6 +227,14 @@ func expandir_corredor_1x3() -> bool:
 	return true
 
 
+func expandir_tres_casillas() -> bool:
+	if casillas_extra_desbloqueadas or not corredor_1x3_desbloqueado:
+		return false
+	aplicar_progreso_mapa(2)
+	reubicar_mineral_para_corredor()
+	return true
+
+
 func expandir_mapa_3x3() -> bool:
 	if mapa_3x3_desbloqueado:
 		return false
@@ -205,7 +242,7 @@ func expandir_mapa_3x3() -> bool:
 	if not corredor_1x3_desbloqueado:
 		return false
 
-	aplicar_progreso_mapa(2)
+	aplicar_progreso_mapa(3)
 
 	print(
 		"Sector adquirido: terreno expandido a 3x3."

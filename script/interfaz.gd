@@ -40,11 +40,13 @@ var minerales_rover : int = 0
 @onready var boton_for = $PanelTienda/LienzoArbol/ButtonFor
 @onready var boton_if = $PanelTienda/LienzoArbol/ButtonIf
 @onready var boton_expansion = $PanelTienda/LienzoArbol/ButtonExpansion1
+@onready var boton_expansion_2: Button = $PanelTienda/LienzoArbol/ButtonExpansion2
 
 const PRECIOS = {
 	"while": 15,
 	"for": 30,
-	"mapa": 1
+	"mapa": 1,
+	"casillas_extra": 10
 }
 
 func _ready() -> void:
@@ -289,6 +291,8 @@ func _solicitar_guardado_progreso() -> void:
 
 
 func actualizar_mejoras_visual() -> void:
+	if boton_expansion_2 != null:
+		boton_expansion_2.disabled = get_parent().casillas_extra_desbloqueadas or MissionService.objective_id != "comprar_casillas"
 	if boton_while != null:
 		boton_while.disabled = GestorSintaxis.esta_desbloqueada("while")
 	if boton_for != null:
@@ -438,8 +442,22 @@ func _on_button_expansion_1_pressed() -> void:
 
 
 func _on_button_expansion_2_pressed() -> void:
-	# La segunda expansión queda reservada para una implementación futura.
-	print("EX Mapa 2 todavía no está disponible.")
+	var mundo := get_parent()
+	if mundo.casillas_extra_desbloqueadas or MissionService.objective_id != "comprar_casillas":
+		return
+	if CodeExecutor.ejecutando:
+		transmision_ada.mostrar_mensaje("Espera a que termine el programa antes de expandir el mapa.", "error")
+		return
+	var costo: int = PRECIOS["casillas_extra"]
+	if minerales_nave < costo:
+		transmision_ada.mostrar_mensaje("Necesitas 10 minerales en la nave. Recolecta y transfiere más minerales antes de comprar.", "error")
+		return
+	if mundo.expandir_tres_casillas():
+		minerales_nave -= costo
+		actualizar_contadores()
+		MissionService.registrar_compra_casillas()
+		actualizar_mejoras_visual()
+		_solicitar_guardado_progreso()
 	
 func _on_linea_iniciada(numero: int, contenido: String) -> void:
 	print("Ejecutando línea ", numero, ": ", contenido)
@@ -462,6 +480,10 @@ func _on_error_detectado(error: Dictionary) -> void:
 
 func _on_ejecucion_finalizada(resultado: Dictionary) -> void:
 	print("Resultado de ejecución: ", resultado)
+	if MissionService.objective_id == "ruta_calibracion" and MissionService.objective_completed:
+		MissionService.preparar_mision_expansion()
+		actualizar_mejoras_visual()
+		_solicitar_guardado_progreso()
 
 
 func _on_objetivo_actualizado(_mision_id: String, objetivo: String) -> void:
@@ -483,9 +505,14 @@ func _on_mision_completada(mision_id: String) -> void:
 			transmision_ada.mostrar_mensaje(
 				"Ruta de calibracion completada. Organizaste varias " +
 				"instrucciones en el orden correcto para resolver una tarea. " +
-				"Esto se conoce como una secuencia.",
+				"Esto se conoce como una secuencia. Siguiente misión: reúne 10 minerales en la nave y compra +3 CASILLAS en Mejoras.",
 				"completado",
 				11.0
+			)
+		"comprar_casillas":
+			transmision_ada.mostrar_mensaje(
+				"Expansión completada. Compraste tres casillas y ahora hay dos depósitos de mineral distribuidos aleatoriamente en el mapa.",
+				"completado", 10.0
 			)
 		_:
 			transmision_ada.mostrar_mensaje(
@@ -498,6 +525,9 @@ func _on_mision_completada(mision_id: String) -> void:
 	_solicitar_guardado_progreso()
 	
 func _mostrar_mensaje_inicial_ada() -> void:
+	if MissionService.objective_id == "comprar_casillas":
+		transmision_ada.mostrar_mensaje(MissionService.get_objetivo_actual(), "objetivo", 10.0)
+		return
 	if MissionService.objective_completed:
 		transmision_ada.mostrar_mensaje(
 			"Bienvenido nuevamente, unidad Rover. La primera muestra ya fue procesada. " +
