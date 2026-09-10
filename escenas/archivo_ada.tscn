@@ -1,0 +1,226 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://script/archivo_ada.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fondo_tienda"]
+bg_color = Color(0, 0, 0, 0.6784314)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_codice"]
+bg_color = Color(0.005, 0.055, 0.02, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.372549, 0.592157, 0.419608, 0.95)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0.0039, 0.09, 0.011, 0.85)
+shadow_size = 12
+shadow_offset = Vector2(8, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_caja_codigo"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+bg_color = Color(0.0, 0.03, 0.01, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.5, 0.3, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boton_cerrar"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.0, 0.066, 0.0, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.37, 0.59, 0.42, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="ArchivoADA" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="OscurecerFondo" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_fondo_tienda")
+
+[node name="Centro" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelPrincipal" type="PanelContainer" parent="Centro"]
+custom_minimum_size = Vector2(1180, 720)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel_codice")
+
+[node name="VBox" type="VBoxContainer" parent="Centro/PanelPrincipal"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Cabecera" type="HBoxContainer" parent="Centro/PanelPrincipal/VBox"]
+layout_mode = 2
+
+[node name="Titulo" type="Label" parent="Centro/PanelPrincipal/VBox/Cabecera"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.76, 0.94, 0.78, 1)
+theme_override_font_sizes/font_size = 24
+text = "◆ CÓDICE / ARCHIVO DE CONOCIMIENTOS A.D.A. ◆"
+
+[node name="BotonCerrar" type="Button" parent="Centro/PanelPrincipal/VBox/Cabecera"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_boton_cerrar")
+text = "CERRAR"
+
+[node name="Pestanas" type="HBoxContainer" parent="Centro/PanelPrincipal/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BotonFundamentos" type="Button" parent="Centro/PanelPrincipal/VBox/Pestanas"]
+custom_minimum_size = Vector2(190, 38)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_boton_cerrar")
+text = "[ FUNDAMENTOS ]"
+
+[node name="BotonControl" type="Button" parent="Centro/PanelPrincipal/VBox/Pestanas"]
+custom_minimum_size = Vector2(190, 38)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_boton_cerrar")
+text = "[ CONTROL ]"
+
+[node name="BotonOrganizacion" type="Button" parent="Centro/PanelPrincipal/VBox/Pestanas"]
+custom_minimum_size = Vector2(190, 38)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_boton_cerrar")
+text = "[ ORGANIZACIÓN ]"
+
+[node name="HSeparator" type="HSeparator" parent="Centro/PanelPrincipal/VBox"]
+layout_mode = 2
+
+[node name="Cuerpo" type="HBoxContainer" parent="Centro/PanelPrincipal/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 18
+
+[node name="ColumnaIzquierda" type="PanelContainer" parent="Centro/PanelPrincipal/VBox/Cuerpo"]
+custom_minimum_size = Vector2(330, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_caja_codigo")
+
+[node name="Scroll" type="ScrollContainer" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaIzquierda"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="ListaConceptos" type="VBoxContainer" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaIzquierda/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ColumnaDerecha" type="PanelContainer" parent="Centro/PanelPrincipal/VBox/Cuerpo"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_caja_codigo")
+
+[node name="Scroll" type="ScrollContainer" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="Detalle" type="VBoxContainer" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="TituloConcepto" type="Label" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha/Scroll/Detalle"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.76, 0.94, 0.78, 1)
+theme_override_font_sizes/font_size = 22
+text = "◆ CONCEPTO"
+
+[node name="EstadoConcepto" type="Label" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha/Scroll/Detalle"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "● ESTADO: DESBLOQUEADO"
+
+[node name="Sep1" type="HSeparator" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha/Scroll/Detalle"]
+layout_mode = 2
+
+[node name="Lbl1" type="Label" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha/Scroll/Detalle"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.86, 0.63, 1)
+theme_override_font_sizes/font_size = 15
+text = "DESCRIPCIÓN TEÓRICA:"
+
+[node name="Descripcion" type="RichTextLabel" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha/Scroll/Detalle"]
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+
+[node name="Lbl2" type="Label" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha/Scroll/Detalle"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.86, 0.63, 1)
+theme_override_font_sizes/font_size = 15
+text = "SINTAXIS FORMAL:"
+
+[node name="Sintaxis" type="RichTextLabel" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha/Scroll/Detalle"]
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+
+[node name="Lbl3" type="Label" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha/Scroll/Detalle"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.86, 0.63, 1)
+theme_override_font_sizes/font_size = 15
+text = "EJEMPLO PRÁCTICO CON EL ROVER:"
+
+[node name="Ejemplo" type="RichTextLabel" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha/Scroll/Detalle"]
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+
+[node name="Lbl4" type="Label" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha/Scroll/Detalle"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.86, 0.63, 1)
+theme_override_font_sizes/font_size = 15
+text = "PISTAS Y ERRORES COMUNES:"
+
+[node name="Errores" type="RichTextLabel" parent="Centro/PanelPrincipal/VBox/Cuerpo/ColumnaDerecha/Scroll/Detalle"]
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
