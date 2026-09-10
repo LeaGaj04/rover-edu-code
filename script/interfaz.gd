@@ -33,9 +33,11 @@ var minerales_rover : int = 0
 @export var label_nave : Label
 @export var label_rover : Label
 
-# --- REFERENCIAS A LA TIENDA ---
+# --- REFERENCIAS A LA TIENDA Y CÓDICE ---
 @onready var panel_tienda = $PanelTienda
 @onready var boton_tienda = $ContenedorTienda/BotonTienda
+@onready var panel_archivo = $ArchivoADA
+@onready var boton_archivo = $ContenedorTienda/BotonArchivo
 @onready var boton_while = $PanelTienda/LienzoArbol/ButtonWhile
 @onready var boton_for = $PanelTienda/LienzoArbol/ButtonFor
 @onready var boton_if = $PanelTienda/LienzoArbol/ButtonIf
@@ -73,11 +75,35 @@ func _ready() -> void:
 	# Conectamos la señal del rover a una nueva función de la interfaz
 	if mi_rover != null:
 		mi_rover.mineral_recolectado.connect(_sumar_minerales_rover)
+	if panel_archivo != null:
+		panel_archivo.cerrado.connect(_on_archivo_cerrado)
 
 
 func _on_boton_tienda_pressed() -> void:
 	panel_tienda.show()
 	boton_tienda.hide()
+	if boton_archivo != null:
+		boton_archivo.hide()
+	if panel_codigo != null:
+		panel_codigo.hide()
+
+
+func _on_boton_archivo_pressed() -> void:
+	if panel_archivo != null:
+		panel_archivo.abrir()
+		boton_tienda.hide()
+		if boton_archivo != null:
+			boton_archivo.hide()
+		if panel_codigo != null:
+			panel_codigo.hide()
+
+
+func _on_archivo_cerrado() -> void:
+	boton_tienda.show()
+	if boton_archivo != null:
+		boton_archivo.show()
+	if panel_codigo != null:
+		panel_codigo.show()
 
 
 func _input(event: InputEvent) -> void:
@@ -243,6 +269,10 @@ func _on_boton_cerrar_pressed() -> void:
 	# Restauramos el botón principal para poder volver a abrir la tienda.
 	boton_tienda.text = "MEJORAS"
 	boton_tienda.show()
+	if boton_archivo != null:
+		boton_archivo.show()
+	if panel_codigo != null:
+		panel_codigo.show()
 	
 func actualizar_contadores() -> void:
 	if label_nave != null:
