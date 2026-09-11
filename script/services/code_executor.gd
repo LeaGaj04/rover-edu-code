@@ -84,6 +84,8 @@ func ejecutar_codigo(
 			if cumple_condicion:
 				resultado["if_branch_taken"] = true
 				for sub_instruccion in instruccion.get("cuerpo", []):
+					if int(instruccion.get("loop_iteration", 0)) > 0:
+						sub_instruccion["loop_iteration"] = instruccion["loop_iteration"]
 					var res_sub: Dictionary = await _ejecutar_instruccion_simple(
 						sub_instruccion,
 						ejecutar_comando,
@@ -240,6 +242,18 @@ func analizar_linea(contenido: String, numero_linea: int) -> Dictionary:
 		"steps": pasos
 	}
 
+func _contar_espacios_sangria(linea: String) -> int:
+	var espacios := 0
+	for i in range(linea.length()):
+		var c := linea[i]
+		if c == "\t":
+			espacios += 4
+		elif c == " ":
+			espacios += 1
+		else:
+			break
+	return espacios
+
 func compilar_programa(codigo: String) -> Dictionary:
 	var instrucciones: Array = []
 	var lineas := codigo.split("\n")
@@ -254,27 +268,32 @@ func compilar_programa(codigo: String) -> Dictionary:
 			indice += 1
 			continue
 
-		if contenido.begins_with("if "):
+		var contenido_lower := contenido.to_lower()
+
+		if contenido_lower.begins_with("if "):
 			var resultado_if: Dictionary = _analizar_if(contenido, numero_linea)
 			if not resultado_if["ok"]:
 				return resultado_if
+
+			var sangria_base := _contar_espacios_sangria(linea_original)
 			var cuerpo_if: Array = []
 			indice += 1
+
 			while indice < lineas.size():
 				var linea_cuerpo: String = lineas[indice]
 				if linea_cuerpo.strip_edges().is_empty():
 					indice += 1
 					continue
-				var tiene_sangria := (
-					linea_cuerpo.begins_with("\t")
-					or linea_cuerpo.begins_with("    ")
-				)
-				if not tiene_sangria:
+
+				var sangria_cuerpo := _contar_espacios_sangria(linea_cuerpo)
+				if sangria_cuerpo <= sangria_base:
 					break
+
 				var contenido_cuerpo := linea_cuerpo.strip_edges()
 				var analisis: Dictionary = analizar_linea(contenido_cuerpo, indice + 1)
 				if not analisis["ok"]:
 					return analisis
+
 				cuerpo_if.append({
 					"tipo": "comando",
 					"numero": indice + 1,
@@ -283,23 +302,26 @@ func compilar_programa(codigo: String) -> Dictionary:
 					"steps": analisis["steps"]
 				})
 				indice += 1
+
 			if cuerpo_if.is_empty():
 				return _error_de_linea(
 					numero_linea,
 					contenido,
 					"El condicional if necesita al menos una instrucción con sangría."
 				)
+
 			instrucciones.append({
 				"tipo": "if",
 				"numero": numero_linea,
 				"contenido": contenido,
 				"condition": resultado_if["condition"],
 				"inverted": resultado_if["inverted"],
-				"cuerpo": cuerpo_if
+				"cuerpo": cuerpo_if,
+				"loop_iteration": 0
 			})
 			continue
 
-		if contenido.begins_with("for "):
+		if contenido_lower.begins_with("for "):
 			var resultado_for: Dictionary = _analizar_for(
 				contenido,
 				numero_linea
@@ -309,7 +331,8 @@ func compilar_programa(codigo: String) -> Dictionary:
 				return resultado_for
 
 			var repeticiones: int = resultado_for["repeticiones"]
-			var cuerpo: Array = []
+			var sangria_for := _contar_espacios_sangria(linea_original)
+			var cuerpo_for: Array = []
 			indice += 1
 
 			while indice < lineas.size():
@@ -319,15 +342,66 @@ func compilar_programa(codigo: String) -> Dictionary:
 					indice += 1
 					continue
 
-				var tiene_sangria := (
-					linea_cuerpo.begins_with("\t")
-					or linea_cuerpo.begins_with("    ")
-				)
-
-				if not tiene_sangria:
+				var sangria_cuerpo := _contar_espacios_sangria(linea_cuerpo)
+				if sangria_cuerpo <= sangria_for:
 					break
 
 				var contenido_cuerpo := linea_cuerpo.strip_edges()
+				var cont_cuerpo_lower := contenido_cuerpo.to_lower()
+
+				# Caso 1: if anidado dentro de for
+				if cont_cuerpo_lower.begins_with("if "):
+					var num_linea_if := indice + 1
+					var res_if_anidado := _analizar_if(contenido_cuerpo, num_linea_if)
+					if not res_if_anidado["ok"]:
+						return res_if_anidado
+
+					var sangria_if := sangria_cuerpo
+					var cuerpo_if_anidado: Array = []
+					indice += 1
+
+					while indice < lineas.size():
+						var linea_sub := lineas[indice]
+						if linea_sub.strip_edges().is_empty():
+							indice += 1
+							continue
+
+						var sangria_sub := _contar_espacios_sangria(linea_sub)
+						if sangria_sub <= sangria_if:
+							break
+
+						var cont_sub := linea_sub.strip_edges()
+						var analisis_sub := analizar_linea(cont_sub, indice + 1)
+						if not analisis_sub["ok"]:
+							return analisis_sub
+
+						cuerpo_if_anidado.append({
+							"tipo": "comando",
+							"numero": indice + 1,
+							"contenido": cont_sub,
+							"command": analisis_sub["command"],
+							"steps": analisis_sub["steps"]
+						})
+						indice += 1
+
+					if cuerpo_if_anidado.is_empty():
+						return _error_de_linea(
+							num_linea_if,
+							contenido_cuerpo,
+							"El condicional if necesita al menos una instrucción con sangría."
+						)
+
+					cuerpo_for.append({
+						"tipo": "if",
+						"numero": num_linea_if,
+						"contenido": contenido_cuerpo,
+						"condition": res_if_anidado["condition"],
+						"inverted": res_if_anidado["inverted"],
+						"cuerpo": cuerpo_if_anidado
+					})
+					continue
+
+				# Caso 2: comando normal dentro de for
 				var analisis: Dictionary = analizar_linea(
 					contenido_cuerpo,
 					indice + 1
@@ -336,7 +410,8 @@ func compilar_programa(codigo: String) -> Dictionary:
 				if not analisis["ok"]:
 					return analisis
 
-				cuerpo.append({
+				cuerpo_for.append({
+					"tipo": "comando",
 					"numero": indice + 1,
 					"contenido": contenido_cuerpo,
 					"command": analisis["command"],
@@ -345,7 +420,7 @@ func compilar_programa(codigo: String) -> Dictionary:
 
 				indice += 1
 
-			if cuerpo.is_empty():
+			if cuerpo_for.is_empty():
 				return _error_de_linea(
 					numero_linea,
 					contenido,
@@ -353,8 +428,8 @@ func compilar_programa(codigo: String) -> Dictionary:
 				)
 
 			for iteracion in range(repeticiones):
-				for instruccion in cuerpo:
-					var copia: Dictionary = instruccion.duplicate()
+				for instruccion in cuerpo_for:
+					var copia: Dictionary = instruccion.duplicate(true)
 					copia["loop_iteration"] = iteracion + 1
 					instrucciones.append(copia)
 
@@ -369,6 +444,7 @@ func compilar_programa(codigo: String) -> Dictionary:
 			return analisis
 
 		instrucciones.append({
+			"tipo": "comando",
 			"numero": numero_linea,
 			"contenido": contenido,
 			"command": analisis["command"],
@@ -389,7 +465,7 @@ func _analizar_for(
 ) -> Dictionary:
 	var expresion := RegEx.new()
 	var patron := (
-		"^for\\s+([A-Za-z_][A-Za-z0-9_]*)"
+		"^(?i)for\\s+([A-Za-z_][A-Za-z0-9_]*)"
 		+ "\\s+in\\s+range\\((\\d+)\\):$"
 	)
 
