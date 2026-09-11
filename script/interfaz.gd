@@ -48,7 +48,8 @@ const PRECIOS = {
 	"while": 15,
 	"for": 30,
 	"mapa": 1,
-	"casillas_extra": 10
+	"casillas_extra": 10,
+	"if": 10
 }
 
 func _ready() -> void:
@@ -80,6 +81,7 @@ func _ready() -> void:
 
 
 func _on_boton_tienda_pressed() -> void:
+	actualizar_mejoras_visual()
 	panel_tienda.show()
 	boton_tienda.hide()
 	if boton_archivo != null:
@@ -202,16 +204,13 @@ func _on_boton_minimizar_pressed() -> void:
 func _on_button_pressed() -> void:
 	var resultado: Dictionary = await CodeExecutor.ejecutar_codigo(
 		caja_codigo.text,
-		ejecutar_movimiento_rover
+		ejecutar_movimiento_rover,
+		evaluar_condicion_rover
 	)
-
 	if resultado["success"]:
 		print("Programa completado correctamente.")
 	else:
-		print(
-			"Error A.D.A: ",
-			resultado["error_message"]
-		)
+		print("Error A.D.A: ", resultado["error_message"])
 
 
 func ejecutar_movimiento_rover(
@@ -261,6 +260,12 @@ func ejecutar_movimiento_rover(
 		"El rover no conoce el comando '" + comando + "'."
 	)
 
+func evaluar_condicion_rover(condicion: String) -> bool:
+	if mi_rover == null:
+		return false
+	if condicion == "rover.hay_mineral()" or condicion == "hay_mineral()":
+		return mi_rover.hay_mineral()
+	return false
 
 func _on_boton_cerrar_pressed() -> void:
 	# Ocultamos el panel directamente
@@ -329,6 +334,8 @@ func actualizar_mejoras_visual() -> void:
 		boton_for.disabled = GestorSintaxis.esta_desbloqueada("for")
 	if boton_if != null:
 		boton_if.disabled = GestorSintaxis.esta_desbloqueada("if")
+		if GestorSintaxis.esta_desbloqueada("if") and has_node("PanelTienda/LienzoArbol/Line2D3"):
+			$PanelTienda/LienzoArbol/Line2D3.modulate = Color(1.0, 0.84, 0.0)
 	if boton_expansion != null:
 		var mundo := get_parent()
 		boton_expansion.disabled = (
@@ -362,6 +369,12 @@ func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem
 		_solicitar_guardado_progreso()
 	else:
 		print("Minerales insuficientes para comprar: " + item_id)
+		if transmision_ada != null:
+			transmision_ada.mostrar_mensaje(
+				"Minerales insuficientes en la nave. Requiere %d minerales (tienes %d)." % [costo, minerales_nave],
+				"error",
+				4.0
+			)
 		
 func _sumar_minerales_rover(cantidad: int) -> void:
 	minerales_rover = mini(minerales_rover + cantidad, CAPACIDAD_ROVER)
@@ -458,12 +471,12 @@ func _on_button_while_pressed() -> void:
 		"objetivo",
 		6.0
 	)
+
 func _on_button_if_pressed() -> void:
-	transmision_ada.mostrar_mensaje(
-		"El condicional if está en desarrollo para futuras misiones con sensores.",
-		"objetivo",
-		6.0
-	)
+	intentar_compra("if", boton_if, $PanelTienda/LienzoArbol/Line2D3)
+	if GestorSintaxis.esta_desbloqueada("if"):
+		MissionService.desbloquear_conocimiento("condicional_if")
+		MissionService.registrar_compra_if()
 
 func _on_button_expansion_1_pressed() -> void:
 	var mundo = get_parent()
