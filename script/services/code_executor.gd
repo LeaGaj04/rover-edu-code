@@ -12,7 +12,8 @@ var _tiempo_inicio_msec : float = 0.0
 
 func ejecutar_codigo(
 	codigo: String,
-	ejecutar_comando: Callable
+	ejecutar_comando: Callable,
+	evaluar_condicion: Callable = Callable()
 ) -> Dictionary:
 	_tiempo_inicio_msec = Time.get_ticks_msec()
 	var resultado := _crear_resultado(codigo)
@@ -64,69 +65,89 @@ func ejecutar_codigo(
 			)
 
 	for instruccion in instrucciones:
-		var numero_linea: int = instruccion["numero"]
-		var contenido: String = instruccion["contenido"]
+		var tipo: String = instruccion.get("tipo", "comando")
 
-		linea_iniciada.emit(numero_linea, contenido)
+		if tipo == "if":
+			var num_linea: int = instruccion["numero"]
+			var cont_linea: String = instruccion["contenido"]
+			linea_iniciada.emit(num_linea, cont_linea)
 
-		var resultado_comando: Dictionary = await ejecutar_comando.call(
-			instruccion["command"],
-			instruccion["steps"]
+			var cumple_condicion: bool = false
+			if evaluar_condicion.is_valid():
+				cumple_condicion = await evaluar_condicion.call(instruccion["condition"])
+
+			if instruccion.get("inverted", false):
+				cumple_condicion = not cumple_condicion
+
+			resultado["if_evaluations"] = resultado.get("if_evaluations", 0) + 1
+
+			if cumple_condicion:
+				resultado["if_branch_taken"] = true
+				for sub_instruccion in instruccion.get("cuerpo", []):
+					var res_sub: Dictionary = await _ejecutar_instruccion_simple(
+						sub_instruccion,
+						ejecutar_comando,
+						resultado
+					)
+					if not res_sub.get("ok", false):
+						_finalizar(resultado)
+						return resultado
+
+			linea_finalizada.emit(num_linea, cont_linea)
+			continue
+
+		var res_cmd: Dictionary = await _ejecutar_instruccion_simple(
+			instruccion,
+			ejecutar_comando,
+			resultado
 		)
-
-		resultado["commands_used"].append(
-			instruccion["command"]
-		)
-		resultado["commands_data"].append({
-			"command": instruccion["command"],
-			"steps": instruccion["steps"]
-		})
-		resultado["command_count"] += 1
-		resultado["movement_count"] += int(
-			resultado_comando.get("steps_completed", 0)
-		)
-
-		if not resultado_comando.get("ok", false):
-			var error_comando := {
-				"type": resultado_comando.get(
-					"error_type",
-					"ejecucion"
-				),
-				"line": numero_linea,
-				"content": contenido,
-				"message": resultado_comando.get(
-					"message",
-					"El comando no pudo completarse."
-				)
-			}
-
-			resultado["error_type"] = error_comando["type"]
-			resultado["error_message"] = error_comando["message"]
-			resultado["errors"].append(error_comando)
-
-			error_detectado.emit(error_comando)
+		if not res_cmd.get("ok", false):
 			_finalizar(resultado)
 			return resultado
-
-		var recolectados: int = int(
-			resultado_comando.get("minerals_collected", 0)
-		)
-		var transferidos: int = int(
-			resultado_comando.get("minerals_transferred", 0)
-		)
-
-		resultado["minerals_collected"] += recolectados
-		resultado["minerals_transferred"] += transferidos
-
-		if int(instruccion.get("loop_iteration", 0)) > 0:
-			resultado["loop_minerals_collected"] += recolectados
-
-		linea_finalizada.emit(numero_linea, contenido)
 
 	resultado["success"] = true
 	_finalizar(resultado)
 	return resultado
 
+
+func _ejecutar_instruccion_simple(
+	instruccion: Dictionary,
+	ejecutar_comando: Callable,
+	resultado: Dictionary
+) -> Dictionary:
+	var numero_linea: int = instruccion["numero"]
+	var contenido: String = instruccion["contenido"]
+	linea_iniciada.emit(numero_linea, contenido)
+	var resultado_comando: Dictionary = await ejecutar_comando.call(
+		instruccion["command"],
+		instruccion["steps"]
+	)
+	resultado["commands_used"].append(instruccion["command"])
+	resultado["commands_data"].append({
+		"command": instruccion["command"],
+		"steps": instruccion["steps"]
+	})
+	resultado["command_count"] += 1
+	resultado["movement_count"] += int(resultado_comando.get("steps_completed", 0))
+	var recolectados: int = int(resultado_comando.get("minerals_collected", 0))
+	var transferidos: int = int(resultado_comando.get("minerals_transferred", 0))
+	resultado["minerals_collected"] += recolectados
+	resultado["minerals_transferred"] += transferidos
+	if int(instruccion.get("loop_iteration", 0)) > 0:
+		resultado["loop_minerals_collected"] += recolectados
+	if not resultado_comando.get("ok", false):
+		var error_comando := {
+			"type": resultado_comando.get("error_type", "ejecucion"),
+			"line": numero_linea,
+			"content": contenido,
+			"message": resultado_comando.get("message", "El comando no pudo completarse.")
+		}
+		resultado["error_type"] = error_comando["type"]
+		resultado["error_message"] = error_comando["message"]
+		resultado["errors"].append(error_comando)
+		error_detectado.emit(error_comando)
+	linea_finalizada.emit(numero_linea, contenido)
+	return resultado_comando
 
 func analizar_linea(contenido: String, numero_linea: int) -> Dictionary:
 	if not contenido.begins_with("rover."):
@@ -231,6 +252,51 @@ func compilar_programa(codigo: String) -> Dictionary:
 
 		if contenido.is_empty():
 			indice += 1
+			continue
+
+		if contenido.begins_with("if "):
+			var resultado_if: Dictionary = _analizar_if(contenido, numero_linea)
+			if not resultado_if["ok"]:
+				return resultado_if
+			var cuerpo_if: Array = []
+			indice += 1
+			while indice < lineas.size():
+				var linea_cuerpo: String = lineas[indice]
+				if linea_cuerpo.strip_edges().is_empty():
+					indice += 1
+					continue
+				var tiene_sangria := (
+					linea_cuerpo.begins_with("\t")
+					or linea_cuerpo.begins_with("    ")
+				)
+				if not tiene_sangria:
+					break
+				var contenido_cuerpo := linea_cuerpo.strip_edges()
+				var analisis: Dictionary = analizar_linea(contenido_cuerpo, indice + 1)
+				if not analisis["ok"]:
+					return analisis
+				cuerpo_if.append({
+					"tipo": "comando",
+					"numero": indice + 1,
+					"contenido": contenido_cuerpo,
+					"command": analisis["command"],
+					"steps": analisis["steps"]
+				})
+				indice += 1
+			if cuerpo_if.is_empty():
+				return _error_de_linea(
+					numero_linea,
+					contenido,
+					"El condicional if necesita al menos una instrucción con sangría."
+				)
+			instrucciones.append({
+				"tipo": "if",
+				"numero": numero_linea,
+				"contenido": contenido,
+				"condition": resultado_if["condition"],
+				"inverted": resultado_if["inverted"],
+				"cuerpo": cuerpo_if
+			})
 			continue
 
 		if contenido.begins_with("for "):
@@ -364,6 +430,36 @@ func _analizar_for(
 		"repeticiones": repeticiones
 	}
 
+func _analizar_if(contenido: String, numero_linea: int) -> Dictionary:
+	if not contenido.ends_with(":"):
+		return _error_de_linea(
+			numero_linea,
+			contenido,
+			"Falta el carácter de dos puntos ':' al final del condicional if."
+		)
+	var condicion := contenido.substr(3, contenido.length() - 4).strip_edges()
+	var invertido := false
+	if condicion.begins_with("not "):
+		invertido = true
+		condicion = condicion.substr(4).strip_edges()
+	# Aceptamos tanto "rover.hay_mineral()" como "hay_mineral()"
+	if condicion == "rover.hay_mineral()" or condicion == "hay_mineral()":
+		return {
+			"ok": true,
+			"condition": "rover.hay_mineral()",
+			"inverted": invertido
+		}
+	if condicion in ["rover.hay_mineral", "hay_mineral"]:
+		return _error_de_linea(
+			numero_linea,
+			contenido,
+			"Te faltaron los paréntesis de la función: usa 'if rover.hay_mineral():'"
+		)
+	return _error_de_linea(
+		numero_linea,
+		contenido,
+		"Condición no reconocida. Sensor disponible: rover.hay_mineral()"
+	)
 
 func _crear_resultado(codigo: String) -> Dictionary:
 	return {

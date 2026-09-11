@@ -48,7 +48,8 @@ const PRECIOS = {
 	"while": 15,
 	"for": 30,
 	"mapa": 1,
-	"casillas_extra": 10
+	"casillas_extra": 10,
+	"if": 15
 }
 
 func _ready() -> void:
@@ -202,16 +203,13 @@ func _on_boton_minimizar_pressed() -> void:
 func _on_button_pressed() -> void:
 	var resultado: Dictionary = await CodeExecutor.ejecutar_codigo(
 		caja_codigo.text,
-		ejecutar_movimiento_rover
+		ejecutar_movimiento_rover,
+		evaluar_condicion_rover
 	)
-
 	if resultado["success"]:
 		print("Programa completado correctamente.")
 	else:
-		print(
-			"Error A.D.A: ",
-			resultado["error_message"]
-		)
+		print("Error A.D.A: ", resultado["error_message"])
 
 
 func ejecutar_movimiento_rover(
@@ -261,6 +259,12 @@ func ejecutar_movimiento_rover(
 		"El rover no conoce el comando '" + comando + "'."
 	)
 
+func evaluar_condicion_rover(condicion: String) -> bool:
+	if mi_rover == null:
+		return false
+	if condicion == "rover.hay_mineral()" or condicion == "hay_mineral()":
+		return mi_rover.hay_mineral()
+	return false
 
 func _on_boton_cerrar_pressed() -> void:
 	# Ocultamos el panel directamente
@@ -458,12 +462,11 @@ func _on_button_while_pressed() -> void:
 		"objetivo",
 		6.0
 	)
+
 func _on_button_if_pressed() -> void:
-	transmision_ada.mostrar_mensaje(
-		"El condicional if está en desarrollo para futuras misiones con sensores.",
-		"objetivo",
-		6.0
-	)
+	intentar_compra("if", boton_if, $PanelTienda/LienzoArbol/Line2D3)
+	if GestorSintaxis.esta_desbloqueada("if"):
+		MissionService.desbloquear_conocimiento("condicional_if")
 
 func _on_button_expansion_1_pressed() -> void:
 	var mundo = get_parent()

@@ -104,6 +104,25 @@ func _destino_esta_desbloqueado(destino_global: Vector3) -> bool:
 	casilla.y = 0
 	return grid_map.get_cell_item(casilla) != GridMap.INVALID_CELL_ITEM
 
+# --- SENSORES ---
+func hay_mineral() -> bool:
+	var grid_map := get_parent() as GridMap
+	if grid_map == null:
+		return false
+	var posicion_rover_local := grid_map.to_local(global_position)
+	var casilla_rover := grid_map.local_to_map(posicion_rover_local)
+	casilla_rover.y = 0
+	var minerales_en_mapa := get_tree().get_nodes_in_group("minerales")
+	for mineral in minerales_en_mapa:
+		var nodo_mineral := mineral.get_parent() as Node3D
+		if nodo_mineral == null or nodo_mineral.is_queued_for_deletion():
+			continue
+		var posicion_mineral_local := grid_map.to_local(nodo_mineral.global_position)
+		var casilla_mineral := grid_map.local_to_map(posicion_mineral_local)
+		casilla_mineral.y = 0
+		if casilla_rover == casilla_mineral:
+			return true
+	return false
 
 func minar() -> Dictionary:
 	var grid_map := get_parent() as GridMap
