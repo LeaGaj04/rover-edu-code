@@ -13,6 +13,7 @@ enum EstadoMision {
 	COMPRAR_CASILLAS,
 	CICLO_RECOLECCION,
 	CAMINO_LARGO,
+	COMPRAR_IF,
 	SENALES_INCIERTAS,
 }
 
@@ -210,11 +211,32 @@ func aplicar_progreso(progress: Dictionary) -> void:
 	):
 		iniciar_camino_largo()
 		return
+	if (
+		(objective_id == "camino_largo" and objective_completed)
+		or (objective_id == "camino_largo" and "camino_largo" in completed_missions)
+	):
+		if GestorSintaxis.esta_desbloqueada("if"):
+			iniciar_senales_inciertas()
+		else:
+			iniciar_mision_comprar_if()
+		return
 	if objective_id == "camino_largo":
 		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.CAMINO_LARGO
 		return
+	if (
+		objective_id == "comprar_if"
+		and (objective_completed or GestorSintaxis.esta_desbloqueada("if") or "comprar_if" in completed_missions)
+	):
+		iniciar_senales_inciertas()
+		return
+	if objective_id == "comprar_if":
+		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.COMPRAR_IF
+		return
 	if objective_id == "senales_inciertas":
-		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.SENALES_INCIERTAS
+		if not GestorSintaxis.esta_desbloqueada("if") and "comprar_if" not in completed_missions:
+			iniciar_mision_comprar_if()
+		else:
+			estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.SENALES_INCIERTAS
 		return
 	if objective_id == "comprar_casillas":
 		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.COMPRAR_CASILLAS
@@ -262,6 +284,14 @@ func get_objetivo_actual() -> String:
 			"una sola vez al final, en un mismo programa. " +
 			"La transferencia debe quedar fuera del bloque.\n" +
 			"Empieza en el centro con el inventario del rover vacío."
+		)
+
+	if objective_id == "comprar_if":
+		return (
+			"ACTUALIZACIÓN DE HARDWARE (CONDICIONAL IF)\n" +
+			"Las muestras minerales en este sector se distribuyen de forma inestable.\n" +
+			"Reúne 10 minerales en la nave mediante tus programas y adquiere " +
+			"el [ CONDICIONAL IF ] en Mejoras para instalar los sensores del rover."
 		)
 
 	if objective_id == "comprar_casillas":
@@ -312,6 +342,10 @@ func evaluar_programa(resultado: Dictionary) -> void:
 
 	if objective_id == "senales_inciertas":
 		_evaluar_senales_inciertas(resultado)
+		return
+
+	if objective_id == "comprar_if":
+		_evaluar_comprar_if(resultado)
 		return
 
 	if objective_id == "camino_largo":
@@ -463,9 +497,42 @@ func _evaluar_camino_largo(resultado: Dictionary) -> void:
 	desbloquear_conocimiento("parametro")
 	mision_completada.emit(objective_id)
 	print("Misión camino_largo completada!")
-	iniciar_senales_inciertas()
-	
-	
+	iniciar_mision_comprar_if()
+
+
+func iniciar_mision_comprar_if() -> void:
+	objective_id = "comprar_if"
+	objective_completed = "comprar_if" in completed_missions or GestorSintaxis.esta_desbloqueada("if")
+
+	if objective_completed:
+		iniciar_senales_inciertas()
+		return
+
+	estado_actual = EstadoMision.COMPRAR_IF
+	mision_iniciada.emit(objective_id)
+	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
+	print("Misión iniciada: comprar_if")
+
+
+func registrar_compra_if() -> void:
+	if "comprar_if" not in completed_missions:
+		completed_missions.append("comprar_if")
+
+	mision_completada.emit("comprar_if")
+	desbloquear_conocimiento("condicional_if")
+
+	if objective_id == "comprar_if" or objective_id == "senales_inciertas":
+		objective_completed = true
+		estado_actual = EstadoMision.COMPLETADA
+		iniciar_senales_inciertas()
+
+
+func _evaluar_comprar_if(resultado: Dictionary) -> void:
+	var transferidos: int = int(resultado.get("minerals_transferred", 0))
+	if transferidos > 0:
+		print("Minerales transferidos en fase de acumulación: ", transferidos)
+
+
 func iniciar_senales_inciertas() -> void:
 	objective_id = "senales_inciertas"
 	objective_completed = "senales_inciertas" in completed_missions
@@ -473,6 +540,7 @@ func iniciar_senales_inciertas() -> void:
 	mision_iniciada.emit(objective_id)
 	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
 	print("Misión iniciada: senales_inciertas")
+
 
 func _evaluar_senales_inciertas(resultado: Dictionary) -> void:
 	var if_evaluations: int = int(resultado.get("if_evaluations", 0))

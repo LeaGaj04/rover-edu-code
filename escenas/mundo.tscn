@@ -423,6 +423,10 @@ offset_left = 425.0
 offset_top = 280.0
 offset_right = 575.0
 offset_bottom = 350.0
+tooltip_text = "Condicional If
+Desbloquea el análisis de sensores para tomar decisiones lógicas antes de perforar.
+
+Costo: 10 minerales"
 theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
 theme_override_colors/font_disabled_color = Color(0.55, 0.55, 0.58, 1)
 theme_override_font_sizes/font_size = 17
@@ -430,7 +434,7 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_tienda_disabled")
 text = "[ CONDICIONAL IF ]
-15 MINERALES"
+10 MINERALES"
 
 [node name="ButtonFor" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=75203908]
 layout_mode = 0

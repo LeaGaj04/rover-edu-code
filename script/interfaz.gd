@@ -49,7 +49,7 @@ const PRECIOS = {
 	"for": 30,
 	"mapa": 1,
 	"casillas_extra": 10,
-	"if": 15
+	"if": 10
 }
 
 func _ready() -> void:
@@ -81,6 +81,7 @@ func _ready() -> void:
 
 
 func _on_boton_tienda_pressed() -> void:
+	actualizar_mejoras_visual()
 	panel_tienda.show()
 	boton_tienda.hide()
 	if boton_archivo != null:
@@ -333,6 +334,8 @@ func actualizar_mejoras_visual() -> void:
 		boton_for.disabled = GestorSintaxis.esta_desbloqueada("for")
 	if boton_if != null:
 		boton_if.disabled = GestorSintaxis.esta_desbloqueada("if")
+		if GestorSintaxis.esta_desbloqueada("if") and has_node("PanelTienda/LienzoArbol/Line2D3"):
+			$PanelTienda/LienzoArbol/Line2D3.modulate = Color(1.0, 0.84, 0.0)
 	if boton_expansion != null:
 		var mundo := get_parent()
 		boton_expansion.disabled = (
@@ -366,6 +369,12 @@ func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem
 		_solicitar_guardado_progreso()
 	else:
 		print("Minerales insuficientes para comprar: " + item_id)
+		if transmision_ada != null:
+			transmision_ada.mostrar_mensaje(
+				"Minerales insuficientes en la nave. Requiere %d minerales (tienes %d)." % [costo, minerales_nave],
+				"error",
+				4.0
+			)
 		
 func _sumar_minerales_rover(cantidad: int) -> void:
 	minerales_rover = mini(minerales_rover + cantidad, CAPACIDAD_ROVER)
@@ -467,6 +476,7 @@ func _on_button_if_pressed() -> void:
 	intentar_compra("if", boton_if, $PanelTienda/LienzoArbol/Line2D3)
 	if GestorSintaxis.esta_desbloqueada("if"):
 		MissionService.desbloquear_conocimiento("condicional_if")
+		MissionService.registrar_compra_if()
 
 func _on_button_expansion_1_pressed() -> void:
 	var mundo = get_parent()
