@@ -124,6 +124,18 @@ func hay_mineral() -> bool:
 			return true
 	return false
 
+func tiene_espacio() -> bool:
+	var interfaz := get_tree().current_scene.get_node_or_null("CanvasLayer")
+	if interfaz != null:
+		return int(interfaz.minerales_rover) < int(interfaz.CAPACIDAD_ROVER)
+	return true
+
+func en_base() -> bool:
+	var mundo := get_parent()
+	if mundo != null and mundo.has_method("rover_esta_en_casilla_transferencia"):
+		return mundo.rover_esta_en_casilla_transferencia(self)
+	return false
+
 func minar() -> Dictionary:
 	var grid_map := get_parent() as GridMap
 	if grid_map == null:
