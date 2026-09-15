@@ -18,10 +18,10 @@
 
 ---
 
-## El Problema de Negocio
+## Problematica
 La enseñanza tradicional de la programación a menudo se enfrenta a una barrera crítica: **la abstracción excesiva**. Los estudiantes principiantes experimentan altas tasas de frustración y deserción al enfrentarse a conceptos teóricos como la **Programación Orientada a Objetos (POO)** y las estructuras de control sin una retroalimentación visual e interactiva en tiempo real.
 
-## Nuestra Solución: Edu_Code
+## Solución: Edu_Code
 **Edu_Code** transforma el aprendizaje algorítmico en una experiencia gamificada e inmersiva. A través del control de un **Rover minero espacial en un entorno 3D**, los estudiantes aplican sintaxis real de programación para resolver misiones, recolectar recursos y sobrevivir. Cada comando escrito se refleja visual y físicamente en el motor de juego, haciendo que conceptos como objetos, métodos con parámetros, bucles y condicionales se asimilen de forma intuitiva e inmediata.
 
 ---
