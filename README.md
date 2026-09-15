@@ -3,25 +3,28 @@
 <img width="1920" height="1039" alt="Educode" src="https://github.com/user-attachments/assets/34b3facc-bd29-45d0-9deb-be397d7b284f" />
 
 
-# rover-edu-code
-
+# rover-edu-code (Edu_Code)
 <div align="center">
-
-![Godot Engine](https://img.shields.io/badge/GODOT-%23FFFFFF.svg?style=for-the-badge&logo=godot-engine)
-![GDScript](https://img.shields.io/badge/GDScript-478CBF?style=for-the-badge&logo=godot-engine&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
-![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
-![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
-![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
+![Godot Engine](https://img.shields.io/badge/Godot_4.x-478CBF?style=for-the-badge&logo=godot-engine&logoColor=white)
+![GDScript](https://img.shields.io/badge/GDScript-355570?style=for-the-badge&logo=godot-engine&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase_BaaS-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
 ![Game Design](https://img.shields.io/badge/Game_Design-FF6B6B?style=for-the-badge)
-
+![POO & Algorithms](https://img.shields.io/badge/Pedagogía-POO_y_Algoritmia-orange?style=for-the-badge)
+![Scrum](https://img.shields.io/badge/Metodología-Scrum-blueviolet?style=for-the-badge)
 </div>
-
-## El Problema de Negocio
-La enseñanza tradicional de la programación a menudo se enfrenta a un problema histórico: la abstracción excesiva. Los estudiantes de primeros años suelen abandonar la informática o sentirse frustrados debido a la monotonía de los tutoriales secos y las aulas convencionales, donde es difícil visualizar cómo funciona el código en el mundo real. Conceptos complejos como la Programación Orientada a Objetos (POO) resultan especialmente difíciles de asimilar sin ejemplos tangibles.
-
-## Nuestra Solución: Edu_Code
-Edu_Code resuelve esta barrera transformando la frustración en aprendizaje mediante la gamificación. Proporcionamos una plataforma interactiva donde los conceptos abstractos de la POO se reflejan de forma visual e inmediata sobre un modelo 3D (un Rover minero). Al exigir al jugador que escriba código real para automatizar procesos y sobrevivir, el sistema enseña a optimizar rutinas y comprender objetos, métodos y atributos de una manera inolvidable y altamente práctica.
+---
+## 🎯 El Problema de Negocio
+La enseñanza tradicional de la programación a menudo se enfrenta a una barrera crítica: **la abstracción excesiva**. Los estudiantes principiantes experimentan altas tasas de frustración y deserción al enfrentarse a conceptos teóricos como la **Programación Orientada a Objetos (POO)** y las estructuras de control sin una retroalimentación visual e interactiva en tiempo real.
+## 🚀 Nuestra Solución: Edu_Code
+**Edu_Code** transforma el aprendizaje algorítmico en una experiencia gamificada e inmersiva. A través del control de un **Rover minero espacial en un entorno 3D**, los estudiantes aplican sintaxis real de programación para resolver misiones, recolectar recursos y sobrevivir. Cada comando escrito se refleja visual y físicamente en el motor de juego, haciendo que conceptos como objetos, métodos con parámetros, bucles y condicionales se asimilen de forma intuitiva e inmediata.
+---
+## 🎮 Gameplay Loop y Progresión Pedagógica
+El juego sigue un bucle de progresión diseñado para guiar al estudiante desde los conceptos básicos de programación secuencial hasta la automatización autónoma:
+```text
+Escribir Código (IDE) ──► Ejecución & Sensores (3D) ──► Minar Recursos (Rover)
+         ▲                                                     │
+         │                                                     ▼
+Nuevas Misiones / Retos ◄── Desbloquear Sintaxis / Expansión ◄── Transferir a la Nave
 
 ---
 
