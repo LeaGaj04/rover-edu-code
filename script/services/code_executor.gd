@@ -8,6 +8,8 @@ signal ejecucion_finalizada(resultado: Dictionary)
 
 var ejecutando: bool = false
 var _tiempo_inicio_msec : float = 0.0
+var _objective_id_at_start: String = ""
+var _objective_completed_at_start: bool = false
 
 
 func ejecutar_codigo(
@@ -22,6 +24,14 @@ func ejecutar_codigo(
 		resultado["error_type"] = "ejecucion"
 		resultado["error_message"] = "Ya existe un programa en ejecución."
 		return resultado
+
+	_objective_id_at_start = MissionService.objective_id
+	_objective_completed_at_start = (
+		MissionService.objective_completed
+		or _objective_id_at_start in MissionService.get_completed_missions()
+	)
+	resultado["objective_id"] = _objective_id_at_start
+	resultado["objective_completed"] = false
 
 	ejecutando = true
 	ejecucion_iniciada.emit(codigo)
@@ -740,7 +750,7 @@ func _crear_resultado(codigo: String) -> Dictionary:
 		"loop_minerals_collected": 0,
 		"duration_seconds": 0.0,
 		"objective_id": MissionService.objective_id,
-		"objective_completed": MissionService.objective_completed
+		"objective_completed": false
 	}
 
 
@@ -767,8 +777,19 @@ func _finalizar(resultado: Dictionary) -> void:
 
 	# Captura el estado real después de ejecutar todos los comandos.
 	MissionService.evaluar_programa(resultado)
-	resultado["objective_id"] = MissionService.objective_id
-	resultado["objective_completed"] = MissionService.objective_completed
+	var completed_missions := MissionService.get_completed_missions()
+	var objective_is_completed := (
+		(
+			MissionService.objective_id == _objective_id_at_start
+			and MissionService.objective_completed
+		)
+		or _objective_id_at_start in completed_missions
+	)
+	resultado["objective_id"] = _objective_id_at_start
+	resultado["objective_completed"] = (
+		not _objective_completed_at_start
+		and objective_is_completed
+	)
 
 	ejecutando = false
 
