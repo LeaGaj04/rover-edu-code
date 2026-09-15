@@ -201,6 +201,7 @@ func _on_boton_minimizar_pressed() -> void:
 	_mantener_panel_en_pantalla()
 
 
+
 func _on_button_pressed() -> void:
 	var resultado: Dictionary = await CodeExecutor.ejecutar_codigo(
 		caja_codigo.text,
@@ -263,8 +264,15 @@ func ejecutar_movimiento_rover(
 func evaluar_condicion_rover(condicion: String) -> bool:
 	if mi_rover == null:
 		return false
-	if condicion == "rover.hay_mineral()" or condicion == "hay_mineral()":
+	if condicion in ["rover.hay_mineral()", "hay_mineral()"]:
 		return mi_rover.hay_mineral()
+	if condicion in ["rover.tiene_espacio()", "tiene_espacio()"]:
+		return minerales_rover < CAPACIDAD_ROVER
+	if condicion in ["rover.en_base()", "en_base()"]:
+		var mundo = get_parent()
+		if mundo != null and mundo.has_method("rover_esta_en_casilla_transferencia"):
+			return mundo.rover_esta_en_casilla_transferencia(mi_rover)
+		return false
 	return false
 
 func _on_boton_cerrar_pressed() -> void:
@@ -466,11 +474,10 @@ func _on_button_for_pressed() -> void:
 		8.0
 	)
 func _on_button_while_pressed() -> void:
-	transmision_ada.mostrar_mensaje(
-		"El bucle while está en desarrollo para futuras misiones de automatización.",
-		"objetivo",
-		6.0
-	)
+	intentar_compra("while", boton_while, null)
+	if GestorSintaxis.esta_desbloqueada("while"):
+		MissionService.desbloquear_conocimiento("bucle_while")
+		MissionService.registrar_compra_while()
 
 func _on_button_if_pressed() -> void:
 	intentar_compra("if", boton_if, $PanelTienda/LienzoArbol/Line2D3)
@@ -593,11 +600,66 @@ func _on_mision_completada(mision_id: String) -> void:
 				"completado", 10.0
 			)
 		"camino_largo":
-			transmision_ada.mostrar_mensaje(
+			var msg_param := (
 				"¡Excelente navegación! Has dominado el uso de parámetros.\n" +
-				"Ahora puedes controlar la cantidad exacta de pasos en tus métodos " +
-				"sin necesidad de repetir instrucciones innecesarias.\n" +
-				"Conocimiento desbloqueado: PARÁMETROS.",
+				"Ahora puedes controlar la cantidad exacta de pasos en tus métodos.\n" +
+				"Conocimiento desbloqueado: PARÁMETROS.\n"
+			)
+			if GestorSintaxis.esta_desbloqueada("if"):
+				msg_param += "Como ya adquiriste el Condicional IF, ¡se activa la misión SEÑALES INCIERTAS!"
+			else:
+				msg_param += "Próximo paso: Adquiere el [ CONDICIONAL IF ] en Mejoras."
+			transmision_ada.mostrar_mensaje(msg_param, "completado", 15.0)
+		"comprar_if":
+			transmision_ada.mostrar_mensaje(
+				"¡Módulo Condicional IF instalado!\n" +
+				"Sensores de análisis listos en el rover.\n" +
+				"Nueva misión: SEÑALES INCIERTAS.\n" +
+				"Usa 'if rover.hay_mineral():' para evaluar casillas antes de minar.",
+				"progreso",
+				12.0
+			)
+		"compra_temprana_if":
+			transmision_ada.mostrar_mensaje(
+				"¡Módulo Condicional IF adquirido!\n" +
+				"Sintaxis y sensores listos. Se activarán en tu misión " +
+				"cuando completes tus tareas de calibración actuales.",
+				"progreso",
+				10.0
+			)
+		"senales_inciertas":
+			var msg_if := (
+				"¡Lecturas confirmadas! Has dominado el condicional if y la lectura de sensores.\n" +
+				"El rover ahora solo extrae recursos cuando detecta mineral.\n" +
+				"Conocimiento desbloqueado: CONDICIONAL IF.\n"
+			)
+			if GestorSintaxis.esta_desbloqueada("while"):
+				msg_if += "Como ya adquiriste el Bucle WHILE, ¡se activa la misión CICLO AUTÓNOMO!"
+			else:
+				msg_if += "Ahora puedes adquirir el [ BUCLE WHILE ] en Mejoras."
+			transmision_ada.mostrar_mensaje(msg_if, "completado", 15.0)
+		"comprar_while":
+			transmision_ada.mostrar_mensaje(
+				"¡Módulo Bucle WHILE instalado!\n" +
+				"Capacidad de iteración condicional en línea.\n" +
+				"Nueva misión: CICLO AUTÓNOMO.\n" +
+				"Usa 'while rover.tiene_espacio():' para patrullar y extraer de forma continua.",
+				"progreso",
+				12.0
+			)
+		"compra_temprana_while":
+			transmision_ada.mostrar_mensaje(
+				"¡Módulo Bucle WHILE adquirido!\n" +
+				"Registrado en la nave. Completa tus misiones previas " +
+				"para iniciar los ejercicios de autonomía.",
+				"progreso",
+				10.0
+			)
+		"ciclo_autonomo":
+			transmision_ada.mostrar_mensaje(
+				"¡Autonomía completada! Has programado un bucle while que toma decisiones en tiempo real.\n" +
+				"El rover ahora sabe cuándo continuar y cuándo volver a la base según sus sensores.\n" +
+				"Conocimiento desbloqueado: BUCLE WHILE.",
 				"completado",
 				15.0
 			)
@@ -625,8 +687,12 @@ func _mostrar_mensaje_inicial_ada() -> void:
 			25.0
 		)
 		return
-	if MissionService.objective_id == "comprar_casillas":
-		transmision_ada.mostrar_mensaje(MissionService.get_objetivo_actual(), "objetivo", 10.0)
+	if MissionService.objective_id in ["comprar_casillas", "comprar_if", "senales_inciertas", "comprar_while", "ciclo_autonomo"]:
+		transmision_ada.mostrar_mensaje(
+			MissionService.get_objetivo_actual(),
+			"objetivo",
+			15.0
+		)
 		return
 	if MissionService.objective_completed:
 		transmision_ada.mostrar_mensaje(

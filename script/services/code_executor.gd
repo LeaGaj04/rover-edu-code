@@ -98,6 +98,77 @@ func ejecutar_codigo(
 			linea_finalizada.emit(num_linea, cont_linea)
 			continue
 
+		if tipo == "while":
+			var num_linea: int = instruccion["numero"]
+			var cont_linea: String = instruccion["contenido"]
+			var condicion: String = instruccion["condition"]
+			var invertido: bool = instruccion.get("inverted", false)
+			var cuerpo_while: Array = instruccion.get("cuerpo", [])
+			const MAX_WHILE_ITER: int = 50
+			var iteracion: int = 0
+			resultado["loop_count"] = maxi(int(resultado.get("loop_count", 0)), 1)
+			while true:
+				iteracion += 1
+				if iteracion > MAX_WHILE_ITER:
+					var err_infinito := {
+						"type": "ejecucion",
+						"line": num_linea,
+						"content": cont_linea,
+						"message": "Límite de seguridad alcanzado: el bucle while superó 50 iteraciones para prevenir un bucle infinito."
+					}
+					resultado["error_type"] = err_infinito["type"]
+					resultado["error_message"] = err_infinito["message"]
+					resultado["errors"].append(err_infinito)
+					error_detectado.emit(err_infinito)
+					_finalizar(resultado)
+					return resultado
+				linea_iniciada.emit(num_linea, cont_linea)
+				var cumple: bool = false
+				if evaluar_condicion.is_valid():
+					cumple = await evaluar_condicion.call(condicion)
+				if invertido:
+					cumple = not cumple
+				linea_finalizada.emit(num_linea, cont_linea)
+				if not cumple:
+					break
+				resultado["loop_iterations"] = maxi(int(resultado.get("loop_iterations", 0)), iteracion)
+				for sub_ins in cuerpo_while:
+					var sub_tipo: String = sub_ins.get("tipo", "comando")
+					if sub_tipo == "if":
+						var num_if: int = sub_ins["numero"]
+						var cont_if: String = sub_ins["contenido"]
+						linea_iniciada.emit(num_if, cont_if)
+						var cumple_if: bool = false
+						if evaluar_condicion.is_valid():
+							cumple_if = await evaluar_condicion.call(sub_ins["condition"])
+						if sub_ins.get("inverted", false):
+							cumple_if = not cumple_if
+						resultado["if_evaluations"] = resultado.get("if_evaluations", 0) + 1
+						if cumple_if:
+							resultado["if_branch_taken"] = true
+							for cmd_if in sub_ins.get("cuerpo", []):
+								cmd_if["loop_iteration"] = iteracion
+								var res_sub: Dictionary = await _ejecutar_instruccion_simple(
+									cmd_if,
+									ejecutar_comando,
+									resultado
+								)
+								if not res_sub.get("ok", false):
+									_finalizar(resultado)
+									return resultado
+						linea_finalizada.emit(num_if, cont_if)
+						continue
+					sub_ins["loop_iteration"] = iteracion
+					var res_while_cmd: Dictionary = await _ejecutar_instruccion_simple(
+						sub_ins,
+						ejecutar_comando,
+						resultado
+					)
+					if not res_while_cmd.get("ok", false):
+						_finalizar(resultado)
+						return resultado
+			continue
+
 		var res_cmd: Dictionary = await _ejecutar_instruccion_simple(
 			instruccion,
 			ejecutar_comando,
@@ -117,17 +188,25 @@ func _ejecutar_instruccion_simple(
 	ejecutar_comando: Callable,
 	resultado: Dictionary
 ) -> Dictionary:
-	var numero_linea: int = instruccion["numero"]
-	var contenido: String = instruccion["contenido"]
+	var numero_linea: int = int(instruccion.get("numero", 0))
+	var contenido: String = str(instruccion.get("contenido", ""))
+	var comando: String = str(instruccion.get("command", instruccion.get("comando", "")))
+	var pasos: int = int(instruccion.get("steps", 1))
+
 	linea_iniciada.emit(numero_linea, contenido)
+
+	if comando.is_empty():
+		linea_finalizada.emit(numero_linea, contenido)
+		return {"ok": true}
+
 	var resultado_comando: Dictionary = await ejecutar_comando.call(
-		instruccion["command"],
-		instruccion["steps"]
+		comando,
+		pasos
 	)
-	resultado["commands_used"].append(instruccion["command"])
+	resultado["commands_used"].append(comando)
 	resultado["commands_data"].append({
-		"command": instruccion["command"],
-		"steps": instruccion["steps"]
+		"command": comando,
+		"steps": pasos
 	})
 	resultado["command_count"] += 1
 	resultado["movement_count"] += int(resultado_comando.get("steps_completed", 0))
@@ -290,16 +369,16 @@ func compilar_programa(codigo: String) -> Dictionary:
 					break
 
 				var contenido_cuerpo := linea_cuerpo.strip_edges()
-				var analisis: Dictionary = analizar_linea(contenido_cuerpo, indice + 1)
-				if not analisis["ok"]:
-					return analisis
+				var analisis_if: Dictionary = analizar_linea(contenido_cuerpo, indice + 1)
+				if not analisis_if["ok"]:
+					return analisis_if
 
 				cuerpo_if.append({
 					"tipo": "comando",
 					"numero": indice + 1,
 					"contenido": contenido_cuerpo,
-					"command": analisis["command"],
-					"steps": analisis["steps"]
+					"command": analisis_if["command"],
+					"steps": analisis_if["steps"]
 				})
 				indice += 1
 
@@ -402,20 +481,20 @@ func compilar_programa(codigo: String) -> Dictionary:
 					continue
 
 				# Caso 2: comando normal dentro de for
-				var analisis: Dictionary = analizar_linea(
+				var analisis_for: Dictionary = analizar_linea(
 					contenido_cuerpo,
 					indice + 1
 				)
 
-				if not analisis["ok"]:
-					return analisis
+				if not analisis_for["ok"]:
+					return analisis_for
 
 				cuerpo_for.append({
 					"tipo": "comando",
 					"numero": indice + 1,
 					"contenido": contenido_cuerpo,
-					"command": analisis["command"],
-					"steps": analisis["steps"]
+					"command": analisis_for["command"],
+					"steps": analisis_for["steps"]
 				})
 
 				indice += 1
@@ -433,6 +512,112 @@ func compilar_programa(codigo: String) -> Dictionary:
 					copia["loop_iteration"] = iteracion + 1
 					instrucciones.append(copia)
 
+			continue
+
+		if contenido_lower.begins_with("while "):
+			var resultado_while: Dictionary = _analizar_while(contenido, numero_linea)
+			if not resultado_while["ok"]:
+				return resultado_while
+
+			var sangria_while := _contar_espacios_sangria(linea_original)
+			var cuerpo_while: Array = []
+			indice += 1
+
+			while indice < lineas.size():
+				var linea_cuerpo: String = lineas[indice]
+				if linea_cuerpo.strip_edges().is_empty():
+					indice += 1
+					continue
+
+				var sangria_cuerpo := _contar_espacios_sangria(linea_cuerpo)
+				if sangria_cuerpo <= sangria_while:
+					break
+
+				var contenido_cuerpo := linea_cuerpo.strip_edges()
+				var cont_cuerpo_lower := contenido_cuerpo.to_lower()
+
+				# Soporte para if anidado dentro de while
+				if cont_cuerpo_lower.begins_with("if "):
+					var num_linea_if := indice + 1
+					var res_if_anidado := _analizar_if(contenido_cuerpo, num_linea_if)
+					if not res_if_anidado["ok"]:
+						return res_if_anidado
+
+					var sangria_if := sangria_cuerpo
+					var cuerpo_if_anidado: Array = []
+					indice += 1
+
+					while indice < lineas.size():
+						var linea_sub := lineas[indice]
+						if linea_sub.strip_edges().is_empty():
+							indice += 1
+							continue
+
+						var sangria_sub := _contar_espacios_sangria(linea_sub)
+						if sangria_sub <= sangria_if:
+							break
+
+						var cont_sub := linea_sub.strip_edges()
+						var analisis_sub := analizar_linea(cont_sub, indice + 1)
+						if not analisis_sub["ok"]:
+							return analisis_sub
+
+						cuerpo_if_anidado.append({
+							"tipo": "comando",
+							"numero": indice + 1,
+							"contenido": cont_sub,
+							"command": analisis_sub["command"],
+							"steps": analisis_sub["steps"]
+						})
+						indice += 1
+
+					if cuerpo_if_anidado.is_empty():
+						return _error_de_linea(
+							num_linea_if,
+							contenido_cuerpo,
+							"El condicional if necesita al menos una instrucción con sangría."
+						)
+
+					cuerpo_while.append({
+						"tipo": "if",
+						"numero": num_linea_if,
+						"contenido": contenido_cuerpo,
+						"condition": res_if_anidado["condition"],
+						"inverted": res_if_anidado["inverted"],
+						"cuerpo": cuerpo_if_anidado
+					})
+					continue
+
+				# Comando regular
+				var analisis_cmd: Dictionary = analizar_linea(contenido_cuerpo, indice + 1)
+				if not analisis_cmd["ok"]:
+					return analisis_cmd
+
+				cuerpo_while.append({
+					"tipo": "comando",
+					"numero": indice + 1,
+					"contenido": contenido_cuerpo,
+					"command": analisis_cmd["command"],
+					"steps": analisis_cmd["steps"]
+				})
+				indice += 1
+
+			if cuerpo_while.is_empty():
+				return _error_de_linea(
+					numero_linea,
+					contenido,
+					"El bucle while necesita al menos una instrucción con sangría."
+				)
+
+			instrucciones.append({
+				"tipo": "while",
+				"numero": numero_linea,
+				"contenido": contenido,
+				"condition": resultado_while["condition"],
+				"inverted": resultado_while["inverted"],
+				"cuerpo": cuerpo_while,
+				"loop_iteration": 0
+			})
 			continue
 
 		var analisis: Dictionary = analizar_linea(
@@ -595,3 +780,47 @@ func _finalizar(resultado: Dictionary) -> void:
 	)
 
 	ejecucion_finalizada.emit(resultado)
+
+func _analizar_while(contenido: String, numero_linea: int) -> Dictionary:
+	if not contenido.ends_with(":"):
+		return _error_de_linea(
+			numero_linea,
+			contenido,
+			"Falta el carácter de dos puntos ':' al final del bucle while."
+		)
+
+	var condicion := contenido.substr(5, contenido.length() - 6).strip_edges()
+	var invertido := false
+
+	if condicion.begins_with("not ") or condicion.begins_with("NOT "):
+		invertido = true
+		condicion = condicion.substr(4).strip_edges()
+
+	var condiciones_validas := [
+		"rover.hay_mineral()",
+		"hay_mineral()",
+		"rover.tiene_espacio()",
+		"tiene_espacio()",
+		"rover.en_base()",
+		"en_base()"
+	]
+
+	if condicion in condiciones_validas:
+		return {
+			"ok": true,
+			"condition": condicion,
+			"inverted": invertido
+		}
+
+	if condicion in ["rover.hay_mineral", "hay_mineral", "rover.tiene_espacio", "tiene_espacio", "rover.en_base", "en_base"]:
+		return _error_de_linea(
+			numero_linea,
+			contenido,
+			"Te faltaron los paréntesis '()' en la condición: usa '" + condicion + "()'"
+		)
+
+	return _error_de_linea(
+		numero_linea,
+		contenido,
+		"Condición no válida para while. Sensores disponibles: rover.tiene_espacio(), rover.en_base(), rover.hay_mineral()"
+	)

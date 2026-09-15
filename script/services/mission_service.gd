@@ -15,6 +15,8 @@ enum EstadoMision {
 	CAMINO_LARGO,
 	COMPRAR_IF,
 	SENALES_INCIERTAS,
+	COMPRAR_WHILE,
+	CICLO_AUTONOMO,
 }
 
 var objective_id: String = "recolectar_primer_mineral"
@@ -317,6 +319,24 @@ func get_objetivo_actual() -> String:
 			"antes de extraerlo, y transfiere el cargamento a la nave."
 		)
 
+	if objective_id == "comprar_while":
+		return (
+			"AUTOMATIZACIÓN AVANZADA (BUCLE WHILE)\n" +
+			"Reúne 15 minerales en la nave y adquiere el [ BUCLE WHILE ] " +
+			"en el Centro de Mejoras para desbloquear ciclos condicionales continuos."
+		)
+	if objective_id == "ciclo_autonomo":
+		return (
+			"CICLO AUTÓNOMO (BUCLE WHILE)\n" +
+			"A diferencia de for, un bucle while repite instrucciones mientras una condición sea verdadera.\n\n" +
+			"Por ejemplo:\n" +
+			"while rover.tiene_espacio():\n" +
+			"    # patrulla y mina\n" +
+			"rover.transferir()\n\n" +
+			"Tu desafío: programa un ciclo while que patrulle y extraiga recursos hasta " +
+			"recolectar al menos 3 minerales y transferirlos a la nave."
+		)
+
 	match estado_actual:
 		EstadoMision.BUSCAR_MINERAL:
 			return "Minar la primera muestra."
@@ -338,6 +358,13 @@ func evaluar_programa(resultado: Dictionary) -> void:
 		return
 
 	if not resultado.get("success", false):
+		return
+
+	if objective_id == "ciclo_autonomo":
+		_evaluar_ciclo_autonomo(resultado)
+		return
+
+	if objective_id == "comprar_while":
 		return
 
 	if objective_id == "senales_inciertas":
@@ -518,13 +545,15 @@ func registrar_compra_if() -> void:
 	if "comprar_if" not in completed_missions:
 		completed_missions.append("comprar_if")
 
-	mision_completada.emit("comprar_if")
 	desbloquear_conocimiento("condicional_if")
 
-	if objective_id == "comprar_if" or objective_id == "senales_inciertas":
+	if objective_id == "comprar_if":
 		objective_completed = true
 		estado_actual = EstadoMision.COMPLETADA
+		mision_completada.emit("comprar_if")
 		iniciar_senales_inciertas()
+	else:
+		mision_completada.emit("compra_temprana_if")
 
 
 func _evaluar_comprar_if(resultado: Dictionary) -> void:
@@ -567,3 +596,68 @@ func _evaluar_senales_inciertas(resultado: Dictionary) -> void:
 	desbloquear_conocimiento("condicional_if")
 	mision_completada.emit(objective_id)
 	print("Misión senales_inciertas completada!")
+	iniciar_mision_comprar_while()
+
+
+func iniciar_mision_comprar_while() -> void:
+	objective_id = "comprar_while"
+	objective_completed = "comprar_while" in completed_missions or GestorSintaxis.esta_desbloqueada("while")
+	if objective_completed:
+		iniciar_ciclo_autonomo()
+		return
+	estado_actual = EstadoMision.COMPRAR_WHILE
+	mision_iniciada.emit(objective_id)
+	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
+	print("Misión iniciada: comprar_while")
+
+
+func registrar_compra_while() -> void:
+	if "comprar_while" not in completed_missions:
+		completed_missions.append("comprar_while")
+
+	desbloquear_conocimiento("bucle_while")
+
+	if objective_id == "comprar_while":
+		objective_completed = true
+		estado_actual = EstadoMision.COMPLETADA
+		mision_completada.emit("comprar_while")
+		iniciar_ciclo_autonomo()
+	else:
+		mision_completada.emit("compra_temprana_while")
+
+
+func iniciar_ciclo_autonomo() -> void:
+	objective_id = "ciclo_autonomo"
+	objective_completed = "ciclo_autonomo" in completed_missions
+	estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.CICLO_AUTONOMO
+	mision_iniciada.emit(objective_id)
+	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
+	print("Misión iniciada: ciclo_autonomo")
+
+
+func _evaluar_ciclo_autonomo(resultado: Dictionary) -> void:
+	var _comandos_usados: Array = resultado.get("commands_used", [])
+	var recolectados: int = int(resultado.get("minerals_collected", 0))
+	var transferidos: int = int(resultado.get("minerals_transferred", 0))
+	var iteraciones: int = int(resultado.get("loop_iterations", 0))
+	if iteraciones < 1:
+		objetivo_actualizado.emit(
+			objective_id,
+			"Debes usar la estructura 'while <condicion>:' (como rover.tiene_espacio()) " +
+			"para que el rover decida de forma autónoma cuándo detenerse."
+		)
+		return
+	if recolectados < 3 or transferidos < 3:
+		objetivo_actualizado.emit(
+			objective_id,
+			"El ciclo while funcionó, pero debes recolectar y transferir al menos 3 minerales " +
+			"para demostrar la autonomía del rover."
+		)
+		return
+	objective_completed = true
+	estado_actual = EstadoMision.COMPLETADA
+	if objective_id not in completed_missions:
+		completed_missions.append(objective_id)
+	desbloquear_conocimiento("bucle_while")
+	mision_completada.emit(objective_id)
+	print("Misión ciclo_autonomo completada!")

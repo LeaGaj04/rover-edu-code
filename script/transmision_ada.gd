@@ -11,6 +11,7 @@ var tween_actual: Tween
 
 
 func _ready() -> void:
+	z_index = 100
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	posicion_visible = panel.position
 	posicion_oculta = posicion_visible + Vector2(panel.size.x + 40.0, 0.0)
