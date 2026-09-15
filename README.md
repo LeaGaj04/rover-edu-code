@@ -75,20 +75,36 @@ Control de Versiones y Despliegue: Git y GitHub para el repositorio del equipo ,
 ## Para facilitar la lectura y escalabilidad del código bajo la metodología Scrum, el proyecto en Godot está estructurado de la siguiente manera:
 
 ```text
- Edu_Code/
-├──  assets/            # Modelos 3D (.glb/.gltf), texturas, materiales y sonidos
-├──  scenes/            # Nodos y escenas visuales de Godot
-│   ├──  mundo.tscn     # Escena principal (GridMap, iluminación y cámara)
-│   ├──  rover.tscn     # Escena del jugador (CharacterBody3D)
-│   └──  main_menu.tscn # Interfaz de inicio (Jugar, Configuraciones, Salir)
-├──  scripts/           # Lógica central en GDScript
-│   ├──  parser.gd      # Analizador léxico y validación algorítmica de código
-│   ├──  rover.gd       # Funciones de movimiento y POO del vehículo
-│   └──  ui_manager.gd  # Control de menús e interacciones del jugador
-├──  database/          # Archivos de conexión y lógica en la nube
-│   └──  supabase.gd    # SDK y scripts de conexión con el Backend as a Service
-├──  project.godot      # Archivo de configuración general del motor de juego
-└──  README.md
+rover-edu-code/
+├── assets/                  # Recursos gráficos, fuentes y materiales
+├── Fondos/                  # Texturas de ambiente y fondo espacial
+├── Minerales/               # Modelos y texturas de yacimientos minerales
+├── Modelados3D/             # Modelos 3D del Rover, la Nave y props
+├── escenas/                 # Nodos y escenas principales de Godot (.tscn)
+│   ├── mundo.tscn           # Escena principal con GridMap, iluminación y cámara
+│   ├── rover.tscn           # Escena del vehículo del jugador (CharacterBody3D)
+│   ├── nave.tscn            # Base de operaciones y punto de transferencia
+│   ├── mineral.tscn         # Objeto recolectable con colisiones
+│   ├── menu_inicio.tscn     # Pantalla principal con acceso a juego y opciones
+│   ├── auth.tscn            # Pantalla de autenticación y registro con Supabase
+│   ├── archivo_ada.tscn     # Panel del Códice pedagógico de POO
+│   └── transmision_ada.tscn # Avatar y panel de transmisión de la IA A.D.A.
+├── script/                  # Lógica del juego en GDScript
+│   ├── rover.gd             # Métodos del vehículo: movimiento, minería y sensores
+│   ├── mundo.gd             # Generación procedimental de minerales y expansión del mapa
+│   ├── interfaz.gd          # UI in-game, gestión del IDE, inventarios y tienda
+│   ├── archivo_ada.gd       # Diccionario pedagógico y lógica del Códice POO
+│   ├── transmision_ada.gd   # Sistema de mensajes y feedback reactivo de A.D.A.
+│   ├── lexer.gd             # Análisis léxico y tokenización de código
+│   ├── auth.gd              # Controlador de login y registro de usuarios
+│   └── services/            # Autoloads y servicios centrales del sistema
+│       ├── code_executor.gd # Ejecutor e intérprete seguro de instrucciones
+│       ├── gestor_sintaxis.gd# Control de sintaxis permitida y validación
+│       ├── mission_service.gd# Máquina de estados de misiones y evaluación
+│       ├── progress_service.gd# Serialización y guardado de progreso en nube
+│       └── supabase.gd      # Cliente REST / BaaS de Supabase
+├── documentos/              # Especificaciones de diseño y guías de jugabilidad
+└── project.godot            # Archivo de configuración central del motor Godot
 ```
 
 ---
