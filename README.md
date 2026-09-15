@@ -48,6 +48,29 @@ Interfaz de Usuario (UI) y Gamificación: Actúa como el puente interactivo entr
 
 Backend y Cloud Computing: Es la capa de infraestructura externa gestionada mediante Backend as a Service (Supabase/Firebase). Se encarga de la autenticación segura de los usuarios y utiliza bases de datos no relacionales para garantizar la persistencia asíncrona del progreso del jugador (guardando el inventario de minerales, los niveles superados y los fragmentos de código desbloqueados) sin interrumpir el flujo del juego.
 
+┌──────────────────────────────────────────────────────────────────┐
+│                   CAPA DE INTERFAZ Y EXPERIENCIA                 │
+│  IDE Flotante (TextEdit) │ Archivo A.D.A. (Códice) │ Tienda/Mejoras  │
+└─────────────────────────────────┬────────────────────────────────┘
+                                  │
+┌─────────────────────────────────▼────────────────────────────────┐
+│                    NÚCLEO LÓGICO & COMPILADOR                    │
+│   Lexer.gd  ◄──►  GestorSintaxis.gd  ◄──►  CodeExecutor.gd       │
+│   (Validación sintáctica, sandboxing y protección anti bucle)    │
+└─────────────────────────────────┬────────────────────────────────┘
+                                  │
+┌─────────────────────────────────▼────────────────────────────────┐
+│                    MOTOR FÍSICO Y ENTORNO 3D                     │
+│    GridMap Modular (Tiers 0, 1, 2)  ◄──►  Rover (CharacterBody3D)│
+│    (Navegación cinemática por casillas, colisiones y sensores)   │
+└─────────────────────────────────┬────────────────────────────────┘
+                                  │
+┌─────────────────────────────────▼────────────────────────────────┐
+│                 INFRAESTRUCTURA Y NUBE (SUPABASE)                │
+│    AuthService (Sesión JWT)  ◄──►  ProgressService (Sync JSON)    │
+│    (Inventario, mapa_tier, misiones y sintaxis desbloqueadas)     │
+└──────────────────────────────────────────────────────────────────┘
+
 ---
 
 # Tecnología Usada (Tech Stack)
