@@ -71,8 +71,8 @@ Control de Versiones y Despliegue: Git y GitHub para el repositorio del equipo ,
 
 ---
 
-# Mapa de Carpetas (Estructura del Proyecto)
-## Para facilitar la lectura y escalabilidad del código bajo la metodología Scrum, el proyecto en Godot está estructurado de la siguiente manera:
+# Mapa de Carpetas
+### Para facilitar la lectura y escalabilidad del código bajo la metodología Scrum, el proyecto en Godot está estructurado de la siguiente manera:
 
 ```text
 rover-edu-code/
