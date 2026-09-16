@@ -5,6 +5,7 @@ extends CanvasLayer
 @onready var contenido_codigo: Control = $PanelCodigo/Contenido
 @onready var boton_minimizar: Button = $PanelCodigo/BarraTitulo/BotonMinimizar
 @onready var caja_codigo: TextEdit = $PanelCodigo/Contenido/TextEdit
+@onready var boton_ejecutar: Button = $PanelCodigo/Contenido/Button
 @onready var transmision_ada = $TransmisionADA
 @export var mi_rover : CharacterBody3D
 
@@ -203,11 +204,21 @@ func _on_boton_minimizar_pressed() -> void:
 
 
 func _on_button_pressed() -> void:
+	if CodeExecutor.ejecutando:
+		CodeExecutor.detener_ejecucion()
+		boton_ejecutar.text = "Deteniendo..."
+		return
+
+	boton_ejecutar.text = "Detener"
+
 	var resultado: Dictionary = await CodeExecutor.ejecutar_codigo(
 		caja_codigo.text,
 		ejecutar_movimiento_rover,
 		evaluar_condicion_rover
 	)
+
+	boton_ejecutar.text = "Ejecutar"
+
 	if resultado["success"]:
 		print("Programa completado correctamente.")
 	else:
@@ -263,6 +274,10 @@ func ejecutar_movimiento_rover(
 
 func evaluar_condicion_rover(condicion: String) -> bool:
 	if mi_rover == null:
+		return false
+	if condicion in ["True", "true"]:
+		return true
+	if condicion in ["False", "false"]:
 		return false
 	if condicion in ["rover.hay_mineral()", "hay_mineral()"]:
 		return mi_rover.hay_mineral()
@@ -474,10 +489,21 @@ func _on_button_for_pressed() -> void:
 		8.0
 	)
 func _on_button_while_pressed() -> void:
-	intentar_compra("while", boton_while, null)
 	if GestorSintaxis.esta_desbloqueada("while"):
-		MissionService.desbloquear_conocimiento("bucle_while")
-		MissionService.registrar_compra_while()
+		transmision_ada.mostrar_mensaje(
+			"El bucle while ya está desbloqueado. " +
+			"Puedes usarlo para repetir una rutina.",
+			"objetivo",
+			8.0
+		)
+		return
+
+	transmision_ada.mostrar_mensaje(
+		"Completa la Ruta de calibración para desbloquear " +
+		"el módulo while.",
+		"objetivo",
+		8.0
+	)
 
 func _on_button_if_pressed() -> void:
 	intentar_compra("if", boton_if, $PanelTienda/LienzoArbol/Line2D3)
@@ -543,6 +569,7 @@ func _on_error_detectado(error: Dictionary) -> void:
 
 
 func _on_ejecucion_finalizada(resultado: Dictionary) -> void:
+	boton_ejecutar.text = "Ejecutar"
 	print("Resultado de ejecución: ", resultado)
 
 	if (
