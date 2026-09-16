@@ -12,6 +12,7 @@ enum EstadoMision {
 	COMPLETADA,
 	COMPRAR_CASILLAS,
 	CICLO_RECOLECCION,
+	TRABAJO_CONTINUO,
 	CAMINO_LARGO,
 	COMPRAR_IF,
 	SENALES_INCIERTAS,
@@ -71,7 +72,7 @@ func preparar_mision_expansion() -> void:
 		return
 
 	if objective_id == "ruta_calibracion":
-		iniciar_ciclo_recoleccion()
+		iniciar_trabajo_continuo()
 		return
 
 	if objective_id != "ciclo_recoleccion":
@@ -126,23 +127,42 @@ func registrar_transferencia(cantidad: int) -> void:
 		return
 
 	if cantidad <= 0:
-		
 		return
+
 	if objective_id == "ruta_calibracion":
-		
 		return
+
+	var mision_completada_id := objective_id
 
 	estado_actual = EstadoMision.COMPLETADA
 	objective_completed = true
 
-	if objective_id not in completed_missions:
-		completed_missions.append(objective_id)
+	if mision_completada_id not in completed_missions:
+		completed_missions.append(mision_completada_id)
 
 	desbloquear_conocimiento("secuencia")
 
-	mision_completada.emit(objective_id)
+	# Después de la primera muestra, el siguiente objetivo es ampliar el mapa.
+	if mision_completada_id == "recolectar_primer_mineral":
+		objective_id = "comprar_casillas"
+		objective_completed = "comprar_casillas" in completed_missions
+		estado_actual = (
+			EstadoMision.COMPLETADA
+			if objective_completed
+			else EstadoMision.COMPRAR_CASILLAS
+		)
 
-	print("Mision completada: ", objective_id)
+	mision_completada.emit(mision_completada_id)
+
+	if mision_completada_id == "recolectar_primer_mineral":
+		mision_iniciada.emit(objective_id)
+		objetivo_actualizado.emit(
+			objective_id,
+			"Has almacenado tu primera muestra. " +
+			"Ahora amplía el sector desde el Centro de Mejoras."
+		)
+
+	print("Misión completada: ", mision_completada_id)
 	print("Conocimiento desbloqueado: secuencia")
 
 
@@ -378,6 +398,10 @@ func evaluar_programa(resultado: Dictionary) -> void:
 	if objective_id == "camino_largo":
 		_evaluar_camino_largo(resultado)
 		return
+	
+	if objective_id == "trabajo_continuo":
+		_evaluar_trabajo_continuo(resultado)
+		return
 
 	if objective_id == "ciclo_recoleccion":
 		_evaluar_ciclo_recoleccion(resultado)
@@ -413,6 +437,37 @@ func evaluar_programa(resultado: Dictionary) -> void:
 			"norte, minar, sur y transferir, dentro del mismo programa."
 		)
 
+func _evaluar_trabajo_continuo(resultado: Dictionary) -> void:
+	var comandos: Array = resultado.get("commands_used", [])
+	var bucle_detectado: int = int(resultado.get("loop_count", 0))
+	var iteraciones: int = int(resultado.get("loop_iterations", 0))
+
+	var cumple_objetivo: bool = (
+		bucle_detectado > 0
+		and iteraciones >= 2
+		and comandos.count("norte") >= 2
+		and comandos.count("minar") >= 2
+		and comandos.count("sur") >= 2
+		and comandos.count("transferir") >= 2
+	)
+
+	if not cumple_objetivo:
+		objetivo_actualizado.emit(
+			objective_id,
+			"El ciclo todavía está incompleto. " +
+			"Debes repetir al menos dos veces la rutina " +
+			"norte, minar, sur y transferir usando while."
+		)
+		return
+
+	objective_completed = true
+	estado_actual = EstadoMision.COMPLETADA
+
+	if objective_id not in completed_missions:
+		completed_missions.append(objective_id)
+
+	mision_completada.emit(objective_id)
+	print("Misión de ciclo de suministro completada.")
 
 func _evaluar_ciclo_recoleccion(resultado: Dictionary) -> void:
 	var comandos: Array = resultado.get("commands_used", [])
@@ -464,7 +519,10 @@ func desbloquear_modulo_for() -> void:
 	GestorSintaxis.desbloquear_sintaxis("for")
 	GestorSintaxis.desbloquear_sintaxis("in range")
 	desbloquear_conocimiento("bucle_for")
-
+	
+func desbloquear_modulo_while() -> void:
+	GestorSintaxis.desbloquear_sintaxis("while")
+	desbloquear_conocimiento("bucle_while")
 
 func iniciar_ciclo_recoleccion() -> void:
 	objective_id = "ciclo_recoleccion"
@@ -475,6 +533,24 @@ func iniciar_ciclo_recoleccion() -> void:
 	mision_iniciada.emit(objective_id)
 
 	print("Misión iniciada: ciclo_recoleccion")
+
+func iniciar_trabajo_continuo() -> void:
+	objective_id = "trabajo_continuo"
+	objective_completed = false
+	estado_actual = EstadoMision.TRABAJO_CONTINUO
+
+	desbloquear_modulo_while()
+	mision_iniciada.emit(objective_id)
+
+	objetivo_actualizado.emit(
+	objective_id,
+	"CICLO DE SUMINISTRO\n" +
+	"Programa el rover para viajar al depósito del norte, " +
+	"extraer el mineral, regresar a la base y transferirlo. " +
+	"Repite todo el ciclo usando un bucle while."
+)
+
+	print("Misión iniciada: trabajo_continuo")
 
 func iniciar_camino_largo() -> void:
 	objective_id = "camino_largo"

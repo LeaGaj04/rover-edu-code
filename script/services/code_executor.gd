@@ -7,10 +7,14 @@ signal error_detectado(error: Dictionary)
 signal ejecucion_finalizada(resultado: Dictionary)
 
 var ejecutando: bool = false
+var detener_solicitado: bool = false
 var _tiempo_inicio_msec : float = 0.0
 var _objective_id_at_start: String = ""
 var _objective_completed_at_start: bool = false
 
+func detener_ejecucion() -> void:
+	if ejecutando:
+		detener_solicitado = true
 
 func ejecutar_codigo(
 	codigo: String,
@@ -34,6 +38,7 @@ func ejecutar_codigo(
 	resultado["objective_completed"] = false
 
 	ejecutando = true
+	detener_solicitado = false
 	ejecucion_iniciada.emit(codigo)
 
 	if not GestorSintaxis.validar_codigo(codigo):
@@ -118,6 +123,8 @@ func ejecutar_codigo(
 			var iteracion: int = 0
 			resultado["loop_count"] = maxi(int(resultado.get("loop_count", 0)), 1)
 			while true:
+				if detener_solicitado:
+					break
 				iteracion += 1
 				if iteracion > MAX_WHILE_ITER:
 					var err_infinito := {
@@ -177,6 +184,11 @@ func ejecutar_codigo(
 					if not res_while_cmd.get("ok", false):
 						_finalizar(resultado)
 						return resultado
+					if detener_solicitado:
+						break
+
+			if detener_solicitado:
+				break
 			continue
 
 		var res_cmd: Dictionary = await _ejecutar_instruccion_simple(
@@ -224,6 +236,11 @@ func _ejecutar_instruccion_simple(
 	var transferidos: int = int(resultado_comando.get("minerals_transferred", 0))
 	resultado["minerals_collected"] += recolectados
 	resultado["minerals_transferred"] += transferidos
+	if (
+		_objective_id_at_start == "trabajo_continuo"
+		and int(resultado.get("minerals_transferred", 0)) >= 2
+	):
+		detener_solicitado = true
 	if int(instruccion.get("loop_iteration", 0)) > 0:
 		resultado["loop_minerals_collected"] += recolectados
 	if not resultado_comando.get("ok", false):
@@ -818,6 +835,10 @@ func _analizar_while(contenido: String, numero_linea: int) -> Dictionary:
 		condicion = condicion.substr(4).strip_edges()
 
 	var condiciones_validas := [
+		"True",
+		"False",
+		"true",
+		"false",
 		"rover.hay_mineral()",
 		"hay_mineral()",
 		"rover.tiene_espacio()",
@@ -825,7 +846,7 @@ func _analizar_while(contenido: String, numero_linea: int) -> Dictionary:
 		"rover.en_base()",
 		"en_base()"
 	]
-
+	
 	if condicion in condiciones_validas:
 		return {
 			"ok": true,
@@ -843,5 +864,7 @@ func _analizar_while(contenido: String, numero_linea: int) -> Dictionary:
 	return _error_de_linea(
 		numero_linea,
 		contenido,
-		"Condición no válida para while. Sensores disponibles: rover.tiene_espacio(), rover.en_base(), rover.hay_mineral()"
+		"Condición no válida para while. Puedes usar True, False " +
+		"o los sensores rover.tiene_espacio(), rover.en_base() " +
+		"y rover.hay_mineral()."
 	)
