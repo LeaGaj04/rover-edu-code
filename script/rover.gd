@@ -9,6 +9,7 @@ var paso_distancia: float = 2.0
 # Control de la cola de movimiento
 var cola_instrucciones: Array = []
 var esta_moviendose: bool = false
+var tiempo_minado: float = 3.0
 
 
 # --- FUNCIONES DE MOVIMIENTO (Aceptan cantidad de pasos) ---
@@ -165,7 +166,7 @@ func minar() -> Dictionary:
 
 		if casilla_rover == casilla_mineral:
 			print("Rover posicionado. Iniciando protocolo de minería...")
-			await get_tree().create_timer(3.0).timeout
+			await get_tree().create_timer(tiempo_minado).timeout
 
 			if is_instance_valid(nodo_mineral):
 				nodo_mineral.queue_free()

@@ -265,13 +265,11 @@ func expandir_tres_casillas() -> bool:
 
 
 func expandir_mapa_3x3() -> bool:
-	if mapa_3x3_desbloqueado:
-		return false
-
-	if not corredor_1x3_desbloqueado:
+	if mapa_3x3_desbloqueado or not casillas_extra_desbloqueadas:
 		return false
 
 	aplicar_progreso_mapa(3)
+	reubicar_mineral_para_corredor()
 
 	print(
 		"Sector adquirido: terreno expandido a 3x3."
