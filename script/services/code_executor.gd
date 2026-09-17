@@ -5,6 +5,7 @@ signal linea_iniciada(numero: int, contenido: String)
 signal linea_finalizada(numero: int, contenido: String)
 signal error_detectado(error: Dictionary)
 signal ejecucion_finalizada(resultado: Dictionary)
+signal progreso_actualizado(resultado: Dictionary)
 
 var ejecutando: bool = false
 var detener_solicitado: bool = false
@@ -189,6 +190,7 @@ func ejecutar_codigo(
 
 			if detener_solicitado:
 				break
+			progreso_actualizado.emit(resultado)
 			continue
 
 		var res_cmd: Dictionary = await _ejecutar_instruccion_simple(

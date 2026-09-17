@@ -36,6 +36,14 @@ const CONOCIMIENTOS := {
 		"ejemplo": "rover.norte(2)  # Avanza dos casillas al norte\nrover.sur(3)    # Avanza tres casillas al sur",
 		"errores": "Enviar números negativos, texto o enviar parámetros a comandos que no los reciben (como rover.minar(5))."
 	},
+	"bucle_while": {
+		"nombre": "Bucle While",
+		"categoria": "Control",
+		"descripcion": "Repite un bloque de código mientras una condición sea verdadera. Es útil para mantener una rutina de trabajo activa.",
+		"sintaxis": "while <condicion>:\n    <instrucciones>",
+		"ejemplo": "while True:\n    rover.minar()",
+		"errores": "La condición debe ser válida y el bloque interior debe llevar sangría."
+	},
 	"bucle_for": {
 		"nombre": "Bucle For (Repetición)",
 		"categoria": "Control",
@@ -49,15 +57,7 @@ const CONOCIMIENTOS := {
 		"categoria": "Control",
 		"descripcion": "Permite al rover tomar decisiones lógicas en base al estado de sus sensores o del terreno. Si la condición es verdadera, ejecuta el bloque.",
 		"sintaxis": "if <condicion>:\n    <instrucciones>",
-		"ejemplo": "# Próximamente en misiones con sensores",
-		"errores": "Archivo cifrado. Requiere completar misiones de exploración avanzada."
-	},
-	"bucle_while": {
-		"nombre": "Bucle While",
-		"categoria": "Control",
-		"descripcion": "Repite un bloque de código continuamente mientras una condición siga siendo verdadera. Requiere una condición de salida para no crear bucles infinitos.",
-		"sintaxis": "while <condicion>:\n    <instrucciones>",
-		"ejemplo": "# Próximamente en misiones de automatización avanzada",
+		"ejemplo": "# Revisa el entorno antes de tomar una decisión",
 		"errores": "Archivo cifrado. Requiere completar misiones de exploración avanzada."
 	},
 	"variable": {

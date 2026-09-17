@@ -7,6 +7,10 @@ extends CanvasLayer
 @onready var caja_codigo: TextEdit = $PanelCodigo/Contenido/TextEdit
 @onready var boton_ejecutar: Button = $PanelCodigo/Contenido/Button
 @onready var transmision_ada = $TransmisionADA
+@onready var panel_mision: Panel = $PanelMision
+@onready var label_mision: Label = $PanelMision/Nombre
+@onready var label_objetivo_mision: Label = $PanelMision/Objetivo
+@onready var label_estado_mision: Label = $PanelMision/Estado
 @export var mi_rover : CharacterBody3D
 
 const ALTO_PANEL_CODIGO: float = 276.0
@@ -22,6 +26,7 @@ var mouse_inicio_redimension: Vector2 = Vector2.ZERO
 var posicion_inicio_redimension: Vector2 = Vector2.ZERO
 var tamano_inicio_redimension: Vector2 = Vector2.ZERO
 var alto_panel_expandido: float = ALTO_PANEL_CODIGO
+var posicion_panel_mision: Vector2
 
 # --- VARIABLES DE RECURSOS ---
 const CAPACIDAD_ROVER : int = 10
@@ -62,8 +67,12 @@ func _ready() -> void:
 	CodeExecutor.linea_iniciada.connect(_on_linea_iniciada)
 	CodeExecutor.error_detectado.connect(_on_error_detectado)
 	CodeExecutor.ejecucion_finalizada.connect(_on_ejecucion_finalizada)
+	CodeExecutor.progreso_actualizado.connect(_on_progreso_ejecucion)
 	MissionService.objetivo_actualizado.connect(_on_objetivo_actualizado)
 	MissionService.mision_completada.connect(_on_mision_completada)
+	MissionService.conocimiento_desbloqueado.connect(_on_conocimiento_desbloqueado)
+	actualizar_panel_mision()
+	posicion_panel_mision = panel_mision.position
 	get_viewport().size_changed.connect(_mantener_panel_en_pantalla)
 	
 
@@ -571,6 +580,7 @@ func _on_error_detectado(error: Dictionary) -> void:
 func _on_ejecucion_finalizada(resultado: Dictionary) -> void:
 	boton_ejecutar.text = "Ejecutar"
 	print("Resultado de ejecución: ", resultado)
+	actualizar_panel_mision(resultado)
 
 	if (
 		MissionService.objective_completed
@@ -579,16 +589,23 @@ func _on_ejecucion_finalizada(resultado: Dictionary) -> void:
 			"ciclo_recoleccion"
 		]
 	):
+		await get_tree().create_timer(2.5).timeout
 		MissionService.preparar_mision_expansion()
 		actualizar_mejoras_visual()
 		_solicitar_guardado_progreso()
 
+func _on_progreso_ejecucion(resultado: Dictionary) -> void:
+	actualizar_panel_mision(resultado)
+
 
 func _on_objetivo_actualizado(_mision_id: String, objetivo: String) -> void:
-	transmision_ada.mostrar_mensaje(objetivo, "progreso", 8.0)
+	actualizar_panel_mision()
+	_animar_nueva_mision()
 
 
 func _on_mision_completada(mision_id: String) -> void:
+	label_estado_mision.text = "● COMPLETADA"
+	_animar_mision_completada()
 	match mision_id:
 		"recolectar_primer_mineral":
 			transmision_ada.mostrar_mensaje(
@@ -601,23 +618,18 @@ func _on_mision_completada(mision_id: String) -> void:
 
 		"ruta_calibracion":
 			transmision_ada.mostrar_mensaje(
-				"Ruta calibrada. Módulo for desbloqueado.\n" +
-				"Un bucle repite un grupo de instrucciones. " +
-				"Por ejemplo, for ciclo in range(2): repite dos veces " +
-				"las instrucciones con sangría que aparecen debajo.\n" +
-				"Ahora automatiza la recolección de 10 minerales " +
-				"y transfiérelos una sola vez al final. " +
-				"Deja la transferencia fuera del bucle.",
+				"Ruta calibrada. Excelente trabajo, unidad Rover.\n" +
+				"Antes de continuar, revisa el Códice de A.D.A. para conocer " +
+				"las herramientas disponibles. El módulo while puede ayudarte " +
+				"a automatizar el siguiente desafío.",
 				"completado",
 				25.0
 			)
 
 		"ciclo_recoleccion":
 			transmision_ada.mostrar_mensaje(
-				"Diez minerales recibidos. Automatizaste la recolección " +
-				"utilizando un bucle y ejecutaste la transferencia al final.\n" +
-				"Ahora puedes comprar +3 CASILLAS en Mejoras " +
-				"con 10 minerales de la nave.",
+				"Diez minerales recibidos. Excelente automatización, " +
+				"unidad Rover.",
 				"completado",
 				16.0
 			)
@@ -698,51 +710,82 @@ func _on_mision_completada(mision_id: String) -> void:
 			)
 	# Guarda después de que MissionService marque la misión como completada.
 	_solicitar_guardado_progreso()
+
+func _on_conocimiento_desbloqueado(conocimiento_id: String) -> void:
+	var nombre_concepto := conocimiento_id.replace("_", " ").to_upper()
+	transmision_ada.mostrar_mensaje(
+		"Nuevo conocimiento registrado: %s.\n\n" % nombre_concepto +
+		"Revisa el Códice de A.D.A. para conocer sus posibilidades " +
+		"antes de utilizarlo en tus próximas misiones.",
+		"progreso",
+		10.0
+	)
+
+func actualizar_panel_mision(resultado: Dictionary = {}) -> void:
+	if label_mision == null:
+		return
+	var mision_id := MissionService.objective_id
+	label_mision.text = mision_id.replace("_", " ").to_upper()
+	label_objetivo_mision.text = _get_objetivo_panel(mision_id)
+
+	if MissionService.objective_completed:
+		label_estado_mision.text = "● COMPLETADA"
+	else:
+		label_estado_mision.text = "● EN CURSO"
+
+func _animar_nueva_mision() -> void:
+	if panel_mision == null:
+		return
+	var posicion_final := posicion_panel_mision
+	panel_mision.position = posicion_final + Vector2(-18.0, 0.0)
+	panel_mision.modulate.a = 0.0
+	var tween := create_tween().set_parallel(true)
+	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(panel_mision, "position", posicion_final, 0.35)
+	tween.tween_property(panel_mision, "modulate:a", 1.0, 0.35)
+
+func _animar_mision_completada() -> void:
+	if panel_mision == null:
+		return
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(panel_mision, "modulate", Color(0.65, 1.0, 0.9, 1.0), 0.18)
+	tween.tween_property(panel_mision, "modulate", Color.WHITE, 0.45)
+
+func _get_objetivo_panel(mision_id: String) -> String:
+	match mision_id:
+		"recolectar_primer_mineral":
+			return "Obtén y almacena tu primera muestra."
+		"comprar_casillas":
+			return "Amplía el sector de exploración."
+		"ruta_calibracion":
+			return "Completa una ruta de exploración y regresa a la base."
+		"trabajo_continuo":
+			return "Automatiza un ciclo de suministro repetitivo."
+		"ciclo_recoleccion":
+			return "Recolecta y entrega la cantidad requerida de minerales."
+		"camino_largo":
+			return "Navega una distancia extendida usando parámetros."
+		"comprar_if":
+			return "Adquiere el módulo de decisiones condicionales."
+		"senales_inciertas":
+			return "Haz que el rover reaccione a las señales del entorno."
+		"comprar_while":
+			return "Adquiere el módulo de automatización condicional."
+		"ciclo_autonomo":
+			return "Mantén una operación autónoma hasta completar la carga."
+		_:
+			return "Completa el objetivo de la misión actual."
 	
 func _mostrar_mensaje_inicial_ada() -> void:
-	if MissionService.objective_id == "camino_largo" and not MissionService.objective_completed:
-		transmision_ada.mostrar_mensaje(
-			MissionService.get_objetivo_actual(),
-			"objetivo",
-			15.0
-		)
-		return
-	if MissionService.objective_id == "ciclo_recoleccion":
-		transmision_ada.mostrar_mensaje(
-			MissionService.get_objetivo_actual(),
-			"objetivo",
-			25.0
-		)
-		return
-	if MissionService.objective_id in ["comprar_casillas", "comprar_if", "senales_inciertas", "comprar_while", "ciclo_autonomo"]:
-		transmision_ada.mostrar_mensaje(
-			MissionService.get_objetivo_actual(),
-			"objetivo",
-			15.0
-		)
-		return
 	if MissionService.objective_completed:
-		transmision_ada.mostrar_mensaje(
-			"Bienvenido nuevamente, unidad Rover. La primera muestra ya fue procesada. " +
-			"El siguiente paso es ampliar la zona de exploracion desde el arbol de mejoras.",
-			"objetivo",
-			9.0
-		)
 		return
-
-	match MissionService.estado_actual:
-		MissionService.EstadoMision.TRANSFERIR_MINERAL:
-			transmision_ada.mostrar_mensaje(
-				"La muestra sigue almacenada en tu inventario. " +
-				"Ejecuta rover.transferir() para enviarla a la nave.",
-				"objetivo",
-				8.0
-			)
-
-		_:
-			transmision_ada.mostrar_mensaje(
-				"Unidad Rover, enlace establecido. Soy A.D.A., la inteligencia de la nave. " +
-				"Para extraer la primera muestra utiliza rover.minar().",
-				"objetivo",
-				8.0
-			)
+	transmision_ada.mostrar_mensaje(
+		"Unidad Rover, enlace establecido. Soy A.D.A., " +
+		"la inteligencia de la nave y tu asistente durante la exploración.\n\n" +
+		"Antes de comenzar, revisa el Códice de A.D.A. " +
+		"Allí encontrarás información sobre las herramientas " +
+		"que puedes utilizar durante tus misiones.",
+		"progreso",
+		10.0
+	)

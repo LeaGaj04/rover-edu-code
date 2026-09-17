@@ -153,6 +153,30 @@ corner_radius_bottom_left = 20
 shadow_color = Color(0.015, 0.015, 0.018, 0.95)
 shadow_offset = Vector2(10, 10)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mision_barra_fondo"]
+bg_color = Color(0.01, 0.04, 0.055, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.2, 0.55, 0.5, 0.8)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mision_barra_relleno"]
+bg_color = Color(0.2, 0.95, 0.72, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.45, 1, 0.85, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fondo_camara"]
 cull_mode = 2
 shading_mode = 0
@@ -191,6 +215,50 @@ label_nave = NodePath("ContenedorContadores/HBoxContainer/LabelNave")
 label_rover = NodePath("ContenedorContadores/HBoxContainer/LabelRover")
 
 [node name="TransmisionADA" parent="CanvasLayer" unique_id=1467148888 instance=ExtResource("13_ada")]
+
+[node name="PanelMision" type="Panel" parent="CanvasLayer" unique_id=2090000001]
+offset_left = 15.0
+offset_top = 75.0
+offset_right = 385.0
+offset_bottom = 235.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel_codigo")
+
+[node name="Titulo" type="Label" parent="CanvasLayer/PanelMision" unique_id=2090000002]
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 350.0
+offset_bottom = 36.0
+theme_override_colors/font_color = Color(0.46, 1, 0.86, 1)
+theme_override_font_sizes/font_size = 17
+text = "◆ MISIÓN ACTUAL"
+
+[node name="Nombre" type="Label" parent="CanvasLayer/PanelMision" unique_id=2090000003]
+offset_left = 16.0
+offset_top = 43.0
+offset_right = 350.0
+offset_bottom = 67.0
+theme_override_colors/font_color = Color(0.76, 0.94, 0.78, 1)
+theme_override_font_sizes/font_size = 16
+text = "Misión"
+
+[node name="Objetivo" type="Label" parent="CanvasLayer/PanelMision" unique_id=2090000004]
+offset_left = 16.0
+offset_top = 70.0
+offset_right = 350.0
+offset_bottom = 98.0
+theme_override_colors/font_color = Color(0.78, 1, 0.93, 1)
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 2
+text = "Objetivo actual"
+
+[node name="Estado" type="Label" parent="CanvasLayer/PanelMision" unique_id=2090000006]
+offset_left = 16.0
+offset_top = 112.0
+offset_right = 350.0
+offset_bottom = 132.0
+theme_override_colors/font_color = Color(0.55, 0.78, 0.85, 0.9)
+theme_override_font_sizes/font_size = 12
+text = "● EN CURSO"
 
 [node name="PanelCodigo" type="Panel" parent="CanvasLayer" unique_id=1087549051]
 offset_left = 13.0
