@@ -70,7 +70,12 @@ func aplicar_progreso_mapa(map_tier: int) -> void:
 		radio_mapa_desbloqueado >= 3
 	)
 	casillas_extra_desbloqueadas = radio_mapa_desbloqueado >= 2
-	max_minerales = 2 if casillas_extra_desbloqueadas else 1
+	if mapa_3x3_desbloqueado:
+		max_minerales = 3
+	elif casillas_extra_desbloqueadas:
+		max_minerales = 2
+	else:
+		max_minerales = 1
 
 	grid_map.clear()
 

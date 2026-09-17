@@ -18,6 +18,8 @@ enum EstadoMision {
 	SENALES_INCIERTAS,
 	COMPRAR_WHILE,
 	CICLO_AUTONOMO,
+	COMPRAR_MAPA_3X3,
+	EXPLORACION_3X3,
 }
 
 var objective_id: String = "recolectar_primer_mineral"
@@ -75,28 +77,45 @@ func preparar_mision_expansion() -> void:
 		iniciar_trabajo_continuo()
 		return
 
-	if objective_id != "ciclo_recoleccion":
+	if objective_id == "trabajo_continuo":
+		iniciar_mision_comprar_casillas()
 		return
 
-	objective_id = "comprar_casillas"
-	objective_completed = "comprar_casillas" in completed_missions
-	estado_actual = (
-		EstadoMision.COMPLETADA
-		if objective_completed
-		else EstadoMision.COMPRAR_CASILLAS
-	)
+	if objective_id == "ciclo_recoleccion":
+		iniciar_mision_comprar_if()
+		return
 
+
+func iniciar_mision_comprar_casillas() -> void:
+	objective_id = "comprar_casillas"
+	var map_tier: int = int(ProgressService.get_current_progress().get("map_tier", 0))
+	objective_completed = "comprar_casillas" in completed_missions or map_tier >= 2
+	if objective_completed:
+		if GestorSintaxis.esta_desbloqueada("if") or "comprar_if" in completed_missions:
+			iniciar_senales_inciertas()
+		else:
+			iniciar_mision_comprar_if()
+		return
+	estado_actual = EstadoMision.COMPRAR_CASILLAS
 	mision_iniciada.emit(objective_id)
+	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
+	print("Misión iniciada: comprar_casillas")
 
 
 func registrar_compra_casillas() -> void:
-	if objective_id != "comprar_casillas" or objective_completed:
-		return
-	objective_completed = true
-	estado_actual = EstadoMision.COMPLETADA
-	completed_missions.append(objective_id)
-	mision_completada.emit(objective_id)
-	iniciar_camino_largo()
+	if "comprar_casillas" not in completed_missions:
+		completed_missions.append("comprar_casillas")
+
+	if objective_id == "comprar_casillas":
+		objective_completed = true
+		estado_actual = EstadoMision.COMPLETADA
+		mision_completada.emit("comprar_casillas")
+		if GestorSintaxis.esta_desbloqueada("if") or "comprar_if" in completed_missions:
+			iniciar_senales_inciertas()
+		else:
+			iniciar_mision_comprar_if()
+	else:
+		mision_completada.emit("compra_temprana_casillas")
 
 
 func evaluar_objetivo(minerales_recolectados: int) -> void:
@@ -204,46 +223,42 @@ func aplicar_progreso(progress: Dictionary) -> void:
 			"metodo"
 		]
 
-		# Adapta las partidas que llegaron al antiguo objetivo de compra,
-	# siempre que todavía conserven el corredor sin expandir.
-	if (
-		objective_id == "comprar_casillas"
-		and "ruta_calibracion" in completed_missions
-		and "ciclo_recoleccion" not in completed_missions
-		and "comprar_casillas" not in completed_missions
-		and int(progress.get("map_tier", 0)) == 1
-	):
-		objective_id = "ciclo_recoleccion"
-
-	if (
-		"ruta_calibracion" in completed_missions
-		or objective_id == "ciclo_recoleccion"
-	):
-		desbloquear_modulo_for()
-
 	objective_completed = objective_id in completed_missions
 	preparar_mision_expansion()
 
-	if objective_id == "ciclo_recoleccion":
-		estado_actual = EstadoMision.CICLO_RECOLECCION
+	if (
+		(objective_id == "trabajo_continuo" and objective_completed)
+		or (objective_id == "trabajo_continuo" and "trabajo_continuo" in completed_missions)
+	):
+		iniciar_mision_comprar_casillas()
+		return
+	if objective_id == "trabajo_continuo":
+		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.TRABAJO_CONTINUO
 		return
 	if (
 		(objective_id == "comprar_casillas" and objective_completed)
 		or (objective_id == "comprar_casillas" and "comprar_casillas" in completed_missions)
+		or (objective_id == "comprar_casillas" and int(progress.get("map_tier", 0)) >= 2)
 	):
-		iniciar_camino_largo()
-		return
-	if (
-		(objective_id == "camino_largo" and objective_completed)
-		or (objective_id == "camino_largo" and "camino_largo" in completed_missions)
-	):
-		if GestorSintaxis.esta_desbloqueada("if"):
+		if GestorSintaxis.esta_desbloqueada("if") or "comprar_if" in completed_missions:
 			iniciar_senales_inciertas()
 		else:
 			iniciar_mision_comprar_if()
 		return
-	if objective_id == "camino_largo":
-		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.CAMINO_LARGO
+	if objective_id == "comprar_casillas":
+		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.COMPRAR_CASILLAS
+		return
+	if (
+		(objective_id == "ciclo_recoleccion" and objective_completed)
+		or (objective_id == "ciclo_recoleccion" and "ciclo_recoleccion" in completed_missions)
+	):
+		if GestorSintaxis.esta_desbloqueada("if") or "comprar_if" in completed_missions:
+			iniciar_senales_inciertas()
+		else:
+			iniciar_mision_comprar_if()
+		return
+	if objective_id == "ciclo_recoleccion":
+		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.CICLO_RECOLECCION
 		return
 	if (
 		objective_id == "comprar_if"
@@ -254,11 +269,47 @@ func aplicar_progreso(progress: Dictionary) -> void:
 	if objective_id == "comprar_if":
 		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.COMPRAR_IF
 		return
+	if (
+		(objective_id == "senales_inciertas" and objective_completed)
+		or (objective_id == "senales_inciertas" and "senales_inciertas" in completed_missions)
+	):
+		iniciar_ciclo_autonomo()
+		return
 	if objective_id == "senales_inciertas":
 		if not GestorSintaxis.esta_desbloqueada("if") and "comprar_if" not in completed_missions:
 			iniciar_mision_comprar_if()
 		else:
 			estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.SENALES_INCIERTAS
+		return
+	if (
+		objective_id == "comprar_while"
+		and (objective_completed or GestorSintaxis.esta_desbloqueada("while") or "comprar_while" in completed_missions)
+	):
+		iniciar_ciclo_autonomo()
+		return
+	if objective_id == "comprar_while":
+		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.COMPRAR_WHILE
+		return
+	if (
+		(objective_id == "ciclo_autonomo" and objective_completed)
+		or (objective_id == "ciclo_autonomo" and "ciclo_autonomo" in completed_missions)
+	):
+		iniciar_mision_comprar_mapa_3x3()
+		return
+	if objective_id == "ciclo_autonomo":
+		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.CICLO_AUTONOMO
+		return
+	if (
+		objective_id == "comprar_mapa_3x3"
+		and (objective_completed or int(progress.get("map_tier", 0)) >= 3 or "comprar_mapa_3x3" in completed_missions)
+	):
+		iniciar_exploracion_3x3()
+		return
+	if objective_id == "comprar_mapa_3x3":
+		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.COMPRAR_MAPA_3X3
+		return
+	if objective_id == "exploracion_3x3":
+		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.EXPLORACION_3X3
 		return
 	if objective_id == "comprar_casillas":
 		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.COMPRAR_CASILLAS
@@ -289,37 +340,33 @@ func aplicar_progreso(progress: Dictionary) -> void:
 func get_objetivo_actual() -> String:
 	if objective_completed:
 		return "Misión completada."
-	if objective_id == "camino_largo":
+	if objective_id == "trabajo_continuo":
 		return (
-			"CAMINO LARGO (PARÁMETROS)\n" +
-			"Los métodos pueden recibir números para indicar cuántos pasos dar.\n" +
-			"Por ejemplo: rover.norte(2) o rover.sur(2) avanzan dos casillas.\n" +
-			"Tu desafío: navega usando al menos un parámetro mayor a 1, " +
-			"extrae una muestra y transfiérela a la nave."
-		)
-	if objective_id == "ciclo_recoleccion":
-		return (
-			"CICLO DE RECOLECCIÓN\n" +
-			"Un bucle for repite las instrucciones con sangría. " +
-			"Por ejemplo, for ciclo in range(2): repite su bloque dos veces.\n" +
-			"Tu desafío: recoger 10 minerales usando for y transferirlos " +
-			"una sola vez al final, en un mismo programa. " +
-			"La transferencia debe quedar fuera del bloque.\n" +
-			"Empieza en el centro con el inventario del rover vacío."
-		)
-
-	if objective_id == "comprar_if":
-		return (
-			"ACTUALIZACIÓN DE HARDWARE (CONDICIONAL IF)\n" +
-			"Las muestras minerales en este sector se distribuyen de forma inestable.\n" +
-			"Reúne 10 minerales en la nave mediante tus programas y adquiere " +
-			"el [ CONDICIONAL IF ] en Mejoras para instalar los sensores del rover."
+			"CICLO DE SUMINISTRO (BUCLE WHILE)\n" +
+			"Programa el rover para viajar al mineral del norte, extraerlo, " +
+			"regresar a la base y transferirlo. Repite el ciclo usando while."
 		)
 
 	if objective_id == "comprar_casillas":
 		return (
-			"Automatización completada. Compra +3 CASILLAS " +
-			"en Mejoras utilizando 10 minerales de la nave."
+			"EXPANSIÓN DE SECTOR (+3 CASILLAS)\n" +
+			"Reúne 10 minerales y adquiere [ +3 CASILLAS ] " +
+			"en el Centro de Mejoras para expandir el terreno a 2x3."
+		)
+
+	if objective_id == "comprar_if":
+		return (
+			"ADQUISICIÓN DE SENSOR (CONDICIONAL IF)\n" +
+			"Reúne 10 minerales en la nave y adquiere el [ CONDICIONAL IF ] " +
+			"en el Centro de Mejoras para habilitar el sensor rover.hay_mineral()."
+		)
+
+	if objective_id == "ciclo_recoleccion":
+		return (
+			"CICLO DE RECOLECCIÓN (BUCLE FOR)\n" +
+			"Un bucle for repite instrucciones un número exacto de veces: for ciclo in range(N):\n" +
+			"Tu desafío: en el nuevo sector 2x3, usa for para recolectar al menos 2 minerales " +
+			"y transferirlos a la nave en la base."
 		)
 
 	if objective_id == "ruta_calibracion":
@@ -356,6 +403,19 @@ func get_objetivo_actual() -> String:
 			"Tu desafío: programa un ciclo while que patrulle y extraiga recursos hasta " +
 			"recolectar al menos 3 minerales y transferirlos a la nave."
 		)
+	if objective_id == "comprar_mapa_3x3":
+		return (
+			"EXPANSIÓN DE SECTOR (SECTOR 3X3)\n" +
+			"Reúne 20 minerales en la nave y adquiere el [ SECTOR 3X3 ] " +
+			"en el Centro de Mejoras para ampliar el terreno de operaciones."
+		)
+	if objective_id == "exploracion_3x3":
+		return (
+			"BARRIDO DE CUADRANTE (SECTOR 3X3)\n" +
+			"El nuevo sector contiene 3 depósitos de mineral simultáneos y variables.\n\n" +
+			"Tu desafío: programa una rutina combinando bucles (while o for) y el sensor condicional " +
+			"'if rover.hay_mineral():' para recolectar al menos 3 minerales y transferirlos a la base."
+		)
 
 	match estado_actual:
 		EstadoMision.BUSCAR_MINERAL:
@@ -378,6 +438,13 @@ func evaluar_programa(resultado: Dictionary) -> void:
 		return
 
 	if not resultado.get("success", false):
+		return
+
+	if objective_id == "exploracion_3x3":
+		_evaluar_exploracion_3x3(resultado)
+		return
+
+	if objective_id == "comprar_mapa_3x3":
 		return
 
 	if objective_id == "ciclo_autonomo":
@@ -427,6 +494,7 @@ func evaluar_programa(resultado: Dictionary) -> void:
 
 		mision_completada.emit(objective_id)
 		print("Misión completada con la secuencia correcta.")
+		iniciar_trabajo_continuo()
 		return
 
 	if "transferir" in comandos:
@@ -468,41 +536,31 @@ func _evaluar_trabajo_continuo(resultado: Dictionary) -> void:
 
 	mision_completada.emit(objective_id)
 	print("Misión de ciclo de suministro completada.")
+	iniciar_mision_comprar_casillas()
 
 func _evaluar_ciclo_recoleccion(resultado: Dictionary) -> void:
 	var comandos: Array = resultado.get("commands_used", [])
-	var recolectados: int = int(
-		resultado.get("minerals_collected", 0)
-	)
-	var transferidos: int = int(
-		resultado.get("minerals_transferred", 0)
-	)
-	var recogidos_en_bucle: int = int(
-		resultado.get("loop_minerals_collected", 0)
-	)
+	var bucle_detectado: int = int(resultado.get("loop_count", 0))
+	var iteraciones: int = int(resultado.get("loop_iterations", 0))
+	var recolectados: int = int(resultado.get("minerals_collected", 0))
+	var transferidos: int = int(resultado.get("minerals_transferred", 0))
 
 	var termina_transfiriendo: bool = false
 	if not comandos.is_empty():
 		termina_transfiriendo = comandos.back() == "transferir"
 
-	var cumple_objetivo: bool = (
-		int(resultado.get("loop_count", 0)) > 0
-		and recolectados == 10
-		and recogidos_en_bucle == 10
-		and transferidos == 10
-		and comandos.count("transferir") == 1
-		and termina_transfiriendo
-	)
-
-	if not cumple_objetivo:
+	if bucle_detectado < 1 and iteraciones < 1:
 		objetivo_actualizado.emit(
 			objective_id,
-			"Programa terminado. Recogiste %d/10 minerales dentro del bucle " %
-			recogidos_en_bucle +
-			"y transferiste %d/10. " % transferidos +
-			"El desafío requiere recoger los diez usando for y " +
-			"transferirlos una sola vez al final del mismo programa. " +
-			"Antes de reintentar, vacía el inventario en la casilla inicial."
+			"Debes usar la estructura 'for <variable> in range(<N>):' para automatizar la repetición."
+		)
+		return
+
+	if recolectados < 2 or transferidos < 2:
+		objetivo_actualizado.emit(
+			objective_id,
+			"Programa terminado. Recogiste %d minerales y transferiste %d. " % [recolectados, transferidos] +
+			"El desafío requiere recoger al menos 2 minerales usando for y transferirlos a la base."
 		)
 		return
 
@@ -514,6 +572,10 @@ func _evaluar_ciclo_recoleccion(resultado: Dictionary) -> void:
 
 	mision_completada.emit(objective_id)
 	print("Ciclo de recolección completado.")
+	if GestorSintaxis.esta_desbloqueada("if") or "comprar_if" in completed_missions:
+		iniciar_senales_inciertas()
+	else:
+		iniciar_mision_comprar_if()
 	
 func desbloquear_modulo_for() -> void:
 	GestorSintaxis.desbloquear_sintaxis("for")
@@ -526,30 +588,22 @@ func desbloquear_modulo_while() -> void:
 
 func iniciar_ciclo_recoleccion() -> void:
 	objective_id = "ciclo_recoleccion"
-	objective_completed = false
-	estado_actual = EstadoMision.CICLO_RECOLECCION
+	objective_completed = "ciclo_recoleccion" in completed_missions
+	estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.CICLO_RECOLECCION
 
 	desbloquear_modulo_for()
 	mision_iniciada.emit(objective_id)
-
+	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
 	print("Misión iniciada: ciclo_recoleccion")
 
 func iniciar_trabajo_continuo() -> void:
 	objective_id = "trabajo_continuo"
-	objective_completed = false
-	estado_actual = EstadoMision.TRABAJO_CONTINUO
+	objective_completed = "trabajo_continuo" in completed_missions
+	estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.TRABAJO_CONTINUO
 
 	desbloquear_modulo_while()
 	mision_iniciada.emit(objective_id)
-
-	objetivo_actualizado.emit(
-	objective_id,
-	"CICLO DE SUMINISTRO\n" +
-	"Programa el rover para viajar al depósito del norte, " +
-	"extraer el mineral, regresar a la base y transferirlo. " +
-	"Repite todo el ciclo usando un bucle while."
-)
-
+	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
 	print("Misión iniciada: trabajo_continuo")
 
 func iniciar_camino_largo() -> void:
@@ -672,7 +726,7 @@ func _evaluar_senales_inciertas(resultado: Dictionary) -> void:
 	desbloquear_conocimiento("condicional_if")
 	mision_completada.emit(objective_id)
 	print("Misión senales_inciertas completada!")
-	iniciar_mision_comprar_while()
+	iniciar_ciclo_autonomo()
 
 
 func iniciar_mision_comprar_while() -> void:
@@ -737,3 +791,75 @@ func _evaluar_ciclo_autonomo(resultado: Dictionary) -> void:
 	desbloquear_conocimiento("bucle_while")
 	mision_completada.emit(objective_id)
 	print("Misión ciclo_autonomo completada!")
+	iniciar_mision_comprar_mapa_3x3()
+
+
+func iniciar_mision_comprar_mapa_3x3() -> void:
+	var map_tier: int = int(ProgressService.get_current_progress().get("map_tier", 0))
+	objective_id = "comprar_mapa_3x3"
+	objective_completed = "comprar_mapa_3x3" in completed_missions or map_tier >= 3
+	if objective_completed:
+		iniciar_exploracion_3x3()
+		return
+	estado_actual = EstadoMision.COMPRAR_MAPA_3X3
+	mision_iniciada.emit(objective_id)
+	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
+	print("Misión iniciada: comprar_mapa_3x3")
+
+
+func registrar_compra_mapa_3x3() -> void:
+	if "comprar_mapa_3x3" not in completed_missions:
+		completed_missions.append("comprar_mapa_3x3")
+
+	if objective_id == "comprar_mapa_3x3":
+		objective_completed = true
+		estado_actual = EstadoMision.COMPLETADA
+		mision_completada.emit("comprar_mapa_3x3")
+		iniciar_exploracion_3x3()
+	else:
+		mision_completada.emit("compra_temprana_3x3")
+
+
+func iniciar_exploracion_3x3() -> void:
+	objective_id = "exploracion_3x3"
+	objective_completed = "exploracion_3x3" in completed_missions
+	estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.EXPLORACION_3X3
+	mision_iniciada.emit(objective_id)
+	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
+	print("Misión iniciada: exploracion_3x3")
+
+
+func _evaluar_exploracion_3x3(resultado: Dictionary) -> void:
+	var if_evaluations: int = int(resultado.get("if_evaluations", 0))
+	var loop_count: int = int(resultado.get("loop_count", 0))
+	var iteraciones: int = int(resultado.get("loop_iterations", 0))
+	var recolectados: int = int(resultado.get("minerals_collected", 0))
+	var transferidos: int = int(resultado.get("minerals_transferred", 0))
+
+	if loop_count < 1 and iteraciones < 1:
+		objetivo_actualizado.emit(
+			objective_id,
+			"Para explorar eficientemente el sector 3x3, debes emplear un bucle (while o for) en tu programa."
+		)
+		return
+
+	if if_evaluations < 1:
+		objetivo_actualizado.emit(
+			objective_id,
+			"Los depositos en el cuadrante son variables. Usa el sensor 'if rover.hay_mineral():' antes de minar cada casilla."
+		)
+		return
+
+	if recolectados < 3 or transferidos < 3:
+		objetivo_actualizado.emit(
+			objective_id,
+			"Debes recolectar y transferir al menos 3 minerales del sector 3x3 a la base central para completar la expedicion."
+		)
+		return
+
+	objective_completed = true
+	estado_actual = EstadoMision.COMPLETADA
+	if objective_id not in completed_missions:
+		completed_missions.append(objective_id)
+	mision_completada.emit(objective_id)
+	print("Misión exploracion_3x3 completada!")
