@@ -36,8 +36,16 @@ const CONOCIMIENTOS := {
 		"ejemplo": "rover.norte(2)  # Avanza dos casillas al norte\nrover.sur(3)    # Avanza tres casillas al sur",
 		"errores": "Enviar números negativos, texto o enviar parámetros a comandos que no los reciben (como rover.minar(5))."
 	},
+	"bucle_while": {
+		"nombre": "Bucle While (Automatización)",
+		"categoria": "Control",
+		"descripcion": "Estructura de control que repite un bloque de instrucciones continuamente mientras una condición sea verdadera. Permite automatizar rutinas continuas de suministro y patrullaje.",
+		"sintaxis": "while <condicion>:\n    <instrucciones_con_sangria>",
+		"ejemplo": "# Ciclo continuo de suministro:\nwhile True:\n    rover.norte()\n    rover.minar()\n    rover.sur()\n    rover.transferir()\n\n# O según el espacio en bodega:\nwhile rover.tiene_espacio():\n    rover.minar()",
+		"errores": "Olvidar los dos puntos ':' al final, olvidar aplicar sangría a las acciones interiores, o no incluir una condición de parada o retorno a base."
+	},
 	"bucle_for": {
-		"nombre": "Bucle For (Repetición)",
+		"nombre": "Bucle For (Repetición Exacta)",
 		"categoria": "Control",
 		"descripcion": "Estructura de control que permite repetir un bloque de instrucciones un número exacto de veces usando range(N). Todo lo que se repite debe llevar sangría (tabulación o 4 espacios).",
 		"sintaxis": "for <variable> in range(<repeticiones>):\n    <instrucciones_con_sangria>",
@@ -45,20 +53,12 @@ const CONOCIMIENTOS := {
 		"errores": "Olvidar los dos puntos ':' al final de range(), o no aplicar sangría a las instrucciones interiores."
 	},
 	"condicional_if": {
-		"nombre": "Condicional If",
+		"nombre": "Condicional If (Decisiones)",
 		"categoria": "Control",
 		"descripcion": "Permite al rover tomar decisiones lógicas en base al estado de sus sensores o del terreno. Si la condición es verdadera, ejecuta el bloque.",
-		"sintaxis": "if <condicion>:\n    <instrucciones>",
-		"ejemplo": "# Próximamente en misiones con sensores",
-		"errores": "Archivo cifrado. Requiere completar misiones de exploración avanzada."
-	},
-	"bucle_while": {
-		"nombre": "Bucle While",
-		"categoria": "Control",
-		"descripcion": "Repite un bloque de código continuamente mientras una condición siga siendo verdadera. Requiere una condición de salida para no crear bucles infinitos.",
-		"sintaxis": "while <condicion>:\n    <instrucciones>",
-		"ejemplo": "# Próximamente en misiones de automatización avanzada",
-		"errores": "Archivo cifrado. Requiere completar misiones de exploración avanzada."
+		"sintaxis": "if <condicion>:\n    <instrucciones_con_sangria>",
+		"ejemplo": "if rover.hay_mineral():\n    rover.minar()",
+		"errores": "Olvidar los dos puntos ':', olvidar los paréntesis en los sensores (ej: 'rover.hay_mineral' sin '()') o no aplicar sangría a la acción interior."
 	},
 	"variable": {
 		"nombre": "Variables",
