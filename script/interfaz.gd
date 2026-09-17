@@ -39,23 +39,37 @@ var minerales_rover : int = 0
 @export var label_nave : Label
 @export var label_rover : Label
 
-# --- REFERENCIAS A LA TIENDA Y CÓDICE ---
+# Mejoras
 @onready var panel_tienda = $PanelTienda
 @onready var boton_tienda = $ContenedorTienda/BotonTienda
 @onready var panel_archivo = $ArchivoADA
 @onready var boton_archivo = $ContenedorTienda/BotonArchivo
-@onready var boton_while = $PanelTienda/LienzoArbol/ButtonWhile
-@onready var boton_for = $PanelTienda/LienzoArbol/ButtonFor
-@onready var boton_if = $PanelTienda/LienzoArbol/ButtonIf
-@onready var boton_expansion = $PanelTienda/LienzoArbol/ButtonExpansion1
+@onready var boton_while: Button = $PanelTienda/LienzoArbol/ButtonWhile
+@onready var boton_for: Button = $PanelTienda/LienzoArbol/ButtonFor
+@onready var boton_if: Button = $PanelTienda/LienzoArbol/ButtonIf
+@onready var boton_expansion: Button = $PanelTienda/LienzoArbol/ButtonExpansion1
 @onready var boton_expansion_2: Button = $PanelTienda/LienzoArbol/ButtonExpansion2
+@onready var boton_expansion_3: Button = $PanelTienda/LienzoArbol/ButtonExpansion3
+@onready var boton_mineria: Button = $PanelTienda/LienzoArbol/ButtonMineria
+
+@onready var linea_prog_1: Line2D = $PanelTienda/LienzoArbol/LineaProg1
+@onready var linea_prog_2: Line2D = $PanelTienda/LienzoArbol/LineaProg2
+@onready var linea_prog_3: Line2D = $PanelTienda/LienzoArbol/LineaProg3
+@onready var linea_terr_1: Line2D = $PanelTienda/LienzoArbol/LineaTerr1
+@onready var linea_terr_2: Line2D = $PanelTienda/LienzoArbol/LineaTerr2
+@onready var linea_terr_3: Line2D = $PanelTienda/LienzoArbol/LineaTerr3
+@onready var linea_hard_1: Line2D = $PanelTienda/LienzoArbol/LineaHard1
+
+var mineria_rapida_desbloqueada: bool = false
 
 const PRECIOS = {
 	"while": 15,
 	"for": 30,
 	"mapa": 1,
 	"casillas_extra": 10,
-	"if": 10
+	"mapa_3x3": 20,
+	"if": 10,
+	"mineria_rapida": 15
 }
 
 func _ready() -> void:
@@ -334,6 +348,12 @@ func aplicar_progreso(progress: Dictionary) -> void:
 		int(progress.get("minerals_rover", 0))
 	)
 
+	var hardware = progress.get("hardware_upgrades", {})
+	if typeof(hardware) == TYPE_DICTIONARY and int(hardware.get("drill_speed", 0)) > 0:
+		mineria_rapida_desbloqueada = true
+		if mi_rover != null:
+			mi_rover.tiempo_minado = 1.0
+
 	actualizar_contadores()
 	actualizar_mejoras_visual()
 	_mostrar_mensaje_inicial_ada()
@@ -350,6 +370,9 @@ func get_progress_state() -> Dictionary:
 		"current_mission_id": MissionService.objective_id,
 		"completed_missions": MissionService.get_completed_missions(),
 		"unlocked_knowledge": MissionService.get_unlocked_knowledge(),
+		"hardware_upgrades": {
+			"drill_speed": 1 if mineria_rapida_desbloqueada else 0
+		}
 	}
 
 
@@ -358,22 +381,55 @@ func _solicitar_guardado_progreso() -> void:
 
 
 func actualizar_mejoras_visual() -> void:
-	if boton_expansion_2 != null:
-		boton_expansion_2.disabled = get_parent().casillas_extra_desbloqueadas or MissionService.objective_id != "comprar_casillas"
+	var mundo := get_parent()
+	var while_on := GestorSintaxis.esta_desbloqueada("while")
+	var for_on := GestorSintaxis.esta_desbloqueada("for")
+	var if_on := GestorSintaxis.esta_desbloqueada("if")
+
+	var exp1_on: bool = mundo != null and bool(mundo.corredor_1x3_desbloqueado)
+	var exp2_on: bool = mundo != null and bool(mundo.casillas_extra_desbloqueadas)
+	var exp3_on: bool = mundo != null and bool(mundo.mapa_3x3_desbloqueado)
+
 	if boton_while != null:
-		boton_while.disabled = GestorSintaxis.esta_desbloqueada("while")
+		boton_while.disabled = while_on
+		boton_while.text = "[ BUCLE WHILE ]\nDESBLOQUEADO" if while_on else "[ BUCLE WHILE ]\n15 MINERALES"
 	if boton_for != null:
-		boton_for.disabled = GestorSintaxis.esta_desbloqueada("for")
+		boton_for.disabled = for_on or not while_on
+		boton_for.text = "[ BUCLE FOR ]\nDESBLOQUEADO" if for_on else ("[ BUCLE FOR ]\n30 MINERALES" if while_on else "[ BUCLE FOR ]\nBLOQUEADO")
 	if boton_if != null:
-		boton_if.disabled = GestorSintaxis.esta_desbloqueada("if")
-		if GestorSintaxis.esta_desbloqueada("if") and has_node("PanelTienda/LienzoArbol/Line2D3"):
-			$PanelTienda/LienzoArbol/Line2D3.modulate = Color(1.0, 0.84, 0.0)
+		boton_if.disabled = if_on or not for_on
+		boton_if.text = "[ CONDICIONAL IF ]\nDESBLOQUEADO" if if_on else ("[ CONDICIONAL IF ]\n10 MINERALES" if for_on else "[ CONDICIONAL IF ]\nBLOQUEADO")
+
 	if boton_expansion != null:
-		var mundo := get_parent()
-		boton_expansion.disabled = (
-	mundo != null
-	and mundo.corredor_1x3_desbloqueado
-)
+		boton_expansion.disabled = exp1_on
+		boton_expansion.text = "[ CORREDOR 1X3 ]\nDESBLOQUEADO" if exp1_on else "[ CORREDOR 1X3 ]\n1 MINERAL"
+	if boton_expansion_2 != null:
+		boton_expansion_2.disabled = not (exp1_on and not exp2_on and MissionService.objective_id == "comprar_casillas")
+		boton_expansion_2.text = "[ +3 CASILLAS ]\nDESBLOQUEADO" if exp2_on else ("[ +3 CASILLAS ]\n10 MINERALES" if exp1_on else "[ +3 CASILLAS ]\nBLOQUEADO")
+	if boton_expansion_3 != null:
+		boton_expansion_3.disabled = not (exp2_on and not exp3_on)
+		boton_expansion_3.text = "[ SECTOR 3X3 ]\nDESBLOQUEADO" if exp3_on else ("[ SECTOR 3X3 ]\n20 MINERALES" if exp2_on else "[ SECTOR 3X3 ]\nBLOQUEADO")
+
+	if boton_mineria != null:
+		boton_mineria.disabled = mineria_rapida_desbloqueada
+		boton_mineria.text = "[ MINERÍA RÁPIDA ]\nINSTALADO" if mineria_rapida_desbloqueada else "[ MINERÍA RÁPIDA ]\n15 MINERALES"
+
+	if linea_prog_1 != null:
+		linea_prog_1.default_color = Color(0.2, 0.8, 1.0) if while_on else Color(0.3, 0.33, 0.38)
+	if linea_prog_2 != null:
+		linea_prog_2.default_color = Color(0.2, 0.8, 1.0) if for_on else Color(0.3, 0.33, 0.38)
+	if linea_prog_3 != null:
+		linea_prog_3.default_color = Color(0.2, 0.8, 1.0) if if_on else Color(0.3, 0.33, 0.38)
+
+	if linea_terr_1 != null:
+		linea_terr_1.default_color = Color(0.3, 0.9, 0.5) if exp1_on else Color(0.3, 0.33, 0.38)
+	if linea_terr_2 != null:
+		linea_terr_2.default_color = Color(0.3, 0.9, 0.5) if exp2_on else Color(0.3, 0.33, 0.38)
+	if linea_terr_3 != null:
+		linea_terr_3.default_color = Color(0.3, 0.9, 0.5) if exp3_on else Color(0.3, 0.33, 0.38)
+
+	if linea_hard_1 != null:
+		linea_hard_1.default_color = Color(1.0, 0.84, 0.0) if mineria_rapida_desbloqueada else Color(0.3, 0.33, 0.38)
 
 func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem) -> void:
 	# 1. Verificar si ya se compró previamente
@@ -490,59 +546,111 @@ func _crear_error_comando(
 		"steps_completed": 0
 	}
 	
-func _on_button_for_pressed() -> void:
-	transmision_ada.mostrar_mensaje(
-		"El módulo for se desbloquea gratuitamente " +
-		"al completar la Ruta de calibración.",
-		"objetivo",
-		8.0
-	)
 func _on_button_while_pressed() -> void:
 	if GestorSintaxis.esta_desbloqueada("while"):
+		return
+	var costo: int = PRECIOS["while"]
+	if minerales_nave < costo:
 		transmision_ada.mostrar_mensaje(
-			"El bucle while ya está desbloqueado. " +
-			"Puedes usarlo para repetir una rutina.",
-			"objetivo",
-			8.0
+			"Minerales insuficientes en la nave. Requiere %d minerales (tienes %d)." % [costo, minerales_nave],
+			"error",
+			4.0
 		)
 		return
+	minerales_nave -= costo
+	GestorSintaxis.desbloquear_sintaxis("while")
+	MissionService.desbloquear_conocimiento("bucle_while")
+	MissionService.registrar_compra_while()
+	actualizar_contadores()
+	actualizar_mejoras_visual()
+	_solicitar_guardado_progreso()
 
+
+func _on_button_for_pressed() -> void:
+	if GestorSintaxis.esta_desbloqueada("for"):
+		return
+	if not GestorSintaxis.esta_desbloqueada("while"):
+		transmision_ada.mostrar_mensaje(
+			"Debes desbloquear el Bucle While primero.",
+			"objetivo",
+			5.0
+		)
+		return
+	var costo: int = PRECIOS["for"]
+	if minerales_nave < costo:
+		transmision_ada.mostrar_mensaje(
+			"Minerales insuficientes en la nave. Requiere %d minerales (tienes %d)." % [costo, minerales_nave],
+			"error",
+			4.0
+		)
+		return
+	minerales_nave -= costo
+	GestorSintaxis.desbloquear_sintaxis("for")
+	GestorSintaxis.desbloquear_sintaxis("in range")
+	MissionService.desbloquear_conocimiento("bucle_for")
+	actualizar_contadores()
+	actualizar_mejoras_visual()
+	_solicitar_guardado_progreso()
 	transmision_ada.mostrar_mensaje(
-		"Completa la Ruta de calibración para desbloquear " +
-		"el módulo while.",
-		"objetivo",
-		8.0
+		"¡Módulo Bucle FOR instalado! Ahora puedes repetir secuencias con precisión.",
+		"completado",
+		6.0
 	)
 
+
 func _on_button_if_pressed() -> void:
-	intentar_compra("if", boton_if, $PanelTienda/LienzoArbol/Line2D3)
 	if GestorSintaxis.esta_desbloqueada("if"):
-		MissionService.desbloquear_conocimiento("condicional_if")
-		MissionService.registrar_compra_if()
+		return
+	if not GestorSintaxis.esta_desbloqueada("for"):
+		transmision_ada.mostrar_mensaje(
+			"Debes desbloquear el Bucle For primero.",
+			"objetivo",
+			5.0
+		)
+		return
+	var costo: int = PRECIOS["if"]
+	if minerales_nave < costo:
+		transmision_ada.mostrar_mensaje(
+			"Minerales insuficientes en la nave. Requiere %d minerales (tienes %d)." % [costo, minerales_nave],
+			"error",
+			4.0
+		)
+		return
+	minerales_nave -= costo
+	GestorSintaxis.desbloquear_sintaxis("if")
+	MissionService.desbloquear_conocimiento("condicional_if")
+	MissionService.registrar_compra_if()
+	actualizar_contadores()
+	actualizar_mejoras_visual()
+	_solicitar_guardado_progreso()
+
 
 func _on_button_expansion_1_pressed() -> void:
 	var mundo = get_parent()
-	var costo = PRECIOS["mapa"]
+	var costo: int = PRECIOS["mapa"]
 
-	if mundo.corredor_1x3_desbloqueado:
-		print("El corredor 1x3 ya está desbloqueado.")
+	if mundo != null and mundo.corredor_1x3_desbloqueado:
 		return
 
 	if minerales_nave < costo:
-		print("Minerales insuficientes en la Nave. Mapa 1 cuesta ", costo, " minerales.")
+		transmision_ada.mostrar_mensaje(
+			"Minerales insuficientes en la nave. Requiere %d mineral (tienes %d)." % [costo, minerales_nave],
+			"error",
+			4.0
+		)
 		return
 
-	if mundo.expandir_corredor_1x3():
+	if mundo != null and mundo.expandir_corredor_1x3():
 		minerales_nave -= costo
 		actualizar_contadores()
-		boton_expansion.disabled = true
+		actualizar_mejoras_visual()
 		MissionService.iniciar_ruta_calibracion()
 		_solicitar_guardado_progreso()
 
 
 func _on_button_expansion_2_pressed() -> void:
 	var mundo := get_parent()
-	if mundo.casillas_extra_desbloqueadas or MissionService.objective_id != "comprar_casillas":
+	if mundo == null or mundo.casillas_extra_desbloqueadas or MissionService.objective_id != "comprar_casillas":
 		return
 	if CodeExecutor.ejecutando:
 		transmision_ada.mostrar_mensaje("Espera a que termine el programa antes de expandir el mapa.", "error")
@@ -557,6 +665,54 @@ func _on_button_expansion_2_pressed() -> void:
 		MissionService.registrar_compra_casillas()
 		actualizar_mejoras_visual()
 		_solicitar_guardado_progreso()
+
+
+func _on_button_expansion_3_pressed() -> void:
+	var mundo := get_parent()
+	if mundo == null or mundo.mapa_3x3_desbloqueado or not mundo.casillas_extra_desbloqueadas:
+		return
+	if CodeExecutor.ejecutando:
+		transmision_ada.mostrar_mensaje("Espera a que termine el programa antes de expandir el mapa.", "error")
+		return
+	var costo: int = PRECIOS["mapa_3x3"]
+	if minerales_nave < costo:
+		transmision_ada.mostrar_mensaje("Necesitas %d minerales en la nave. Recolecta y transfiere más minerales antes de comprar." % costo, "error")
+		return
+	if mundo.expandir_mapa_3x3():
+		minerales_nave -= costo
+		actualizar_contadores()
+		actualizar_mejoras_visual()
+		_solicitar_guardado_progreso()
+		transmision_ada.mostrar_mensaje(
+			"¡Sector 3x3 desbloqueado! Terreno ampliado para mayores expediciones.",
+			"completado",
+			6.0
+		)
+
+
+func _on_button_mineria_pressed() -> void:
+	if mineria_rapida_desbloqueada:
+		return
+	var costo: int = PRECIOS["mineria_rapida"]
+	if minerales_nave < costo:
+		transmision_ada.mostrar_mensaje(
+			"Minerales insuficientes en la nave. Requiere %d minerales (tienes %d)." % [costo, minerales_nave],
+			"error",
+			4.0
+		)
+		return
+	minerales_nave -= costo
+	mineria_rapida_desbloqueada = true
+	if mi_rover != null:
+		mi_rover.tiempo_minado = 1.0
+	actualizar_contadores()
+	actualizar_mejoras_visual()
+	_solicitar_guardado_progreso()
+	transmision_ada.mostrar_mensaje(
+		"¡Minería rápida instalada! El tiempo de extracción se redujo a 1 segundo.",
+		"completado",
+		6.0
+	)
 	
 func _on_linea_iniciada(numero: int, contenido: String) -> void:
 	print("Ejecutando línea ", numero, ": ", contenido)
