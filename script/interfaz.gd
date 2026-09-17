@@ -658,10 +658,16 @@ func _on_mision_completada(mision_id: String) -> void:
 		"ciclo_autonomo":
 			transmision_ada.mostrar_mensaje(
 				"¡Autonomía completada! Has programado un bucle while que toma decisiones en tiempo real.\n" +
-				"El rover ahora sabe cuándo continuar y cuándo volver a la base según sus sensores.\n" +
-				"Conocimiento desbloqueado: BUCLE WHILE.",
+				"El rover ahora sabe cuándo continuar según sus sensores.\n" +
+				"Siguiente misión: regresa a la base usando la condición negada de en_base().",
 				"completado",
 				15.0
+			)
+		"retorno_base":
+			transmision_ada.mostrar_mensaje(
+				"¡Regreso confirmado! El rover volvió a la casilla de transferencia usando while y not rover.en_base().",
+				"completado",
+				12.0
 			)
 		_:
 			transmision_ada.mostrar_mensaje(
@@ -687,7 +693,7 @@ func _mostrar_mensaje_inicial_ada() -> void:
 			25.0
 		)
 		return
-	if MissionService.objective_id in ["comprar_casillas", "comprar_if", "senales_inciertas", "comprar_while", "ciclo_autonomo"]:
+	if MissionService.objective_id in ["comprar_casillas", "comprar_if", "senales_inciertas", "comprar_while", "ciclo_autonomo", "retorno_base"]:
 		transmision_ada.mostrar_mensaje(
 			MissionService.get_objetivo_actual(),
 			"objetivo",

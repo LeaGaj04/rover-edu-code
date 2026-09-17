@@ -17,6 +17,7 @@ enum EstadoMision {
 	SENALES_INCIERTAS,
 	COMPRAR_WHILE,
 	CICLO_AUTONOMO,
+	RETORNO_BASE,
 }
 
 var objective_id: String = "recolectar_primer_mineral"
@@ -202,6 +203,12 @@ func aplicar_progreso(progress: Dictionary) -> void:
 		desbloquear_modulo_for()
 
 	objective_completed = objective_id in completed_missions
+	if objective_id == "ciclo_autonomo" and objective_completed:
+		iniciar_retorno_base()
+		return
+	if objective_id == "retorno_base":
+		estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.RETORNO_BASE
+		return
 	preparar_mision_expansion()
 
 	if objective_id == "ciclo_recoleccion":
@@ -336,6 +343,14 @@ func get_objetivo_actual() -> String:
 			"Tu desafío: programa un ciclo while que patrulle y extraiga recursos hasta " +
 			"recolectar al menos 3 minerales y transferirlos a la nave."
 		)
+	if objective_id == "retorno_base":
+		return (
+			"RETORNO A LA BASE (WHILE + NOT)\n" +
+			"Usa la condición negada rover.en_base() para repetir el movimiento " +
+			"mientras el rover todavía esté fuera de la base.\n\n" +
+			"Tu desafío: parte fuera de la base, utiliza un bucle while con " +
+			"not rover.en_base() y regresa a la casilla de transferencia."
+		)
 
 	match estado_actual:
 		EstadoMision.BUSCAR_MINERAL:
@@ -362,6 +377,10 @@ func evaluar_programa(resultado: Dictionary) -> void:
 
 	if objective_id == "ciclo_autonomo":
 		_evaluar_ciclo_autonomo(resultado)
+		return
+
+	if objective_id == "retorno_base":
+		_evaluar_retorno_base(resultado)
 		return
 
 	if objective_id == "comprar_while":
@@ -635,6 +654,23 @@ func iniciar_ciclo_autonomo() -> void:
 	print("Misión iniciada: ciclo_autonomo")
 
 
+func iniciar_retorno_base(emitir_senales: bool = true) -> void:
+	objective_id = "retorno_base"
+	objective_completed = "retorno_base" in completed_missions
+	estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.RETORNO_BASE
+	if emitir_senales:
+		mision_iniciada.emit(objective_id)
+		objetivo_actualizado.emit(objective_id, get_objetivo_actual())
+
+
+func _iniciar_retorno_base_despues_de_ciclo() -> void:
+	var mision_completada_id := objective_id
+	iniciar_retorno_base(false)
+	mision_completada.emit(mision_completada_id)
+	mision_iniciada.emit(objective_id)
+	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
+
+
 func _evaluar_ciclo_autonomo(resultado: Dictionary) -> void:
 	var _comandos_usados: Array = resultado.get("commands_used", [])
 	var recolectados: int = int(resultado.get("minerals_collected", 0))
@@ -659,5 +695,27 @@ func _evaluar_ciclo_autonomo(resultado: Dictionary) -> void:
 	if objective_id not in completed_missions:
 		completed_missions.append(objective_id)
 	desbloquear_conocimiento("bucle_while")
-	mision_completada.emit(objective_id)
 	print("Misión ciclo_autonomo completada!")
+	_iniciar_retorno_base_despues_de_ciclo()
+
+
+func _evaluar_retorno_base(resultado: Dictionary) -> void:
+	if bool(resultado.get("en_base_at_start", false)):
+		return
+	if int(resultado.get("while_count", 0)) < 1:
+		return
+	if int(resultado.get("loop_iterations", 0)) < 1:
+		return
+	if not bool(resultado.get("en_base_at_end", false)):
+		return
+	for condicion in resultado.get("while_conditions", []):
+		if (
+			condicion.get("inverted", false)
+			and condicion.get("condition", "") in ["rover.en_base()", "en_base()"]
+		):
+			objective_completed = true
+			estado_actual = EstadoMision.COMPLETADA
+			if objective_id not in completed_missions:
+				completed_missions.append(objective_id)
+			mision_completada.emit(objective_id)
+			return

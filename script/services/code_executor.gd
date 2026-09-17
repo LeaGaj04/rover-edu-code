@@ -10,6 +10,7 @@ var ejecutando: bool = false
 var _tiempo_inicio_msec : float = 0.0
 var _objective_id_at_start: String = ""
 var _objective_completed_at_start: bool = false
+var _evaluar_condicion: Callable = Callable()
 
 
 func ejecutar_codigo(
@@ -30,8 +31,13 @@ func ejecutar_codigo(
 		MissionService.objective_completed
 		or _objective_id_at_start in MissionService.get_completed_missions()
 	)
+	_evaluar_condicion = evaluar_condicion
 	resultado["objective_id"] = _objective_id_at_start
 	resultado["objective_completed"] = false
+	if _evaluar_condicion.is_valid():
+		resultado["en_base_at_start"] = bool(
+			_evaluar_condicion.call("rover.en_base()")
+		)
 
 	ejecutando = true
 	ejecucion_iniciada.emit(codigo)
@@ -114,6 +120,11 @@ func ejecutar_codigo(
 			var condicion: String = instruccion["condition"]
 			var invertido: bool = instruccion.get("inverted", false)
 			var cuerpo_while: Array = instruccion.get("cuerpo", [])
+			resultado["while_count"] += 1
+			resultado["while_conditions"].append({
+				"condition": condicion,
+				"inverted": invertido
+			})
 			const MAX_WHILE_ITER: int = 50
 			var iteracion: int = 0
 			resultado["loop_count"] = maxi(int(resultado.get("loop_count", 0)), 1)
@@ -748,6 +759,10 @@ func _crear_resultado(codigo: String) -> Dictionary:
 		"minerals_collected": 0,
 		"minerals_transferred": 0,
 		"loop_minerals_collected": 0,
+		"while_count": 0,
+		"while_conditions": [],
+		"en_base_at_start": false,
+		"en_base_at_end": false,
 		"duration_seconds": 0.0,
 		"objective_id": MissionService.objective_id,
 		"objective_completed": false
@@ -774,6 +789,10 @@ func _finalizar(resultado: Dictionary) -> void:
 	resultado["duration_seconds"] = (
 		Time.get_ticks_msec() - _tiempo_inicio_msec
 	) / 1000.0
+	if _evaluar_condicion.is_valid():
+		resultado["en_base_at_end"] = bool(
+			_evaluar_condicion.call("rover.en_base()")
+		)
 
 	# Captura el estado real después de ejecutar todos los comandos.
 	MissionService.evaluar_programa(resultado)
