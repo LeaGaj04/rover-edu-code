@@ -2,7 +2,7 @@ extends Control
 
 signal cerrado
 
-# --- DICCIONARIO DE CONOCIMIENTO (GDD Sección 7.2) ---
+# Códice
 const CONOCIMIENTOS := {
 	"objeto": {
 		"nombre": "Objeto",
