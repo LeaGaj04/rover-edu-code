@@ -165,7 +165,7 @@ func _seleccionar_concepto(id_clave: String) -> void:
 	if esta_desbloqueado:
 		label_titulo.text = "◆ " + datos.get("nombre", "").to_upper()
 		label_estado.text = "● ESTADO: DESBLOQUEADO"
-		label_estado.modulate = Color(0.25, 1.0, 0.88)
+		label_estado.modulate = Color(0.7608024, 0.9369633, 0.7753063)
 		txt_descripcion.text = datos.get("descripcion", "")
 		txt_sintaxis.text = "[code]" + datos.get("sintaxis", "") + "[/code]"
 		txt_ejemplo.text = "[code]" + datos.get("ejemplo", "") + "[/code]"
