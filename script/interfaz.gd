@@ -64,7 +64,7 @@ var mineria_rapida_desbloqueada: bool = false
 
 const PRECIOS = {
 	"while": 15,
-	"for": 30,
+	"for": 10,
 	"mapa": 1,
 	"casillas_extra": 10,
 	"mapa_3x3": 20,
@@ -393,18 +393,18 @@ func actualizar_mejoras_visual() -> void:
 	if boton_while != null:
 		boton_while.disabled = while_on
 		boton_while.text = "[ BUCLE WHILE ]\nDESBLOQUEADO" if while_on else "[ BUCLE WHILE ]\n15 MINERALES"
-	if boton_for != null:
-		boton_for.disabled = for_on or not while_on
-		boton_for.text = "[ BUCLE FOR ]\nDESBLOQUEADO" if for_on else ("[ BUCLE FOR ]\n30 MINERALES" if while_on else "[ BUCLE FOR ]\nBLOQUEADO")
 	if boton_if != null:
-		boton_if.disabled = if_on or not for_on
-		boton_if.text = "[ CONDICIONAL IF ]\nDESBLOQUEADO" if if_on else ("[ CONDICIONAL IF ]\n10 MINERALES" if for_on else "[ CONDICIONAL IF ]\nBLOQUEADO")
+		boton_if.disabled = if_on or not while_on
+		boton_if.text = "[ CONDICIONAL IF ]\nDESBLOQUEADO" if if_on else ("[ CONDICIONAL IF ]\n10 MINERALES" if while_on else "[ CONDICIONAL IF ]\nBLOQUEADO")
+	if boton_for != null:
+		boton_for.disabled = for_on or not if_on
+		boton_for.text = "[ BUCLE FOR ]\nDESBLOQUEADO" if for_on else ("[ BUCLE FOR ]\n10 MINERALES" if if_on else "[ BUCLE FOR ]\nBLOQUEADO")
 
 	if boton_expansion != null:
 		boton_expansion.disabled = exp1_on
 		boton_expansion.text = "[ CORREDOR 1X3 ]\nDESBLOQUEADO" if exp1_on else "[ CORREDOR 1X3 ]\n1 MINERAL"
 	if boton_expansion_2 != null:
-		boton_expansion_2.disabled = not (exp1_on and not exp2_on and MissionService.objective_id == "comprar_casillas")
+		boton_expansion_2.disabled = not (exp1_on and not exp2_on)
 		boton_expansion_2.text = "[ +3 CASILLAS ]\nDESBLOQUEADO" if exp2_on else ("[ +3 CASILLAS ]\n10 MINERALES" if exp1_on else "[ +3 CASILLAS ]\nBLOQUEADO")
 	if boton_expansion_3 != null:
 		boton_expansion_3.disabled = not (exp2_on and not exp3_on)
@@ -417,9 +417,9 @@ func actualizar_mejoras_visual() -> void:
 	if linea_prog_1 != null:
 		linea_prog_1.default_color = Color(0.2, 0.8, 1.0) if while_on else Color(0.3, 0.33, 0.38)
 	if linea_prog_2 != null:
-		linea_prog_2.default_color = Color(0.2, 0.8, 1.0) if for_on else Color(0.3, 0.33, 0.38)
+		linea_prog_2.default_color = Color(0.2, 0.8, 1.0) if if_on else Color(0.3, 0.33, 0.38)
 	if linea_prog_3 != null:
-		linea_prog_3.default_color = Color(0.2, 0.8, 1.0) if if_on else Color(0.3, 0.33, 0.38)
+		linea_prog_3.default_color = Color(0.2, 0.8, 1.0) if for_on else Color(0.3, 0.33, 0.38)
 
 	if linea_terr_1 != null:
 		linea_terr_1.default_color = Color(0.3, 0.9, 0.5) if exp1_on else Color(0.3, 0.33, 0.38)
@@ -569,9 +569,9 @@ func _on_button_while_pressed() -> void:
 func _on_button_for_pressed() -> void:
 	if GestorSintaxis.esta_desbloqueada("for"):
 		return
-	if not GestorSintaxis.esta_desbloqueada("while"):
+	if not GestorSintaxis.esta_desbloqueada("if"):
 		transmision_ada.mostrar_mensaje(
-			"Debes desbloquear el Bucle While primero.",
+			"Debes desbloquear el Condicional IF primero.",
 			"objetivo",
 			5.0
 		)
@@ -601,9 +601,9 @@ func _on_button_for_pressed() -> void:
 func _on_button_if_pressed() -> void:
 	if GestorSintaxis.esta_desbloqueada("if"):
 		return
-	if not GestorSintaxis.esta_desbloqueada("for"):
+	if not GestorSintaxis.esta_desbloqueada("while"):
 		transmision_ada.mostrar_mensaje(
-			"Debes desbloquear el Bucle For primero.",
+			"Debes desbloquear el Bucle While primero.",
 			"objetivo",
 			5.0
 		)
@@ -650,7 +650,7 @@ func _on_button_expansion_1_pressed() -> void:
 
 func _on_button_expansion_2_pressed() -> void:
 	var mundo := get_parent()
-	if mundo == null or mundo.casillas_extra_desbloqueadas or MissionService.objective_id != "comprar_casillas":
+	if mundo == null or mundo.casillas_extra_desbloqueadas or not mundo.corredor_1x3_desbloqueado:
 		return
 	if CodeExecutor.ejecutando:
 		transmision_ada.mostrar_mensaje("Espera a que termine el programa antes de expandir el mapa.", "error")
@@ -681,13 +681,9 @@ func _on_button_expansion_3_pressed() -> void:
 	if mundo.expandir_mapa_3x3():
 		minerales_nave -= costo
 		actualizar_contadores()
+		MissionService.registrar_compra_mapa_3x3()
 		actualizar_mejoras_visual()
 		_solicitar_guardado_progreso()
-		transmision_ada.mostrar_mensaje(
-			"¡Sector 3x3 desbloqueado! Terreno ampliado para mayores expediciones.",
-			"completado",
-			6.0
-		)
 
 
 func _on_button_mineria_pressed() -> void:
@@ -742,6 +738,7 @@ func _on_ejecucion_finalizada(resultado: Dictionary) -> void:
 		MissionService.objective_completed
 		and MissionService.objective_id in [
 			"ruta_calibracion",
+			"trabajo_continuo",
 			"ciclo_recoleccion"
 		]
 	):
@@ -775,36 +772,46 @@ func _on_mision_completada(mision_id: String) -> void:
 		"ruta_calibracion":
 			transmision_ada.mostrar_mensaje(
 				"Ruta calibrada. Excelente trabajo, unidad Rover.\n" +
-				"Antes de continuar, revisa el Códice de A.D.A. para conocer " +
-				"las herramientas disponibles. El módulo while puede ayudarte " +
-				"a automatizar el siguiente desafío.",
+				"Ahora activamos el Bucle While para automatizar un ciclo de suministro continuo.",
 				"completado",
-				25.0
+				15.0
 			)
 
-		"ciclo_recoleccion":
+		"trabajo_continuo":
 			transmision_ada.mostrar_mensaje(
-				"Diez minerales recibidos. Excelente automatización, " +
-				"unidad Rover.",
+				"¡Ciclo de suministro completado!\n" +
+				"Has dominado la automatización con bucle while.\n" +
+				"Próximo paso: Adquiere [ +3 CASILLAS ] en Mejoras para expandir el terreno a 2x3.",
 				"completado",
-				16.0
+				15.0
 			)
+
 		"comprar_casillas":
 			transmision_ada.mostrar_mensaje(
-				"Expansión completada. Compraste tres casillas y ahora hay dos depósitos de mineral distribuidos aleatoriamente en el mapa.",
-				"completado", 10.0
+				"¡Sector 2x3 desbloqueado!\n" +
+				"El terreno se ha expandido con dos depósitos de mineral.\n" +
+				"Próximo paso: Adquiere el [ CONDICIONAL IF ] en Mejoras para evaluar casillas antes de perforar.",
+				"completado",
+				15.0
 			)
-		"camino_largo":
-			var msg_param := (
-				"¡Excelente navegación! Has dominado el uso de parámetros.\n" +
-				"Ahora puedes controlar la cantidad exacta de pasos en tus métodos.\n" +
-				"Conocimiento desbloqueado: PARÁMETROS.\n"
+		"compra_temprana_casillas":
+			transmision_ada.mostrar_mensaje(
+				"¡Sector 2x3 adquirido!\n" +
+				"Has sumado 3 casillas al mapa. Módulo Condicional IF disponible en Mejoras.",
+				"progreso",
+				10.0
+			)
+		"ciclo_recoleccion":
+			var msg_for := (
+				"¡Recolección completada con éxito!\n" +
+				"Has dominado el uso de range() y el bucle for en el sector 2x3.\n" +
+				"Conocimiento desbloqueado: BUCLE FOR.\n"
 			)
 			if GestorSintaxis.esta_desbloqueada("if"):
-				msg_param += "Como ya adquiriste el Condicional IF, ¡se activa la misión SEÑALES INCIERTAS!"
+				msg_for += "Como ya adquiriste el Condicional IF, ¡se activa la misión SEÑALES INCIERTAS!"
 			else:
-				msg_param += "Próximo paso: Adquiere el [ CONDICIONAL IF ] en Mejoras."
-			transmision_ada.mostrar_mensaje(msg_param, "completado", 15.0)
+				msg_for += "Próximo paso: Adquiere el [ CONDICIONAL IF ] en Mejoras."
+			transmision_ada.mostrar_mensaje(msg_for, "completado", 15.0)
 		"comprar_if":
 			transmision_ada.mostrar_mensaje(
 				"¡Módulo Condicional IF instalado!\n" +
@@ -826,12 +833,9 @@ func _on_mision_completada(mision_id: String) -> void:
 			var msg_if := (
 				"¡Lecturas confirmadas! Has dominado el condicional if y la lectura de sensores.\n" +
 				"El rover ahora solo extrae recursos cuando detecta mineral.\n" +
-				"Conocimiento desbloqueado: CONDICIONAL IF.\n"
+				"Conocimiento desbloqueado: CONDICIONAL IF.\n" +
+				"¡Se activa la misión CICLO AUTÓNOMO! Combina while con if para patrullar continuamente."
 			)
-			if GestorSintaxis.esta_desbloqueada("while"):
-				msg_if += "Como ya adquiriste el Bucle WHILE, ¡se activa la misión CICLO AUTÓNOMO!"
-			else:
-				msg_if += "Ahora puedes adquirir el [ BUCLE WHILE ] en Mejoras."
 			transmision_ada.mostrar_mensaje(msg_if, "completado", 15.0)
 		"comprar_while":
 			transmision_ada.mostrar_mensaje(
@@ -851,12 +855,42 @@ func _on_mision_completada(mision_id: String) -> void:
 				10.0
 			)
 		"ciclo_autonomo":
-			transmision_ada.mostrar_mensaje(
+			var msg_auto := (
 				"¡Autonomía completada! Has programado un bucle while que toma decisiones en tiempo real.\n" +
 				"El rover ahora sabe cuándo continuar y cuándo volver a la base según sus sensores.\n" +
-				"Conocimiento desbloqueado: BUCLE WHILE.",
+				"Conocimiento desbloqueado: BUCLE WHILE.\n"
+			)
+			var mundo_node := get_parent()
+			var map_t: int = mundo_node.get_map_tier() if mundo_node != null else 0
+			if map_t >= 3 or "comprar_mapa_3x3" in MissionService.get_completed_missions():
+				msg_auto += "Como ya adquiriste el Sector 3x3, ¡se activa la misión BARRIDO DE CUADRANTE!"
+			else:
+				msg_auto += "Próximo paso: Adquiere el [ SECTOR 3X3 ] en el Centro de Mejoras."
+			transmision_ada.mostrar_mensaje(msg_auto, "completado", 16.0)
+		"comprar_mapa_3x3":
+			transmision_ada.mostrar_mensaje(
+				"¡Sector 3x3 adquirido!\n" +
+				"El área de operaciones se ha expandido a un cuadrante de 9 casillas.\n" +
+				"Nueva misión: BARRIDO DE CUADRANTE.\n" +
+				"Combina bucles y sensores condicionales para prospectar el sector completo.",
+				"progreso",
+				12.0
+			)
+		"compra_temprana_3x3":
+			transmision_ada.mostrar_mensaje(
+				"¡Sector 3x3 adquirido!\n" +
+				"El terreno ampliado ya está disponible. Continúa con tus misiones " +
+				"actuales para desbloquear la expedición a este cuadrante.",
+				"progreso",
+				10.0
+			)
+		"exploracion_3x3":
+			transmision_ada.mostrar_mensaje(
+				"¡Barrido de cuadrante completado!\n" +
+				"Has integrado exitosamente bucles, lectura de sensores y navegación " +
+				"en un mapa de rango completo. Excelente trabajo, unidad Rover.",
 				"completado",
-				15.0
+				16.0
 			)
 		_:
 			transmision_ada.mostrar_mensaje(
@@ -913,13 +947,13 @@ func _get_objetivo_panel(mision_id: String) -> String:
 		"recolectar_primer_mineral":
 			return "Obtén y almacena tu primera muestra."
 		"comprar_casillas":
-			return "Amplía el sector de exploración."
+			return "Adquiere el sector de exploración 2x3 (+3 Casillas)."
 		"ruta_calibracion":
 			return "Completa una ruta de exploración y regresa a la base."
 		"trabajo_continuo":
-			return "Automatiza un ciclo de suministro repetitivo."
+			return "Automatiza un ciclo de suministro repetitivo con while."
 		"ciclo_recoleccion":
-			return "Recolecta y entrega la cantidad requerida de minerales."
+			return "Recolecta y entrega minerales en el sector 2x3 usando for."
 		"camino_largo":
 			return "Navega una distancia extendida usando parámetros."
 		"comprar_if":
@@ -930,6 +964,10 @@ func _get_objetivo_panel(mision_id: String) -> String:
 			return "Adquiere el módulo de automatización condicional."
 		"ciclo_autonomo":
 			return "Mantén una operación autónoma hasta completar la carga."
+		"comprar_mapa_3x3":
+			return "Adquiere el sector de exploración 3x3."
+		"exploracion_3x3":
+			return "Recolecta y entrega 3 minerales en el sector 3x3 usando bucles y sensores."
 		_:
 			return "Completa el objetivo de la misión actual."
 	
