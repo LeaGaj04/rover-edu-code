@@ -382,17 +382,58 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_editor_codigo")
 caret_blink = true
 caret_blink_interval = 0.5
 
-[node name="Button" type="Button" parent="CanvasLayer/PanelCodigo/Contenido" unique_id=1661741592]
-layout_mode = 0
-anchor_left = 1.0
+[node name="BarraControles" type="HBoxContainer" parent="CanvasLayer/PanelCodigo/Contenido"]
+layout_mode = 1
+anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -180.0
-offset_top = -42.0
-tooltip_text = "Ejecutar código (Ctrl+Enter)"
+offset_top = -44.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="BotonResetBase" type="Button" parent="CanvasLayer/PanelCodigo/Contenido/BarraControles"]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+tooltip_text = "Devolver el rover a la base central (0, 0)"
 theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+text = "⟲ BASE"
+
+[node name="BotonVelocidad" type="Button" parent="CanvasLayer/PanelCodigo/Contenido/BarraControles"]
+custom_minimum_size = Vector2(45, 36)
+layout_mode = 2
+tooltip_text = "Alternar velocidad de simulación (1x / 2x)"
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+text = "1X"
+
+[node name="Separador" type="Control" parent="CanvasLayer/PanelCodigo/Contenido/BarraControles"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BotonPaso" type="Button" parent="CanvasLayer/PanelCodigo/Contenido/BarraControles"]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+tooltip_text = "Ejecutar paso a paso (F10 / Ctrl+Espacio)"
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+text = "PASO A PASO"
+
+[node name="Button" type="Button" parent="CanvasLayer/PanelCodigo/Contenido/BarraControles" unique_id=1661741592]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+tooltip_text = "Ejecutar código completo (Ctrl+Enter)"
+theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
+theme_override_font_sizes/font_size = 15
 theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
 theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
 text = "EJECUTAR"
@@ -882,7 +923,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.692646, -3.315782, -6.873)
 transform = Transform3D(1, 0, 0, 0, 0.9998309, -0.018388607, 0, 0.018388607, 0.9998309, 2.4590905, 0.4190023, -2.6192255)
 
 [connection signal="pressed" from="CanvasLayer/PanelCodigo/BarraTitulo/BotonMinimizar" to="CanvasLayer" method="_on_boton_minimizar_pressed"]
-[connection signal="pressed" from="CanvasLayer/PanelCodigo/Contenido/Button" to="CanvasLayer" method="_on_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelCodigo/Contenido/BarraControles/BotonResetBase" to="CanvasLayer" method="_on_boton_reset_base_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelCodigo/Contenido/BarraControles/BotonVelocidad" to="CanvasLayer" method="_on_boton_velocidad_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelCodigo/Contenido/BarraControles/BotonPaso" to="CanvasLayer" method="_on_boton_paso_pressed"]
+[connection signal="pressed" from="CanvasLayer/PanelCodigo/Contenido/BarraControles/Button" to="CanvasLayer" method="_on_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/ContenedorTienda/BotonTienda" to="CanvasLayer" method="_on_boton_tienda_pressed"]
 [connection signal="pressed" from="CanvasLayer/ContenedorTienda/BotonArchivo" to="CanvasLayer" method="_on_boton_archivo_pressed"]
 [connection signal="pressed" from="CanvasLayer/PanelTienda/LienzoArbol/ButtonWhile" to="CanvasLayer" method="_on_button_while_pressed"]

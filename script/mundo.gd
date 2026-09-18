@@ -147,6 +147,20 @@ func _posicionar_rover_en_casilla_inicial() -> void:
 	rover.position.x = centro.x
 	rover.position.z = centro.z
 
+
+func resetear_posicion_rover() -> void:
+	var rover := grid_map.get_node_or_null("Rover") as Node3D
+	if rover == null:
+		return
+	var centro_local: Vector3 = grid_map.map_to_local(CASILLA_INICIAL)
+	var centro_global: Vector3 = grid_map.to_global(centro_local)
+	centro_global.y = rover.global_position.y
+	if rover.has_method("resetear_a_base"):
+		rover.resetear_a_base(centro_global)
+	else:
+		rover.global_position = centro_global
+		rover.rotation = Vector3.ZERO
+
 func generar_minerales_iniciales():
 	# Si el radio es 0 (solo 1 casilla), solo hacemos aparecer 1 mineral
 	if radio_mapa_desbloqueado == 0:
