@@ -10,7 +10,6 @@ var paso_distancia: float = 2.0
 var cola_instrucciones: Array = []
 var esta_moviendose: bool = false
 var tiempo_minado: float = 3.0
-var multiplicador_velocidad: float = 1.0
 
 
 # --- FUNCIONES DE MOVIMIENTO (Aceptan cantidad de pasos) ---
@@ -73,13 +72,12 @@ func _intentar_mover() -> Dictionary:
 				"steps_completed": pasos_completados
 			}
 
-		var duracion_paso: float = maxf(0.1, 0.4 / multiplicador_velocidad)
 		var tween := create_tween()
 		tween.tween_property(
 			self,
 			"global_position",
 			destino,
-			duracion_paso
+			0.4
 		)
 
 		await tween.finished
@@ -168,8 +166,7 @@ func minar() -> Dictionary:
 
 		if casilla_rover == casilla_mineral:
 			print("Rover posicionado. Iniciando protocolo de minería...")
-			var duracion_minado: float = maxf(0.2, tiempo_minado / multiplicador_velocidad)
-			await get_tree().create_timer(duracion_minado).timeout
+			await get_tree().create_timer(tiempo_minado).timeout
 
 			if is_instance_valid(nodo_mineral):
 				nodo_mineral.queue_free()

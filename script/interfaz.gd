@@ -8,7 +8,6 @@ extends CanvasLayer
 @onready var boton_ejecutar: Button = $PanelCodigo/Contenido/BarraControles/Button
 @onready var boton_paso: Button = $PanelCodigo/Contenido/BarraControles/BotonPaso
 @onready var boton_reset_base: Button = $PanelCodigo/Contenido/BarraControles/BotonResetBase
-@onready var boton_velocidad: Button = $PanelCodigo/Contenido/BarraControles/BotonVelocidad
 @onready var transmision_ada = $TransmisionADA
 @onready var panel_mision: Panel = $PanelMision
 @onready var label_mision: Label = $PanelMision/Nombre
@@ -311,20 +310,6 @@ func _on_boton_reset_base_pressed() -> void:
 				3.5
 			)
 
-
-func _on_boton_velocidad_pressed() -> void:
-	if mi_rover == null:
-		return
-	if mi_rover.multiplicador_velocidad <= 1.0:
-		mi_rover.multiplicador_velocidad = 2.0
-		if boton_velocidad != null:
-			boton_velocidad.text = "2X"
-			boton_velocidad.tooltip_text = "Velocidad actual: 2x (Clic para 1x)"
-	else:
-		mi_rover.multiplicador_velocidad = 1.0
-		if boton_velocidad != null:
-			boton_velocidad.text = "1X"
-			boton_velocidad.tooltip_text = "Velocidad actual: 1x (Clic para 2x)"
 
 
 func _actualizar_estado_botones_ejecucion(ejecutando_ahora: bool) -> void:
