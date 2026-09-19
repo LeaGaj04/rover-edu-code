@@ -94,12 +94,72 @@ var concepto_actual_id: String = "objeto"
 @onready var btn_organizacion: Button = $Centro/PanelPrincipal/VBox/Pestanas/BotonOrganizacion
 
 
+var estilo_concepto_normal: StyleBoxFlat
+var estilo_concepto_hover: StyleBoxFlat
+var estilo_concepto_selected: StyleBoxFlat
+var estilo_concepto_cifrado: StyleBoxFlat
+var botones_por_id: Dictionary = {}
+
+
 func _ready() -> void:
 	hide()
+	_inicializar_estilos_conceptos()
 	btn_fundamentos.pressed.connect(_cambiar_categoria.bind("Fundamentos"))
 	btn_control.pressed.connect(_cambiar_categoria.bind("Control"))
 	btn_organizacion.pressed.connect(_cambiar_categoria.bind("Organización"))
 	$Centro/PanelPrincipal/VBox/Cabecera/BotonCerrar.pressed.connect(cerrar)
+
+
+func _inicializar_estilos_conceptos() -> void:
+	estilo_concepto_normal = StyleBoxFlat.new()
+	estilo_concepto_normal.bg_color = Color(0.0, 0.06666667, 0.0, 0.76)
+	estilo_concepto_normal.border_color = Color(0.37254903, 0.5921569, 0.41960785, 0.85)
+	estilo_concepto_normal.set_border_width_all(2)
+	estilo_concepto_normal.set_corner_radius_all(10)
+	estilo_concepto_normal.content_margin_left = 14.0
+	estilo_concepto_normal.content_margin_top = 8.0
+	estilo_concepto_normal.content_margin_right = 14.0
+	estilo_concepto_normal.content_margin_bottom = 8.0
+	estilo_concepto_normal.shadow_color = Color(0.0039, 0.09, 0.011, 0.65)
+	estilo_concepto_normal.shadow_offset = Vector2(3, 3)
+
+	estilo_concepto_hover = StyleBoxFlat.new()
+	estilo_concepto_hover.bg_color = Color(0.015, 0.12, 0.025, 0.92)
+	estilo_concepto_hover.border_color = Color(0.48, 0.76, 0.54, 1.0)
+	estilo_concepto_hover.set_border_width_all(2)
+	estilo_concepto_hover.set_corner_radius_all(10)
+	estilo_concepto_hover.content_margin_left = 14.0
+	estilo_concepto_hover.content_margin_top = 8.0
+	estilo_concepto_hover.content_margin_right = 14.0
+	estilo_concepto_hover.content_margin_bottom = 8.0
+	estilo_concepto_hover.expand_margin_left = 1.0
+	estilo_concepto_hover.expand_margin_top = 1.0
+	estilo_concepto_hover.expand_margin_right = 1.0
+	estilo_concepto_hover.expand_margin_bottom = 1.0
+	estilo_concepto_hover.shadow_color = Color(0.0039, 0.09, 0.011, 0.65)
+	estilo_concepto_hover.shadow_offset = Vector2(3, 3)
+
+	estilo_concepto_selected = StyleBoxFlat.new()
+	estilo_concepto_selected.bg_color = Color(0.025, 0.14, 0.04, 0.95)
+	estilo_concepto_selected.border_color = Color(0.7607843, 0.9372549, 0.7764706, 1.0)
+	estilo_concepto_selected.set_border_width_all(2)
+	estilo_concepto_selected.set_corner_radius_all(10)
+	estilo_concepto_selected.content_margin_left = 14.0
+	estilo_concepto_selected.content_margin_top = 8.0
+	estilo_concepto_selected.content_margin_right = 14.0
+	estilo_concepto_selected.content_margin_bottom = 8.0
+	estilo_concepto_selected.shadow_color = Color(0.0039, 0.09, 0.011, 0.75)
+	estilo_concepto_selected.shadow_offset = Vector2(4, 4)
+
+	estilo_concepto_cifrado = StyleBoxFlat.new()
+	estilo_concepto_cifrado.bg_color = Color(0.01, 0.03, 0.015, 0.6)
+	estilo_concepto_cifrado.border_color = Color(0.25, 0.4, 0.3, 0.45)
+	estilo_concepto_cifrado.set_border_width_all(1)
+	estilo_concepto_cifrado.set_corner_radius_all(10)
+	estilo_concepto_cifrado.content_margin_left = 14.0
+	estilo_concepto_cifrado.content_margin_top = 8.0
+	estilo_concepto_cifrado.content_margin_right = 14.0
+	estilo_concepto_cifrado.content_margin_bottom = 8.0
 
 
 func abrir() -> void:
@@ -124,6 +184,7 @@ func _cambiar_categoria(categoria: String) -> void:
 
 
 func _poblar_lista_conceptos() -> void:
+	botones_por_id.clear()
 	for hijo in contenedor_lista.get_children():
 		hijo.queue_free()
 
@@ -139,14 +200,27 @@ func _poblar_lista_conceptos() -> void:
 		var boton := Button.new()
 		boton.text = datos["nombre"] if esta_desbloqueado else "[ CIFRADO ] " + datos["nombre"]
 		boton.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		boton.custom_minimum_size = Vector2(0, 44)
+		boton.custom_minimum_size = Vector2(0, 42)
 		boton.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
-		if esta_desbloqueado:
-			boton.modulate = Color(0.76, 0.94, 0.78)
-		else:
-			boton.modulate = Color(0.5, 0.5, 0.55)
+		boton.add_theme_font_size_override("font_size", 14)
+		boton.add_theme_color_override("font_outline_color", Color(0.025, 0.02, 0.055, 1))
+		boton.add_theme_constant_override("outline_size", 2)
 
+		if esta_desbloqueado:
+			boton.add_theme_color_override("font_color", Color(0.7607843, 0.9372549, 0.7764706, 1))
+			boton.add_theme_color_override("font_hover_color", Color(0.92, 1.0, 0.92, 1))
+			boton.add_theme_stylebox_override("normal", estilo_concepto_normal)
+			boton.add_theme_stylebox_override("hover", estilo_concepto_hover)
+			boton.add_theme_stylebox_override("focus", estilo_concepto_selected)
+		else:
+			boton.add_theme_color_override("font_color", Color(0.45, 0.6, 0.5, 0.75))
+			boton.add_theme_color_override("font_hover_color", Color(0.6, 0.75, 0.65, 0.9))
+			boton.add_theme_stylebox_override("normal", estilo_concepto_cifrado)
+			boton.add_theme_stylebox_override("hover", estilo_concepto_hover)
+			boton.add_theme_stylebox_override("focus", estilo_concepto_cifrado)
+
+		botones_por_id[id_clave] = boton
 		boton.pressed.connect(_seleccionar_concepto.bind(id_clave))
 		contenedor_lista.add_child(boton)
 
@@ -161,6 +235,16 @@ func _seleccionar_concepto(id_clave: String) -> void:
 	concepto_actual_id = id_clave
 	var datos = CONOCIMIENTOS.get(id_clave, {})
 	var esta_desbloqueado = id_clave in MissionService.get_unlocked_knowledge()
+
+	# Resaltar el botón activo en la lista
+	for clave in botones_por_id:
+		var btn: Button = botones_por_id[clave]
+		if is_instance_valid(btn):
+			var desbloq = clave in MissionService.get_unlocked_knowledge()
+			if clave == id_clave:
+				btn.add_theme_stylebox_override("normal", estilo_concepto_selected)
+			else:
+				btn.add_theme_stylebox_override("normal", estilo_concepto_normal if desbloq else estilo_concepto_cifrado)
 
 	if esta_desbloqueado:
 		label_titulo.text = "◆ " + datos.get("nombre", "").to_upper()
