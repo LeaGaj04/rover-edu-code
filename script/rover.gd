@@ -193,3 +193,12 @@ func minar() -> Dictionary:
 		"minerals_collected": 0,
 		"steps_completed": 0
 	}
+
+
+func resetear_a_base(posicion_global: Vector3) -> void:
+	cola_instrucciones.clear()
+	esta_moviendose = false
+	rotation = Vector3.ZERO
+	var tween := create_tween()
+	tween.tween_property(self, "global_position", posicion_global, 0.35)
+	await tween.finished

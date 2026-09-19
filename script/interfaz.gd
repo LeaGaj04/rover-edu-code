@@ -5,13 +5,21 @@ extends CanvasLayer
 @onready var contenido_codigo: Control = $PanelCodigo/Contenido
 @onready var boton_minimizar: Button = $PanelCodigo/BarraTitulo/BotonMinimizar
 @onready var caja_codigo: TextEdit = $PanelCodigo/Contenido/TextEdit
-@onready var boton_ejecutar: Button = $PanelCodigo/Contenido/Button
+@onready var boton_ejecutar: Button = $PanelCodigo/Contenido/BarraControles/Button
+@onready var boton_paso: Button = $PanelCodigo/Contenido/BarraControles/BotonPaso
+@onready var boton_reset_base: Button = $PanelCodigo/Contenido/BarraControles/BotonResetBase
 @onready var transmision_ada = $TransmisionADA
 @onready var panel_mision: Panel = $PanelMision
 @onready var label_mision: Label = $PanelMision/Nombre
 @onready var label_objetivo_mision: Label = $PanelMision/Objetivo
 @onready var label_estado_mision: Label = $PanelMision/Estado
 @export var mi_rover : CharacterBody3D
+
+const COLOR_LINEA_ACTIVA: Color = Color(1.0, 1.0, 1.0, 0.40)
+const COLOR_LINEA_ERROR: Color = Color(1.0, 0.25, 0.25, 0.45)
+const COLOR_LINEA_NORMAL: Color = Color(0.0, 0.0, 0.0, 0.0)
+
+var linea_actual_resaltada: int = -1
 
 const ALTO_PANEL_CODIGO: float = 276.0
 const ALTO_PANEL_MINIMIZADO: float = 60.0
@@ -79,6 +87,8 @@ func _ready() -> void:
 	$PanelCodigo/EsquinaInferiorIzquierda.gui_input.connect(_on_esquina_codigo_gui_input.bind(Vector2(-1, 1)))
 	$PanelCodigo/EsquinaInferiorDerecha.gui_input.connect(_on_esquina_codigo_gui_input.bind(Vector2(1, 1)))
 	CodeExecutor.linea_iniciada.connect(_on_linea_iniciada)
+	CodeExecutor.linea_finalizada.connect(_on_linea_finalizada)
+	CodeExecutor.paso_esperando.connect(_on_paso_esperando)
 	CodeExecutor.error_detectado.connect(_on_error_detectado)
 	CodeExecutor.ejecucion_finalizada.connect(_on_ejecucion_finalizada)
 	CodeExecutor.progreso_actualizado.connect(_on_progreso_ejecucion)
@@ -145,9 +155,13 @@ func _input(event: InputEvent) -> void:
 		elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
 			arrastrando_panel = false
 
-	if event is InputEventKey and event.pressed and not event.echo and event.ctrl_pressed and event.keycode == KEY_ENTER:
-		get_viewport().set_input_as_handled()
-		_on_button_pressed()
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.ctrl_pressed and event.keycode == KEY_ENTER:
+			get_viewport().set_input_as_handled()
+			_on_button_pressed()
+		elif event.keycode == KEY_F10 or (event.ctrl_pressed and event.keycode == KEY_SPACE):
+			get_viewport().set_input_as_handled()
+			_on_boton_paso_pressed()
 
 
 func _on_barra_codigo_gui_input(event: InputEvent) -> void:
@@ -228,24 +242,84 @@ func _on_boton_minimizar_pressed() -> void:
 
 func _on_button_pressed() -> void:
 	if CodeExecutor.ejecutando:
+		if CodeExecutor.modo_paso_a_paso:
+			CodeExecutor.continuar_todo()
+			boton_ejecutar.text = "Detener"
+			if boton_paso != null:
+				boton_paso.disabled = true
+			return
 		CodeExecutor.detener_ejecucion()
 		boton_ejecutar.text = "Deteniendo..."
 		return
 
-	boton_ejecutar.text = "Detener"
+	_limpiar_resaltado_lineas()
+	_actualizar_estado_botones_ejecucion(true)
 
 	var resultado: Dictionary = await CodeExecutor.ejecutar_codigo(
 		caja_codigo.text,
 		ejecutar_movimiento_rover,
-		evaluar_condicion_rover
+		evaluar_condicion_rover,
+		false
 	)
 
-	boton_ejecutar.text = "Ejecutar"
+	_actualizar_estado_botones_ejecucion(false)
 
-	if resultado["success"]:
+	if resultado.get("success", false):
 		print("Programa completado correctamente.")
 	else:
-		print("Error A.D.A: ", resultado["error_message"])
+		print("Error A.D.A: ", resultado.get("error_message", ""))
+
+
+func _on_boton_paso_pressed() -> void:
+	if not CodeExecutor.ejecutando:
+		_limpiar_resaltado_lineas()
+		if boton_ejecutar != null:
+			boton_ejecutar.text = "CONTINUAR"
+		if boton_paso != null:
+			boton_paso.text = "SIGUIENTE"
+		if boton_reset_base != null:
+			boton_reset_base.disabled = true
+
+		var resultado: Dictionary = await CodeExecutor.ejecutar_codigo(
+			caja_codigo.text,
+			ejecutar_movimiento_rover,
+			evaluar_condicion_rover,
+			true
+		)
+
+		_actualizar_estado_botones_ejecucion(false)
+		if resultado.get("success", false):
+			print("Programa completado correctamente paso a paso.")
+		else:
+			print("Error A.D.A: ", resultado.get("error_message", ""))
+	elif CodeExecutor.modo_paso_a_paso:
+		CodeExecutor.avanzar_un_paso()
+
+
+func _on_boton_reset_base_pressed() -> void:
+	if CodeExecutor.ejecutando:
+		return
+	var mundo := get_parent()
+	if mundo != null and mundo.has_method("resetear_posicion_rover"):
+		mundo.resetear_posicion_rover()
+		_limpiar_resaltado_lineas()
+		if transmision_ada != null:
+			transmision_ada.mostrar_mensaje(
+				"Rover reposicionado en la base central (0, 0).",
+				"progreso",
+				3.5
+			)
+
+
+
+func _actualizar_estado_botones_ejecucion(ejecutando_ahora: bool) -> void:
+	if boton_ejecutar != null:
+		boton_ejecutar.text = "Detener" if ejecutando_ahora else "EJECUTAR"
+	if boton_paso != null:
+		boton_paso.disabled = false
+		boton_paso.text = "PASO A PASO"
+	if boton_reset_base != null:
+		boton_reset_base.disabled = ejecutando_ahora
 
 
 func ejecutar_movimiento_rover(
@@ -710,19 +784,62 @@ func _on_button_mineria_pressed() -> void:
 		6.0
 	)
 	
+func _resaltar_linea(numero_1based: int) -> void:
+	if caja_codigo == null:
+		return
+	var idx := numero_1based - 1
+	if idx < 0 or idx >= caja_codigo.get_line_count():
+		return
+	if linea_actual_resaltada >= 0 and linea_actual_resaltada < caja_codigo.get_line_count():
+		caja_codigo.set_line_background_color(linea_actual_resaltada, COLOR_LINEA_NORMAL)
+	caja_codigo.set_line_background_color(idx, COLOR_LINEA_ACTIVA)
+	linea_actual_resaltada = idx
+	caja_codigo.set_caret_line(idx)
+	caja_codigo.center_viewport_to_caret()
+
+
+func _limpiar_resaltado_lineas() -> void:
+	if caja_codigo == null:
+		return
+	for i in range(caja_codigo.get_line_count()):
+		caja_codigo.set_line_background_color(i, COLOR_LINEA_NORMAL)
+	linea_actual_resaltada = -1
+
+
+func _resaltar_linea_error(numero_1based: int) -> void:
+	if caja_codigo == null:
+		return
+	var idx := numero_1based - 1
+	if idx >= 0 and idx < caja_codigo.get_line_count():
+		caja_codigo.set_line_background_color(idx, COLOR_LINEA_ERROR)
+		caja_codigo.set_caret_line(idx)
+		caja_codigo.center_viewport_to_caret()
+
+
 func _on_linea_iniciada(numero: int, contenido: String) -> void:
 	print("Ejecutando línea ", numero, ": ", contenido)
+	_resaltar_linea(numero)
+
+
+func _on_linea_finalizada(_numero: int, _contenido: String) -> void:
+	pass
+
+
+func _on_paso_esperando(numero: int, _contenido: String) -> void:
+	_resaltar_linea(numero)
 
 
 func _on_error_detectado(error: Dictionary) -> void:
+	var num_linea := int(error.get("line", 0))
+	_resaltar_linea_error(num_linea)
 	print(
 		"Error en línea ",
-		error.get("line", 0),
+		num_linea,
 		": ",
 		error.get("message", "Error desconocido")
 	)
 	transmision_ada.mostrar_mensaje(
-		"Detecte un problema en la instruccion: " +
+		"Detecté un problema en la instrucción: " +
 		str(error.get("message", "Error desconocido")),
 		"error",
 		8.0
@@ -730,7 +847,9 @@ func _on_error_detectado(error: Dictionary) -> void:
 
 
 func _on_ejecucion_finalizada(resultado: Dictionary) -> void:
-	boton_ejecutar.text = "Ejecutar"
+	_actualizar_estado_botones_ejecucion(false)
+	if resultado.get("success", false):
+		_limpiar_resaltado_lineas()
 	print("Resultado de ejecución: ", resultado)
 	actualizar_panel_mision(resultado)
 

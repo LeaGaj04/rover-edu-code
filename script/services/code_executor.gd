@@ -6,9 +6,13 @@ signal linea_finalizada(numero: int, contenido: String)
 signal error_detectado(error: Dictionary)
 signal ejecucion_finalizada(resultado: Dictionary)
 signal progreso_actualizado(resultado: Dictionary)
+signal paso_esperando(numero: int, contenido: String)
+signal _avanzar_paso_solicitado
 
 var ejecutando: bool = false
 var detener_solicitado: bool = false
+var modo_paso_a_paso: bool = false
+var esperando_paso: bool = false
 var _tiempo_inicio_msec : float = 0.0
 var _objective_id_at_start: String = ""
 var _objective_completed_at_start: bool = false
@@ -16,11 +20,31 @@ var _objective_completed_at_start: bool = false
 func detener_ejecucion() -> void:
 	if ejecutando:
 		detener_solicitado = true
+		if esperando_paso:
+			_avanzar_paso_solicitado.emit()
+
+func avanzar_un_paso() -> void:
+	if ejecutando and esperando_paso:
+		_avanzar_paso_solicitado.emit()
+
+func continuar_todo() -> void:
+	if ejecutando:
+		modo_paso_a_paso = false
+		if esperando_paso:
+			_avanzar_paso_solicitado.emit()
+
+func _esperar_paso_si_aplica(numero: int, contenido: String) -> void:
+	if modo_paso_a_paso and not detener_solicitado:
+		esperando_paso = true
+		paso_esperando.emit(numero, contenido)
+		await _avanzar_paso_solicitado
+		esperando_paso = false
 
 func ejecutar_codigo(
 	codigo: String,
 	ejecutar_comando: Callable,
-	evaluar_condicion: Callable = Callable()
+	evaluar_condicion: Callable = Callable(),
+	paso_a_paso: bool = false
 ) -> Dictionary:
 	_tiempo_inicio_msec = Time.get_ticks_msec()
 	var resultado := _crear_resultado(codigo)
@@ -40,6 +64,8 @@ func ejecutar_codigo(
 
 	ejecutando = true
 	detener_solicitado = false
+	modo_paso_a_paso = paso_a_paso
+	esperando_paso = false
 	ejecucion_iniciada.emit(codigo)
 
 	if not GestorSintaxis.validar_codigo(codigo):
@@ -87,6 +113,10 @@ func ejecutar_codigo(
 			var num_linea: int = instruccion["numero"]
 			var cont_linea: String = instruccion["contenido"]
 			linea_iniciada.emit(num_linea, cont_linea)
+			await _esperar_paso_si_aplica(num_linea, cont_linea)
+			if detener_solicitado:
+				linea_finalizada.emit(num_linea, cont_linea)
+				break
 
 			var cumple_condicion: bool = false
 			if evaluar_condicion.is_valid():
@@ -100,6 +130,8 @@ func ejecutar_codigo(
 			if cumple_condicion:
 				resultado["if_branch_taken"] = true
 				for sub_instruccion in instruccion.get("cuerpo", []):
+					if detener_solicitado:
+						break
 					if int(instruccion.get("loop_iteration", 0)) > 0:
 						sub_instruccion["loop_iteration"] = instruccion["loop_iteration"]
 					var res_sub: Dictionary = await _ejecutar_instruccion_simple(
@@ -112,6 +144,8 @@ func ejecutar_codigo(
 						return resultado
 
 			linea_finalizada.emit(num_linea, cont_linea)
+			if detener_solicitado:
+				break
 			continue
 
 		if tipo == "while":
@@ -141,6 +175,10 @@ func ejecutar_codigo(
 					_finalizar(resultado)
 					return resultado
 				linea_iniciada.emit(num_linea, cont_linea)
+				await _esperar_paso_si_aplica(num_linea, cont_linea)
+				if detener_solicitado:
+					linea_finalizada.emit(num_linea, cont_linea)
+					break
 				var cumple: bool = false
 				if evaluar_condicion.is_valid():
 					cumple = await evaluar_condicion.call(condicion)
@@ -151,11 +189,17 @@ func ejecutar_codigo(
 					break
 				resultado["loop_iterations"] = maxi(int(resultado.get("loop_iterations", 0)), iteracion)
 				for sub_ins in cuerpo_while:
+					if detener_solicitado:
+						break
 					var sub_tipo: String = sub_ins.get("tipo", "comando")
 					if sub_tipo == "if":
 						var num_if: int = sub_ins["numero"]
 						var cont_if: String = sub_ins["contenido"]
 						linea_iniciada.emit(num_if, cont_if)
+						await _esperar_paso_si_aplica(num_if, cont_if)
+						if detener_solicitado:
+							linea_finalizada.emit(num_if, cont_if)
+							break
 						var cumple_if: bool = false
 						if evaluar_condicion.is_valid():
 							cumple_if = await evaluar_condicion.call(sub_ins["condition"])
@@ -165,6 +209,8 @@ func ejecutar_codigo(
 						if cumple_if:
 							resultado["if_branch_taken"] = true
 							for cmd_if in sub_ins.get("cuerpo", []):
+								if detener_solicitado:
+									break
 								cmd_if["loop_iteration"] = iteracion
 								var res_sub: Dictionary = await _ejecutar_instruccion_simple(
 									cmd_if,
@@ -218,6 +264,15 @@ func _ejecutar_instruccion_simple(
 	var pasos: int = int(instruccion.get("steps", 1))
 
 	linea_iniciada.emit(numero_linea, contenido)
+	await _esperar_paso_si_aplica(numero_linea, contenido)
+
+	if detener_solicitado:
+		linea_finalizada.emit(numero_linea, contenido)
+		return {
+			"ok": false,
+			"error_type": "ejecucion",
+			"message": "Ejecución detenida."
+		}
 
 	if comando.is_empty():
 		linea_finalizada.emit(numero_linea, contenido)
@@ -811,6 +866,8 @@ func _finalizar(resultado: Dictionary) -> void:
 	)
 
 	ejecutando = false
+	modo_paso_a_paso = false
+	esperando_paso = false
 
 	print(
 		"Misión: ",
