@@ -12,10 +12,6 @@ border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color(0.372549, 0.592157, 0.419608, 0.95)
-corner_radius_top_left = 14
-corner_radius_top_right = 14
-corner_radius_bottom_right = 14
-corner_radius_bottom_left = 14
 shadow_color = Color(0.0039, 0.09, 0.011, 0.85)
 shadow_size = 12
 shadow_offset = Vector2(8, 8)
@@ -31,10 +27,6 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.25, 0.5, 0.3, 0.6)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boton_cerrar"]
 content_margin_left = 14.0

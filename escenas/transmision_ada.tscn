@@ -14,10 +14,6 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.3744904, 0.5937168, 0.41924155, 0.8509804)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
 shadow_color = Color(0.005598605, 0.09105549, 0.011137269, 0.6509804)
 shadow_size = 12
 
