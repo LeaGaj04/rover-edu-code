@@ -16,13 +16,13 @@
 [ext_resource type="PackedScene" path="res://escenas/archivo_ada.tscn" id="14_codice"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_codigo"]
-bg_color = Color(4.4370537e-08, 0.067600854, 0.00088399946, 0.7607843)
+bg_color = Color(0.005, 0.055, 0.02, 0.96)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.3744904, 0.5937168, 0.41924155, 0.8509804)
-shadow_color = Color(0.005598605, 0.09105549, 0.011137269, 0.6509804)
+border_color = Color(0.372549, 0.592157, 0.419608, 0.95)
+shadow_color = Color(0.0039, 0.09, 0.011, 0.85)
 shadow_offset = Vector2(6, 6)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_barra_codigo"]
@@ -75,13 +75,23 @@ content_margin_left = 12.0
 content_margin_top = 10.0
 content_margin_right = 12.0
 content_margin_bottom = 10.0
-bg_color = Color(0, 0.06666667, 0, 0.7607843)
+bg_color = Color(0.082, 0.102, 0.098, 0.98)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.37254903, 0.5921569, 0.41960785, 0.8509804)
+border_color = Color(0.37, 0.61, 0.45, 0.95)
 shadow_color = Color(0.003921569, 0.09019608, 0.011764706, 0.6509804)
+
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_rover"]
+keyword_colors = {"and": Color(1, 0.74, 0.22, 1), "as": Color(1, 0.74, 0.22, 1), "elif": Color(1, 0.74, 0.22, 1), "else": Color(1, 0.74, 0.22, 1), "for": Color(1, 0.74, 0.22, 1), "if": Color(1, 0.74, 0.22, 1), "in": Color(1, 0.74, 0.22, 1), "not": Color(1, 0.74, 0.22, 1), "or": Color(1, 0.74, 0.22, 1), "pass": Color(1, 0.74, 0.22, 1), "return": Color(1, 0.74, 0.22, 1), "while": Color(1, 0.74, 0.22, 1), "norte": Color(0.33, 0.91, 1, 1), "sur": Color(0.33, 0.91, 1, 1), "este": Color(0.33, 0.91, 1, 1), "oeste": Color(0.33, 0.91, 1, 1), "mover": Color(0.33, 0.91, 1, 1), "minar": Color(0.38, 1, 0.6, 1), "transferir": Color(0.38, 1, 0.6, 1), "hay_mineral": Color(0.82, 0.6, 1, 1), "tiene_espacio": Color(0.82, 0.6, 1, 1)}
+member_keyword_colors = {"norte": Color(0.33, 0.91, 1, 1), "sur": Color(0.33, 0.91, 1, 1), "este": Color(0.33, 0.91, 1, 1), "oeste": Color(0.33, 0.91, 1, 1), "mover": Color(0.33, 0.91, 1, 1), "minar": Color(0.38, 1, 0.6, 1), "transferir": Color(0.38, 1, 0.6, 1), "hay_mineral": Color(0.82, 0.6, 1, 1), "tiene_espacio": Color(0.82, 0.6, 1, 1)}
+color_regions = {"#": Color(0.48, 0.74, 0.58, 1)}
+symbol_color = Color(0.9, 1, 0.92, 1)
+number_color = Color(1, 0.88, 0.25, 1)
+function_color = Color(0.3, 1, 0.68, 1)
+member_variable_color = Color(0.55, 1, 0.65, 1)
+string_color = Color(1, 0.72, 0.32, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tienda_focus"]
 bg_color = Color(0, 0.06666667, 0, 0.7607843)
@@ -348,18 +358,30 @@ offset_top = 60.0
 offset_right = -8.0
 offset_bottom = -8.0
 
-[node name="TextEdit" type="TextEdit" parent="CanvasLayer/PanelCodigo/Contenido" unique_id=1732974269]
+[node name="TextEdit" type="CodeEdit" parent="CanvasLayer/PanelCodigo/Contenido" unique_id=1732974269]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_bottom = -50.0
-theme_override_colors/caret_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
-theme_override_colors/selection_color = Color(0.37254903, 0.5921569, 0.41960785, 0.8509804)
-theme_override_colors/font_color = Color(0.8651328, 0.9999998, 0.866359, 0.6509804)
+theme_override_colors/caret_color = Color(0.76, 0.94, 0.78, 1)
+theme_override_colors/selection_color = Color(0.19, 0.36, 0.27, 0.95)
+theme_override_colors/font_color = Color(0.89, 1, 0.91, 1)
+theme_override_colors/current_line_color = Color(0.12, 0.16, 0.14, 0.9)
+theme_override_colors/line_number_color = Color(0.38, 0.58, 0.43, 1)
+theme_override_colors/line_length_guideline_color = Color(0.18, 0.3, 0.2, 0.4)
+theme_override_colors/completion_background_color = Color(0.082, 0.102, 0.098, 0.98)
+theme_override_colors/completion_selected_color = Color(0.19, 0.36, 0.27, 0.98)
+theme_override_colors/completion_existing_color = Color(0.37, 0.61, 0.45, 1)
 theme_override_font_sizes/font_size = 17
 theme_override_styles/normal = SubResource("StyleBoxFlat_editor_codigo")
 caret_blink = true
 caret_blink_interval = 0.5
+gutters_draw_line_numbers = true
+gutters_draw_fold_gutter = true
+draw_current_line = true
+draw_tabs = true
+syntax_highlighter = SubResource("CodeHighlighter_rover")
+completion_sort_options = false
 
 [node name="BarraControles" type="HBoxContainer" parent="CanvasLayer/PanelCodigo/Contenido"]
 layout_mode = 1
