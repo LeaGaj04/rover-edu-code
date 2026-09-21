@@ -14,6 +14,7 @@ enum EstadoMision {
 	CICLO_RECOLECCION,
 	TRABAJO_CONTINUO,
 	CAMINO_LARGO,
+	RETORNO_BASE,
 	COMPRAR_IF,
 	SENALES_INCIERTAS,
 	COMPRAR_WHILE,
@@ -178,7 +179,6 @@ func registrar_transferencia(cantidad: int) -> void:
 			if objective_completed
 			else EstadoMision.COMPRAR_CASILLAS
 		)
-
 	mision_completada.emit(mision_completada_id)
 
 	if mision_completada_id == "recolectar_primer_mineral":
@@ -427,6 +427,14 @@ func get_objetivo_actual() -> String:
 			"Tu desafío: programa una rutina combinando bucles (while o for) y el sensor condicional " +
 			"'if rover.hay_mineral():' para recolectar al menos 3 minerales y transferirlos a la base."
 		)
+	if objective_id == "retorno_base":
+		return (
+			"RETORNO A BASE (CONDICIÓN NOT)\n" +
+			"Haz que el rover regrese de forma autónoma usando:\n\n" +
+			"while not rover.en_base():\n" +
+			"    rover.sur()\n\n" +
+			"El ciclo debe detenerse al detectar que el rover llegó a la base."
+		)
 
 	match estado_actual:
 		EstadoMision.BUSCAR_MINERAL:
@@ -487,6 +495,10 @@ func evaluar_programa(resultado: Dictionary) -> void:
 
 	if objective_id == "camino_largo":
 		_evaluar_camino_largo(resultado)
+		return
+
+	if objective_id == "retorno_base":
+		_evaluar_retorno_base(resultado)
 		return
 	
 	if objective_id == "trabajo_continuo":
@@ -673,7 +685,37 @@ func _evaluar_camino_largo(resultado: Dictionary) -> void:
 
 	desbloquear_conocimiento("parametro")
 	mision_completada.emit(objective_id)
+	iniciar_retorno_base()
 	print("Misión camino_largo completada!")
+
+
+func iniciar_retorno_base() -> void:
+	objective_id = "retorno_base"
+	objective_completed = "retorno_base" in completed_missions
+	estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.RETORNO_BASE
+	mision_iniciada.emit(objective_id)
+	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
+	print("Misión iniciada: retorno_base")
+
+
+func _evaluar_retorno_base(resultado: Dictionary) -> void:
+	var codigo: String = str(resultado.get("code", "")).to_lower().replace(" ", "")
+	var iteraciones: int = int(resultado.get("loop_iterations", 0))
+	if not codigo.contains("whilenotrover.en_base():") or iteraciones < 1:
+		objetivo_actualizado.emit(
+			objective_id,
+			"Debes usar 'while not rover.en_base():' para que el rover regrese " +
+			"de forma autónoma y se detenga al llegar a la base."
+		)
+		return
+
+	objective_completed = true
+	estado_actual = EstadoMision.COMPLETADA
+	if objective_id not in completed_missions:
+		completed_missions.append(objective_id)
+	desbloquear_conocimiento("condicion_not")
+	mision_completada.emit(objective_id)
+	print("Misión retorno_base completada!")
 
 
 func iniciar_mision_comprar_if() -> void:
@@ -789,11 +831,19 @@ func _evaluar_ciclo_autonomo(resultado: Dictionary) -> void:
 	var recolectados: int = int(resultado.get("minerals_collected", 0))
 	var transferidos: int = int(resultado.get("minerals_transferred", 0))
 	var iteraciones: int = int(resultado.get("loop_iterations", 0))
+	var if_evaluations: int = int(resultado.get("if_evaluations", 0))
 	if iteraciones < 1:
 		objetivo_actualizado.emit(
 			objective_id,
 			"Debes usar la estructura 'while <condicion>:' (como rover.tiene_espacio()) " +
 			"para que el rover decida de forma autónoma cuándo detenerse."
+		)
+		return
+	if if_evaluations < 1:
+		objetivo_actualizado.emit(
+			objective_id,
+			"El ciclo se repite, pero todavía debes usar 'if rover.hay_mineral():' " +
+			"para que el rover decida cuándo extraer."
 		)
 		return
 	if recolectados < 3 or transferidos < 3:
@@ -848,12 +898,25 @@ func iniciar_exploracion_3x3() -> void:
 
 
 func _evaluar_exploracion_3x3(resultado: Dictionary) -> void:
-	var _if_evaluations: int = int(resultado.get("if_evaluations", 0))
-	var _loop_count: int = int(resultado.get("loop_count", 0))
-	var _iteraciones: int = int(resultado.get("loop_iterations", 0))
+	var if_evaluations: int = int(resultado.get("if_evaluations", 0))
+	var loop_count: int = int(resultado.get("loop_count", 0))
 	var recolectados: int = int(resultado.get("minerals_collected", 0))
 	var transferidos: int = int(resultado.get("minerals_transferred", 0))
 
+	if loop_count < 1:
+		objetivo_actualizado.emit(
+			objective_id,
+			"Para explorar el cuadrante necesitas usar un bucle 'while' o 'for' " +
+			"que recorra varias casillas."
+		)
+		return
+	if if_evaluations < 1:
+		objetivo_actualizado.emit(
+			objective_id,
+			"Antes de minar, usa 'if rover.hay_mineral():' para leer las señales " +
+			"del cuadrante. Los depósitos cambian de posición."
+		)
+		return
 	if recolectados < 3 or transferidos < 3:
 		objetivo_actualizado.emit(
 			objective_id,
