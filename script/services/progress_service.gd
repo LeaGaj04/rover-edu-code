@@ -26,6 +26,7 @@ const CONOCIMIENTOS_CONOCIDOS := [
 	"metodo",
 	"secuencia",
 	"parametro",
+	"condicion_not",
 	"bucle_for",
 	"condicional_if",
 	"bucle_while",

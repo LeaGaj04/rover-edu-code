@@ -1070,6 +1070,14 @@ func _on_mision_completada(mision_id: String) -> void:
 				"completado",
 				16.0
 			)
+		"retorno_base":
+			transmision_ada.mostrar_mensaje(
+				"¡Retorno autónomo completado!\n" +
+				"El rover utilizó la condición 'not' para detectar su llegada a la base.\n" +
+				"Ahora puede navegar y detenerse sin una distancia fija.",
+				"completado",
+				14.0
+			)
 		_:
 			transmision_ada.mostrar_mensaje(
 				"Mision completada correctamente.",
