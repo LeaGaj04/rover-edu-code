@@ -4,7 +4,7 @@ extends CanvasLayer
 @onready var barra_codigo: Panel = $PanelCodigo/BarraTitulo
 @onready var contenido_codigo: Control = $PanelCodigo/Contenido
 @onready var boton_minimizar: Button = $PanelCodigo/BarraTitulo/BotonMinimizar
-@onready var caja_codigo: TextEdit = $PanelCodigo/Contenido/TextEdit
+@onready var caja_codigo: CodeEdit = $PanelCodigo/Contenido/TextEdit
 @onready var boton_ejecutar: Button = $PanelCodigo/Contenido/BarraControles/Button
 @onready var boton_paso: Button = $PanelCodigo/Contenido/BarraControles/BotonPaso
 @onready var boton_reset_base: Button = $PanelCodigo/Contenido/BarraControles/BotonResetBase
@@ -83,6 +83,10 @@ const PRECIOS = {
 
 func _ready() -> void:
 	barra_codigo.gui_input.connect(_on_barra_codigo_gui_input)
+	caja_codigo.code_completion_enabled = true
+	caja_codigo.code_completion_prefixes = PackedStringArray(["."])
+	caja_codigo.code_completion_requested.connect(_on_code_completion_requested)
+	caja_codigo.text_changed.connect(_on_codigo_text_changed)
 	$PanelCodigo/EsquinaSuperiorIzquierda.gui_input.connect(_on_esquina_codigo_gui_input.bind(Vector2(-1, -1)))
 	$PanelCodigo/EsquinaSuperiorDerecha.gui_input.connect(_on_esquina_codigo_gui_input.bind(Vector2(1, -1)))
 	$PanelCodigo/EsquinaInferiorIzquierda.gui_input.connect(_on_esquina_codigo_gui_input.bind(Vector2(-1, 1)))
@@ -114,6 +118,50 @@ func _ready() -> void:
 	if panel_archivo != null:
 		panel_archivo.cerrado.connect(_on_archivo_cerrado)
 	_marcar_interfaz_inicializada()
+
+
+func _on_codigo_text_changed() -> void:
+	# Abre sugerencias automáticamente después de escribir un punto.
+	var linea := caja_codigo.get_line(caja_codigo.get_caret_line())
+	var columna := caja_codigo.get_caret_column()
+	var texto_hasta_cursor := linea.substr(0, columna)
+	if texto_hasta_cursor.rfind("rover.") >= 0:
+		caja_codigo.call_deferred("request_code_completion", true)
+
+
+func _on_code_completion_requested() -> void:
+	var linea := caja_codigo.get_line(caja_codigo.get_caret_line())
+	var texto_hasta_cursor := linea.substr(0, caja_codigo.get_caret_column())
+	var inicio_rover := texto_hasta_cursor.rfind("rover.")
+	if inicio_rover < 0:
+		return
+	var filtro := texto_hasta_cursor.substr(inicio_rover + 6).to_lower()
+	if filtro.contains(" ") or filtro.contains("("):
+		return
+
+	var opciones := [
+		["\u200brover.minar()", "minar()", "Extraer mineral", Color(0.35, 1, 0.38, 1)],
+		["\u200brover.transferir()", "transferir()", "Transferir minerales", Color(0.35, 1, 0.38, 1)],
+		["\u200crover.norte()", "norte()", "Mover al norte", Color(0.18, 0.86, 1, 1)],
+		["\u200crover.sur()", "sur()", "Mover al sur", Color(0.18, 0.86, 1, 1)],
+		["\u200crover.este()", "este()", "Mover al este", Color(0.18, 0.86, 1, 1)],
+		["\u200crover.oeste()", "oeste()", "Mover al oeste", Color(0.18, 0.86, 1, 1)],
+		["\u200drover.hay_mineral()", "hay_mineral()", "Consultar sensor de mineral", Color(1, 0.35, 0.85, 1)],
+		["\u200drover.tiene_espacio()", "tiene_espacio()", "Consultar capacidad del Rover", Color(1, 0.35, 0.85, 1)]
+	]
+
+	for opcion in opciones:
+		if not str(opcion[1]).to_lower().begins_with(filtro):
+			continue
+		caja_codigo.add_code_completion_option(
+			CodeEdit.KIND_FUNCTION,
+			opcion[0],
+			opcion[1],
+			opcion[3],
+			null,
+			opcion[2]
+		)
+	caja_codigo.update_code_completion_options(true)
 
 
 func _marcar_interfaz_inicializada() -> void:
@@ -166,7 +214,7 @@ func _input(event: InputEvent) -> void:
 		if event.ctrl_pressed and event.keycode == KEY_ENTER:
 			get_viewport().set_input_as_handled()
 			_on_button_pressed()
-		elif event.keycode == KEY_F10 or (event.ctrl_pressed and event.keycode == KEY_SPACE):
+		elif event.keycode == KEY_F10:
 			get_viewport().set_input_as_handled()
 			_on_boton_paso_pressed()
 
