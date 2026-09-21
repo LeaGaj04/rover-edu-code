@@ -298,6 +298,16 @@ func _ejecutar_instruccion_simple(
 		and int(resultado.get("minerals_transferred", 0)) >= 2
 	):
 		detener_solicitado = true
+	elif (
+		_objective_id_at_start in ["ciclo_autonomo", "exploracion_3x3"]
+		and int(resultado.get("minerals_transferred", 0)) >= 3
+	):
+		detener_solicitado = true
+	elif (
+		_objective_id_at_start == "ciclo_recoleccion"
+		and int(resultado.get("minerals_transferred", 0)) >= 2
+	):
+		detener_solicitado = true
 	if int(instruccion.get("loop_iteration", 0)) > 0:
 		resultado["loop_minerals_collected"] += recolectados
 	if not resultado_comando.get("ok", false):
