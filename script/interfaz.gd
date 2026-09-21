@@ -69,6 +69,7 @@ var minerales_rover : int = 0
 @onready var linea_hard_1: Line2D = $PanelTienda/LienzoArbol/LineaHard1
 
 var mineria_rapida_desbloqueada: bool = false
+var _interfaz_inicializada: bool = false
 
 const PRECIOS = {
 	"while": 15,
@@ -112,6 +113,12 @@ func _ready() -> void:
 		mi_rover.mineral_recolectado.connect(_sumar_minerales_rover)
 	if panel_archivo != null:
 		panel_archivo.cerrado.connect(_on_archivo_cerrado)
+	_marcar_interfaz_inicializada()
+
+
+func _marcar_interfaz_inicializada() -> void:
+	await get_tree().create_timer(1.0).timeout
+	_interfaz_inicializada = true
 
 
 func _on_boton_tienda_pressed() -> void:
@@ -858,10 +865,12 @@ func _on_ejecucion_finalizada(resultado: Dictionary) -> void:
 		and MissionService.objective_id in [
 			"ruta_calibracion",
 			"trabajo_continuo",
+			"ciclo_autonomo",
+			"exploracion_3x3",
 			"ciclo_recoleccion"
 		]
 	):
-		await get_tree().create_timer(2.5).timeout
+		await get_tree().create_timer(3.0).timeout
 		MissionService.preparar_mision_expansion()
 		actualizar_mejoras_visual()
 		_solicitar_guardado_progreso()
@@ -873,6 +882,8 @@ func _on_progreso_ejecucion(resultado: Dictionary) -> void:
 func _on_objetivo_actualizado(_mision_id: String, objetivo: String) -> void:
 	actualizar_panel_mision()
 	_animar_nueva_mision()
+	if _interfaz_inicializada and not MissionService.objective_completed and not objetivo.is_empty():
+		transmision_ada.mostrar_mensaje(objetivo, "progreso", 12.0)
 
 
 func _on_mision_completada(mision_id: String) -> void:
@@ -992,7 +1003,7 @@ func _on_mision_completada(mision_id: String) -> void:
 				"El área de operaciones se ha expandido a un cuadrante de 9 casillas.\n" +
 				"Nueva misión: BARRIDO DE CUADRANTE.\n" +
 				"Combina bucles y sensores condicionales para prospectar el sector completo.",
-				"progreso",
+				"completado",
 				12.0
 			)
 		"compra_temprana_3x3":
@@ -1006,8 +1017,8 @@ func _on_mision_completada(mision_id: String) -> void:
 		"exploracion_3x3":
 			transmision_ada.mostrar_mensaje(
 				"¡Barrido de cuadrante completado!\n" +
-				"Has integrado exitosamente bucles, lectura de sensores y navegación " +
-				"en un mapa de rango completo. Excelente trabajo, unidad Rover.",
+				"Has recolectado y transferido los 3 minerales requeridos del sector 3x3.\n" +
+				"Excelente trabajo, unidad Rover.",
 				"completado",
 				16.0
 			)
