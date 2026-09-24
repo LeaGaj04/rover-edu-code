@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dyhy7jwkqhw2o"]
 
 [ext_resource type="Script" uid="uid://ct48y8s8ntq7e" path="res://script/auth.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://b8ehq8b88pwrm" path="res://Fondos/ROVER_FONDO.png" id="2_fkd26"]
+[ext_resource type="Texture2D" path="res://Fondos/estrellas_frames/frame_00.png" id="2_fkd26"]
 
 [sub_resource type="StyleBoxFlat" id="PanelAuth"]
 content_margin_left = 28.0
@@ -124,6 +124,22 @@ grow_vertical = 2
 texture = ExtResource("2_fkd26")
 expand_mode = 1
 stretch_mode = 6
+
+[node name="Titulo" type="Label" parent="." unique_id=2026092401]
+layout_mode = 1
+offset_left = 36.0
+offset_top = 34.0
+offset_right = 1200.0
+offset_bottom = 250.0
+theme_override_colors/font_color = Color(0.91, 1, 0.97, 1)
+theme_override_colors/font_outline_color = Color(0.16, 0.82, 0.64, 1)
+theme_override_colors/font_shadow_color = Color(0.35, 0.08, 0.85, 0.8)
+theme_override_constants/outline_size = 15
+theme_override_constants/shadow_offset_x = 5
+theme_override_constants/shadow_offset_y = 7
+theme_override_font_sizes/font_size = 150
+text = "SPIDOCODE"
+horizontal_alignment = 1
 
 [node name="Panel" type="PanelContainer" parent="." unique_id=2128576799]
 layout_mode = 1
