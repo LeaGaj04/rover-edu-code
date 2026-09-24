@@ -17,6 +17,17 @@ var _tiempo_inicio_msec : float = 0.0
 var _objective_id_at_start: String = ""
 var _objective_completed_at_start: bool = false
 
+const PALABRAS_RESERVADAS := [
+	"rover", "for", "while", "if", "else", "in", "range",
+	"not", "and", "or", "true", "false", "True", "False"
+]
+
+func _es_identificador_valido(nombre: String) -> bool:
+	var regex := RegEx.new()
+	if regex.compile("^[A-Za-z_][A-Za-z0-9_]*$") != OK:
+		return false
+	return regex.search(nombre) != null and nombre not in PALABRAS_RESERVADAS
+
 func detener_ejecucion() -> void:
 	if ejecutando:
 		detener_solicitado = true
@@ -48,6 +59,7 @@ func ejecutar_codigo(
 ) -> Dictionary:
 	_tiempo_inicio_msec = Time.get_ticks_msec()
 	var resultado := _crear_resultado(codigo)
+	var variables_env: Dictionary = {}
 
 	if ejecutando:
 		resultado["error_type"] = "ejecucion"
@@ -109,6 +121,46 @@ func ejecutar_codigo(
 	for instruccion in instrucciones:
 		var tipo: String = instruccion.get("tipo", "comando")
 
+		if tipo == "asignacion":
+			var num_linea: int = instruccion["numero"]
+			var cont_linea: String = instruccion["contenido"]
+			linea_iniciada.emit(num_linea, cont_linea)
+			await _esperar_paso_si_aplica(num_linea, cont_linea)
+			if detener_solicitado:
+				linea_finalizada.emit(num_linea, cont_linea)
+				break
+
+			var var_name: String = instruccion["var_name"]
+			var var_expr: String = instruccion["var_expr"]
+			var val: int = 0
+
+			if var_expr.is_valid_int():
+				val = int(var_expr)
+			elif variables_env.has(var_expr):
+				val = int(variables_env[var_expr])
+				if var_expr not in resultado["variables_used"]:
+					resultado["variables_used"].append(var_expr)
+			else:
+				var err_asig := {
+					"type": "ejecucion",
+					"line": num_linea,
+					"content": cont_linea,
+					"message": "La variable '" + var_expr + "' no ha sido definida."
+				}
+				resultado["error_type"] = err_asig["type"]
+				resultado["error_message"] = err_asig["message"]
+				resultado["errors"].append(err_asig)
+				error_detectado.emit(err_asig)
+				_finalizar(resultado)
+				return resultado
+
+			variables_env[var_name] = val
+			if var_name not in resultado["variables_defined"]:
+				resultado["variables_defined"].append(var_name)
+
+			linea_finalizada.emit(num_linea, cont_linea)
+			continue
+
 		if tipo == "if":
 			var num_linea: int = instruccion["numero"]
 			var cont_linea: String = instruccion["contenido"]
@@ -137,7 +189,8 @@ func ejecutar_codigo(
 					var res_sub: Dictionary = await _ejecutar_instruccion_simple(
 						sub_instruccion,
 						ejecutar_comando,
-						resultado
+						resultado,
+						variables_env
 					)
 					if not res_sub.get("ok", false):
 						_finalizar(resultado)
@@ -215,7 +268,8 @@ func ejecutar_codigo(
 								var res_sub: Dictionary = await _ejecutar_instruccion_simple(
 									cmd_if,
 									ejecutar_comando,
-									resultado
+									resultado,
+									variables_env
 								)
 								if not res_sub.get("ok", false):
 									_finalizar(resultado)
@@ -226,7 +280,8 @@ func ejecutar_codigo(
 					var res_while_cmd: Dictionary = await _ejecutar_instruccion_simple(
 						sub_ins,
 						ejecutar_comando,
-						resultado
+						resultado,
+						variables_env
 					)
 					if not res_while_cmd.get("ok", false):
 						_finalizar(resultado)
@@ -242,7 +297,8 @@ func ejecutar_codigo(
 		var res_cmd: Dictionary = await _ejecutar_instruccion_simple(
 			instruccion,
 			ejecutar_comando,
-			resultado
+			resultado,
+			variables_env
 		)
 		if not res_cmd.get("ok", false):
 			_finalizar(resultado)
@@ -256,12 +312,14 @@ func ejecutar_codigo(
 func _ejecutar_instruccion_simple(
 	instruccion: Dictionary,
 	ejecutar_comando: Callable,
-	resultado: Dictionary
+	resultado: Dictionary,
+	variables_env: Dictionary = {}
 ) -> Dictionary:
 	var numero_linea: int = int(instruccion.get("numero", 0))
 	var contenido: String = str(instruccion.get("contenido", ""))
 	var comando: String = str(instruccion.get("command", instruccion.get("comando", "")))
 	var pasos: int = int(instruccion.get("steps", 1))
+	var step_var: String = str(instruccion.get("step_var", ""))
 
 	linea_iniciada.emit(numero_linea, contenido)
 	await _esperar_paso_si_aplica(numero_linea, contenido)
@@ -273,6 +331,38 @@ func _ejecutar_instruccion_simple(
 			"error_type": "ejecucion",
 			"message": "Ejecución detenida."
 		}
+
+	if not step_var.is_empty():
+		if variables_env.has(step_var):
+			pasos = int(variables_env[step_var])
+			if step_var not in resultado["variables_used"]:
+				resultado["variables_used"].append(step_var)
+			if pasos <= 0:
+				var error_var := {
+					"type": "ejecucion",
+					"line": numero_linea,
+					"content": contenido,
+					"message": "La variable '" + step_var + "' tiene un valor que debe ser mayor a cero."
+				}
+				resultado["error_type"] = error_var["type"]
+				resultado["error_message"] = error_var["message"]
+				resultado["errors"].append(error_var)
+				error_detectado.emit(error_var)
+				linea_finalizada.emit(numero_linea, contenido)
+				return {"ok": false}
+		else:
+			var error_undef := {
+				"type": "sintaxis",
+				"line": numero_linea,
+				"content": contenido,
+				"message": "La variable '" + step_var + "' no ha sido definida antes de su uso."
+			}
+			resultado["error_type"] = error_undef["type"]
+			resultado["error_message"] = error_undef["message"]
+			resultado["errors"].append(error_undef)
+			error_detectado.emit(error_undef)
+			linea_finalizada.emit(numero_linea, contenido)
+			return {"ok": false}
 
 	if comando.is_empty():
 		linea_finalizada.emit(numero_linea, contenido)
@@ -304,8 +394,8 @@ func _ejecutar_instruccion_simple(
 	):
 		detener_solicitado = true
 	elif (
-		_objective_id_at_start == "ciclo_recoleccion"
-		and int(resultado.get("minerals_transferred", 0)) >= 2
+		_objective_id_at_start in ["ciclo_recoleccion", "variables", "camino_largo"]
+		and int(resultado.get("minerals_transferred", 0)) >= 1
 	):
 		detener_solicitado = true
 	if int(instruccion.get("loop_iteration", 0)) > 0:
@@ -324,12 +414,50 @@ func _ejecutar_instruccion_simple(
 	linea_finalizada.emit(numero_linea, contenido)
 	return resultado_comando
 
+func _analizar_asignacion(contenido: String, numero_linea: int) -> Dictionary:
+	if not ("=" in contenido):
+		return {"ok": false}
+	if "==" in contenido or ">=" in contenido or "<=" in contenido or "!=" in contenido:
+		return {"ok": false}
+	var partes := contenido.split("=", false, 1)
+	if partes.size() != 2:
+		return {"ok": false}
+	var nombre_var := partes[0].strip_edges()
+	var expr_val := partes[1].strip_edges()
+
+	if not _es_identificador_valido(nombre_var):
+		if nombre_var in PALABRAS_RESERVADAS:
+			return _error_de_linea(
+				numero_linea,
+				contenido,
+				"No puedes usar '" + nombre_var + "' como nombre de variable porque es una palabra reservada."
+			)
+		return _error_de_linea(
+			numero_linea,
+			contenido,
+			"'" + nombre_var + "' no es un nombre de variable válido."
+		)
+
+	if not (expr_val.is_valid_int() or _es_identificador_valido(expr_val)):
+		return _error_de_linea(
+			numero_linea,
+			contenido,
+			"El valor asignado a '" + nombre_var + "' debe ser un número entero o una variable previa."
+		)
+
+	return {
+		"ok": true,
+		"tipo": "asignacion",
+		"var_name": nombre_var,
+		"var_expr": expr_val
+	}
+
 func analizar_linea(contenido: String, numero_linea: int) -> Dictionary:
 	if not contenido.begins_with("rover."):
 		return _error_de_linea(
 			numero_linea,
 			contenido,
-			"La instrucción debe comenzar con 'rover.'."
+			"La instrucción debe comenzar con 'rover.' o ser una asignación de variable (ej: pasos = 2)."
 		)
 
 	var posicion_punto := contenido.find(".")
@@ -384,22 +512,24 @@ func analizar_linea(contenido: String, numero_linea: int) -> Dictionary:
 	).strip_edges()
 
 	var pasos := 1
+	var step_var := ""
 
 	if not argumento.is_empty():
-		if not argumento.is_valid_int():
+		if argumento.is_valid_int():
+			pasos = int(argumento)
+			if pasos <= 0:
+				return _error_de_linea(
+					numero_linea,
+					contenido,
+					"La cantidad de pasos debe ser mayor que cero."
+				)
+		elif _es_identificador_valido(argumento):
+			step_var = argumento
+		else:
 			return _error_de_linea(
 				numero_linea,
 				contenido,
-				"El parámetro debe ser un número entero."
-			)
-
-		pasos = int(argumento)
-
-		if pasos <= 0:
-			return _error_de_linea(
-				numero_linea,
-				contenido,
-				"La cantidad de pasos debe ser mayor que cero."
+				"El parámetro debe ser un número entero o una variable válida."
 			)
 
 	if comando in ["minar", "transferir"] and not argumento.is_empty():
@@ -412,7 +542,8 @@ func analizar_linea(contenido: String, numero_linea: int) -> Dictionary:
 	return {
 		"ok": true,
 		"command": comando,
-		"steps": pasos
+		"steps": pasos,
+		"step_var": step_var
 	}
 
 func _contar_espacios_sangria(linea: String) -> int:
@@ -431,17 +562,39 @@ func compilar_programa(codigo: String) -> Dictionary:
 	var instrucciones: Array = []
 	var lineas := codigo.split("\n")
 	var indice := 0
+	var variables_compile_env: Dictionary = {}
 
 	while indice < lineas.size():
 		var linea_original: String = lineas[indice]
 		var contenido := linea_original.strip_edges()
 		var numero_linea := indice + 1
 
-		if contenido.is_empty():
+		if contenido.is_empty() or contenido.begins_with("#"):
 			indice += 1
 			continue
 
 		var contenido_lower := contenido.to_lower()
+
+		var res_asig := _analizar_asignacion(contenido, numero_linea)
+		if res_asig.get("tipo", "") == "asignacion":
+			if not res_asig["ok"]:
+				return res_asig
+			var vname: String = res_asig["var_name"]
+			var vexpr: String = res_asig["var_expr"]
+			if vexpr.is_valid_int():
+				variables_compile_env[vname] = int(vexpr)
+			elif variables_compile_env.has(vexpr):
+				variables_compile_env[vname] = variables_compile_env[vexpr]
+			instrucciones.append({
+				"tipo": "asignacion",
+				"numero": numero_linea,
+				"contenido": contenido,
+				"var_name": vname,
+				"var_expr": vexpr,
+				"loop_iteration": 0
+			})
+			indice += 1
+			continue
 
 		if contenido_lower.begins_with("if "):
 			var resultado_if: Dictionary = _analizar_if(contenido, numero_linea)
@@ -454,7 +607,7 @@ func compilar_programa(codigo: String) -> Dictionary:
 
 			while indice < lineas.size():
 				var linea_cuerpo: String = lineas[indice]
-				if linea_cuerpo.strip_edges().is_empty():
+				if linea_cuerpo.strip_edges().is_empty() or linea_cuerpo.strip_edges().begins_with("#"):
 					indice += 1
 					continue
 
@@ -472,7 +625,8 @@ func compilar_programa(codigo: String) -> Dictionary:
 					"numero": indice + 1,
 					"contenido": contenido_cuerpo,
 					"command": analisis_if["command"],
-					"steps": analisis_if["steps"]
+					"steps": analisis_if["steps"],
+					"step_var": analisis_if.get("step_var", "")
 				})
 				indice += 1
 
@@ -503,7 +657,15 @@ func compilar_programa(codigo: String) -> Dictionary:
 			if not resultado_for["ok"]:
 				return resultado_for
 
-			var repeticiones: int = resultado_for["repeticiones"]
+			var range_var: String = str(resultado_for.get("range_var", ""))
+			var repeticiones: int = int(resultado_for.get("repeticiones", 0))
+
+			if not range_var.is_empty():
+				if variables_compile_env.has(range_var):
+					repeticiones = int(variables_compile_env[range_var])
+				else:
+					repeticiones = 1
+
 			var sangria_for := _contar_espacios_sangria(linea_original)
 			var cuerpo_for: Array = []
 			indice += 1
@@ -511,7 +673,7 @@ func compilar_programa(codigo: String) -> Dictionary:
 			while indice < lineas.size():
 				var linea_cuerpo: String = lineas[indice]
 
-				if linea_cuerpo.strip_edges().is_empty():
+				if linea_cuerpo.strip_edges().is_empty() or linea_cuerpo.strip_edges().begins_with("#"):
 					indice += 1
 					continue
 
@@ -522,7 +684,6 @@ func compilar_programa(codigo: String) -> Dictionary:
 				var contenido_cuerpo := linea_cuerpo.strip_edges()
 				var cont_cuerpo_lower := contenido_cuerpo.to_lower()
 
-				# Caso 1: if anidado dentro de for
 				if cont_cuerpo_lower.begins_with("if "):
 					var num_linea_if := indice + 1
 					var res_if_anidado := _analizar_if(contenido_cuerpo, num_linea_if)
@@ -535,7 +696,7 @@ func compilar_programa(codigo: String) -> Dictionary:
 
 					while indice < lineas.size():
 						var linea_sub := lineas[indice]
-						if linea_sub.strip_edges().is_empty():
+						if linea_sub.strip_edges().is_empty() or linea_sub.strip_edges().begins_with("#"):
 							indice += 1
 							continue
 
@@ -553,7 +714,8 @@ func compilar_programa(codigo: String) -> Dictionary:
 							"numero": indice + 1,
 							"contenido": cont_sub,
 							"command": analisis_sub["command"],
-							"steps": analisis_sub["steps"]
+							"steps": analisis_sub["steps"],
+							"step_var": analisis_sub.get("step_var", "")
 						})
 						indice += 1
 
@@ -574,7 +736,6 @@ func compilar_programa(codigo: String) -> Dictionary:
 					})
 					continue
 
-				# Caso 2: comando normal dentro de for
 				var analisis_for: Dictionary = analizar_linea(
 					contenido_cuerpo,
 					indice + 1
@@ -588,7 +749,8 @@ func compilar_programa(codigo: String) -> Dictionary:
 					"numero": indice + 1,
 					"contenido": contenido_cuerpo,
 					"command": analisis_for["command"],
-					"steps": analisis_for["steps"]
+					"steps": analisis_for["steps"],
+					"step_var": analisis_for.get("step_var", "")
 				})
 
 				indice += 1
@@ -619,7 +781,7 @@ func compilar_programa(codigo: String) -> Dictionary:
 
 			while indice < lineas.size():
 				var linea_cuerpo: String = lineas[indice]
-				if linea_cuerpo.strip_edges().is_empty():
+				if linea_cuerpo.strip_edges().is_empty() or linea_cuerpo.strip_edges().begins_with("#"):
 					indice += 1
 					continue
 
@@ -630,7 +792,6 @@ func compilar_programa(codigo: String) -> Dictionary:
 				var contenido_cuerpo := linea_cuerpo.strip_edges()
 				var cont_cuerpo_lower := contenido_cuerpo.to_lower()
 
-				# Soporte para if anidado dentro de while
 				if cont_cuerpo_lower.begins_with("if "):
 					var num_linea_if := indice + 1
 					var res_if_anidado := _analizar_if(contenido_cuerpo, num_linea_if)
@@ -643,7 +804,7 @@ func compilar_programa(codigo: String) -> Dictionary:
 
 					while indice < lineas.size():
 						var linea_sub := lineas[indice]
-						if linea_sub.strip_edges().is_empty():
+						if linea_sub.strip_edges().is_empty() or linea_sub.strip_edges().begins_with("#"):
 							indice += 1
 							continue
 
@@ -661,7 +822,8 @@ func compilar_programa(codigo: String) -> Dictionary:
 							"numero": indice + 1,
 							"contenido": cont_sub,
 							"command": analisis_sub["command"],
-							"steps": analisis_sub["steps"]
+							"steps": analisis_sub["steps"],
+							"step_var": analisis_sub.get("step_var", "")
 						})
 						indice += 1
 
@@ -682,7 +844,6 @@ func compilar_programa(codigo: String) -> Dictionary:
 					})
 					continue
 
-				# Comando regular
 				var analisis_cmd: Dictionary = analizar_linea(contenido_cuerpo, indice + 1)
 				if not analisis_cmd["ok"]:
 					return analisis_cmd
@@ -692,7 +853,8 @@ func compilar_programa(codigo: String) -> Dictionary:
 					"numero": indice + 1,
 					"contenido": contenido_cuerpo,
 					"command": analisis_cmd["command"],
-					"steps": analisis_cmd["steps"]
+					"steps": analisis_cmd["steps"],
+					"step_var": analisis_cmd.get("step_var", "")
 				})
 				indice += 1
 
@@ -728,6 +890,7 @@ func compilar_programa(codigo: String) -> Dictionary:
 			"contenido": contenido,
 			"command": analisis["command"],
 			"steps": analisis["steps"],
+			"step_var": analisis.get("step_var", ""),
 			"loop_iteration": 0
 		})
 
@@ -745,7 +908,7 @@ func _analizar_for(
 	var expresion := RegEx.new()
 	var patron := (
 		"^(?i)for\\s+([A-Za-z_][A-Za-z0-9_]*)"
-		+ "\\s+in\\s+range\\((\\d+)\\):$"
+		+ "\\s+in\\s+range\\((.+)\\):$"
 	)
 
 	if expresion.compile(patron) != OK:
@@ -764,7 +927,27 @@ func _analizar_for(
 			"Usa el formato: for ciclo in range(10):"
 		)
 
-	var repeticiones := int(coincidencia.get_string(2))
+	var arg_range := coincidencia.get_string(2).strip_edges()
+	var repeticiones := 0
+	var range_var := ""
+
+	if arg_range.is_valid_int():
+		repeticiones = int(arg_range)
+	elif _es_identificador_valido(arg_range):
+		range_var = arg_range
+	else:
+		return _error_de_linea(
+			numero_linea,
+			contenido,
+			"range() debe contener un número entero o una variable válida."
+		)
+
+	if not range_var.is_empty():
+		return {
+			"ok": true,
+			"repeticiones": 1,
+			"range_var": range_var
+		}
 
 	if repeticiones <= 0:
 		return _error_de_linea(
@@ -782,7 +965,8 @@ func _analizar_for(
 
 	return {
 		"ok": true,
-		"repeticiones": repeticiones
+		"repeticiones": repeticiones,
+		"range_var": ""
 	}
 
 func _analizar_if(contenido: String, numero_linea: int) -> Dictionary:
@@ -797,7 +981,6 @@ func _analizar_if(contenido: String, numero_linea: int) -> Dictionary:
 	if condicion.begins_with("not "):
 		invertido = true
 		condicion = condicion.substr(4).strip_edges()
-	# Aceptamos tanto "rover.hay_mineral()" como "hay_mineral()"
 	if condicion == "rover.hay_mineral()" or condicion == "hay_mineral()":
 		return {
 			"ok": true,
@@ -825,6 +1008,8 @@ func _crear_resultado(codigo: String) -> Dictionary:
 		"errors": [],
 		"commands_used": [],
 		"commands_data": [],
+		"variables_defined": [],
+		"variables_used": [],
 		"command_count": 0,
 		"movement_count": 0,
 		"loop_count": 0,
@@ -859,7 +1044,6 @@ func _finalizar(resultado: Dictionary) -> void:
 		Time.get_ticks_msec() - _tiempo_inicio_msec
 	) / 1000.0
 
-	# Captura el estado real después de ejecutar todos los comandos.
 	MissionService.evaluar_programa(resultado)
 	var completed_missions := MissionService.get_completed_missions()
 	var objective_is_completed := (
@@ -937,3 +1121,4 @@ func _analizar_while(contenido: String, numero_linea: int) -> Dictionary:
 		"o los sensores rover.tiene_espacio(), rover.en_base() " +
 		"y rover.hay_mineral()."
 	)
+

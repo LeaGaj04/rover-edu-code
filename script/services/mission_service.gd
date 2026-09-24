@@ -15,6 +15,7 @@ enum EstadoMision {
 	TRABAJO_CONTINUO,
 	CAMINO_LARGO,
 	RETORNO_BASE,
+	VARIABLES,
 	COMPRAR_IF,
 	SENALES_INCIERTAS,
 	COMPRAR_WHILE,
@@ -92,6 +93,10 @@ func preparar_mision_expansion() -> void:
 
 	if objective_id == "ciclo_recoleccion":
 		iniciar_camino_largo()
+		return
+
+	if objective_id == "retorno_base":
+		iniciar_variables()
 		return
 
 
@@ -436,6 +441,17 @@ func get_objetivo_actual() -> String:
 			"El ciclo debe detenerse al detectar que el rover llegó a la base."
 		)
 
+	if objective_id == "variables":
+		return (
+			"VARIABLES DINÁMICAS (ASIGNACIÓN Y USO)\n" +
+			"Una variable almacena datos en memoria para reutilizarlos:\n\n" +
+			"pasos = 2\n" +
+			"rover.norte(pasos)\n\n" +
+			"Tu desafío: define una variable con un valor numérico (ej. pasos = 2), " +
+			"utilízala como argumento en los comandos del rover o en range(), extrae un mineral " +
+			"y transfírelo a la nave en la base."
+		)
+
 	match estado_actual:
 		EstadoMision.BUSCAR_MINERAL:
 			return "Minar la primera muestra."
@@ -499,6 +515,10 @@ func evaluar_programa(resultado: Dictionary) -> void:
 
 	if objective_id == "retorno_base":
 		_evaluar_retorno_base(resultado)
+		return
+
+	if objective_id == "variables":
+		_evaluar_variables(resultado)
 		return
 	
 	if objective_id == "trabajo_continuo":
@@ -715,7 +735,54 @@ func _evaluar_retorno_base(resultado: Dictionary) -> void:
 		completed_missions.append(objective_id)
 	desbloquear_conocimiento("condicion_not")
 	mision_completada.emit(objective_id)
+	iniciar_variables()
 	print("Misión retorno_base completada!")
+
+
+func iniciar_variables() -> void:
+	objective_id = "variables"
+	objective_completed = "variables" in completed_missions
+	estado_actual = EstadoMision.COMPLETADA if objective_completed else EstadoMision.VARIABLES
+	mision_iniciada.emit(objective_id)
+	objetivo_actualizado.emit(objective_id, get_objetivo_actual())
+	print("Misión iniciada: variables")
+
+
+func _evaluar_variables(resultado: Dictionary) -> void:
+	var variables_definidas: Array = resultado.get("variables_defined", [])
+	var variables_usadas: Array = resultado.get("variables_used", [])
+	var recolectados: int = int(resultado.get("minerals_collected", 0))
+	var transferidos: int = int(resultado.get("minerals_transferred", 0))
+
+	if variables_definidas.is_empty():
+		objetivo_actualizado.emit(
+			objective_id,
+			"Para completar esta misión debes definir al menos una variable (ej. 'pasos = 2') antes de usarla."
+		)
+		return
+
+	if variables_usadas.is_empty():
+		objetivo_actualizado.emit(
+			objective_id,
+			"Definiste una variable, pero debes utilizarla como parámetro en los comandos del rover (ej. 'rover.norte(pasos)') o en 'range()'."
+		)
+		return
+
+	if recolectados < 1 or transferidos < 1:
+		objetivo_actualizado.emit(
+			objective_id,
+			"Buen uso de variables, pero debes extraer al menos 1 mineral y transferirlo a la nave en la base."
+		)
+		return
+
+	objective_completed = true
+	estado_actual = EstadoMision.COMPLETADA
+	if objective_id not in completed_missions:
+		completed_missions.append(objective_id)
+
+	desbloquear_conocimiento("variable")
+	mision_completada.emit(objective_id)
+	print("Misión variables completada!")
 
 
 func iniciar_mision_comprar_if() -> void:
