@@ -1070,6 +1070,15 @@ func _on_mision_completada(mision_id: String) -> void:
 				"completado",
 				16.0
 			)
+		"camino_largo":
+			transmision_ada.mostrar_mensaje(
+				"¡Misión Camino Largo completada!\n" +
+				"Has optimizado las trayectorias del rover mediante parámetros numéricos.\n" +
+				"Conocimiento desbloqueado: PARÁMETROS.\n" +
+				"¡Se activa la Misión 13: VARIABLES DINÁMICAS!",
+				"completado",
+				15.0
+			)
 		"retorno_base":
 			transmision_ada.mostrar_mensaje(
 				"¡Retorno autónomo completado!\n" +
