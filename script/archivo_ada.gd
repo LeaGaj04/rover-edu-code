@@ -63,10 +63,10 @@ const CONOCIMIENTOS := {
 	"variable": {
 		"nombre": "Variables",
 		"categoria": "Organización",
-		"descripcion": "Espacios de memoria con nombre para almacenar datos dinámicos (como números o textos) y utilizarlos más adelante.",
+		"descripcion": "Una variable es un espacio asignado en memoria para almacenar un dato (como un entero) bajo un nombre único, permitiendo reutilizar ese dato en múltiples operaciones.",
 		"sintaxis": "nombre_variable = valor",
-		"ejemplo": "# Próximamente",
-		"errores": "Archivo cifrado."
+		"ejemplo": "pasos = 2\nrover.norte(pasos)\nrover.minar()\nrover.sur(pasos)\nrover.transferir()",
+		"errores": "Intentar usar una variable antes de definirla (ej: rover.norte(pasos) sin definir 'pasos = 2') o utilizar nombres de palabras clave del sistema."
 	},
 	"funcion": {
 		"nombre": "Funciones Propias",
