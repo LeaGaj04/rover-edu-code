@@ -1,6 +1,6 @@
 extends Control
 
-# Ruta hacia la escena del juego donde está el asteroide y el Rover
+# Ruta hacia la escena del juego donde está el asteroide y el Spid
 const ESCENA_MUNDO = "res://escenas/mundo.tscn"
 const ESCENA_AUTH = "res://escenas/auth.tscn"
 const ESCENA_PERFIL = "res://escenas/perfil.tscn"

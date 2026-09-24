@@ -49,7 +49,7 @@ func _intentar_mover() -> Dictionary:
 		return {
 			"ok": false,
 			"error_type": "ejecucion",
-			"message": "El rover ya está ejecutando otro movimiento.",
+			"message": "Spid ya está ejecutando otro movimiento.",
 			"steps_completed": pasos_completados
 		}
 
@@ -96,7 +96,7 @@ func _intentar_mover() -> Dictionary:
 func _destino_esta_desbloqueado(destino_global: Vector3) -> bool:
 	var grid_map := get_parent() as GridMap
 	if grid_map == null:
-		push_warning("El Rover debe ser hijo de un GridMap para validar sus límites.")
+		push_warning("El Spid debe ser hijo de un GridMap para validar sus límites.")
 		return false
 
 	var destino_local := grid_map.to_local(destino_global)
@@ -110,9 +110,9 @@ func hay_mineral() -> bool:
 	var grid_map := get_parent() as GridMap
 	if grid_map == null:
 		return false
-	var posicion_rover_local := grid_map.to_local(global_position)
-	var casilla_rover := grid_map.local_to_map(posicion_rover_local)
-	casilla_rover.y = 0
+	var posicion_spid_local := grid_map.to_local(global_position)
+	var casilla_spid := grid_map.local_to_map(posicion_spid_local)
+	casilla_spid.y = 0
 	var minerales_en_mapa := get_tree().get_nodes_in_group("minerales")
 	for mineral in minerales_en_mapa:
 		var nodo_mineral := mineral.get_parent() as Node3D
@@ -121,20 +121,20 @@ func hay_mineral() -> bool:
 		var posicion_mineral_local := grid_map.to_local(nodo_mineral.global_position)
 		var casilla_mineral := grid_map.local_to_map(posicion_mineral_local)
 		casilla_mineral.y = 0
-		if casilla_rover == casilla_mineral:
+		if casilla_spid == casilla_mineral:
 			return true
 	return false
 
 func tiene_espacio() -> bool:
 	var interfaz := get_tree().current_scene.get_node_or_null("CanvasLayer")
 	if interfaz != null:
-		return int(interfaz.minerales_rover) < int(interfaz.CAPACIDAD_ROVER)
+		return int(interfaz.minerales_spid) < int(interfaz.CAPACIDAD_SPID)
 	return true
 
 func en_base() -> bool:
 	var mundo := get_parent()
-	if mundo != null and mundo.has_method("rover_esta_en_casilla_transferencia"):
-		return mundo.rover_esta_en_casilla_transferencia(self)
+	if mundo != null and mundo.has_method("spid_esta_en_casilla_transferencia"):
+		return mundo.spid_esta_en_casilla_transferencia(self)
 	return false
 
 func minar() -> Dictionary:
@@ -143,14 +143,14 @@ func minar() -> Dictionary:
 		return {
 			"ok": false,
 			"error_type": "ejecucion",
-			"message": "No se pudo comprobar la casilla actual del rover.",
+			"message": "No se pudo comprobar la casilla actual dspid.",
 			"minerals_collected": 0,
 			"steps_completed": 0
 		}
 
-	var posicion_rover_local := grid_map.to_local(global_position)
-	var casilla_rover := grid_map.local_to_map(posicion_rover_local)
-	casilla_rover.y = 0
+	var posicion_spid_local := grid_map.to_local(global_position)
+	var casilla_spid := grid_map.local_to_map(posicion_spid_local)
+	casilla_spid.y = 0
 	var minerales_en_mapa := get_tree().get_nodes_in_group("minerales")
 
 	for mineral in minerales_en_mapa:
@@ -164,13 +164,13 @@ func minar() -> Dictionary:
 		var casilla_mineral := grid_map.local_to_map(posicion_mineral_local)
 		casilla_mineral.y = 0
 
-		if casilla_rover == casilla_mineral:
-			print("Rover posicionado. Iniciando protocolo de minería...")
+		if casilla_spid == casilla_mineral:
+			print("Spid posicionado. Iniciando protocolo de minería...")
 			await get_tree().create_timer(tiempo_minado).timeout
 
 			if is_instance_valid(nodo_mineral):
 				nodo_mineral.queue_free()
-			mineral_minado.emit(casilla_rover)
+			mineral_minado.emit(casilla_spid)
 			mineral_recolectado.emit(1)
 			MissionService.evaluar_objetivo(1)
 

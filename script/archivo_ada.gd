@@ -7,41 +7,41 @@ const CONOCIMIENTOS := {
 	"objeto": {
 		"nombre": "Objeto",
 		"categoria": "Fundamentos",
-		"descripcion": "En programación orientada a objetos (POO), un objeto es una entidad que combina propiedades y acciones. En EduCode, tu Rover es el objeto principal que controlas mediante código.",
-		"sintaxis": "rover.<metodo>()",
-		"ejemplo": "rover.minar()\n# 'rover' es el objeto que ejecuta la instrucción.",
-		"errores": "Escribir mal el nombre del objeto o usar mayúsculas (ej: Rover.minar() o rver.minar())."
+		"descripcion": "En programación orientada a objetos (POO), un objeto es una entidad que combina propiedades y acciones. En SpidoCode, tu Spid es el objeto principal que controlas mediante código.",
+		"sintaxis": "spid.<metodo>()",
+		"ejemplo": "spid.minar()\n# 'spid' es el objeto que ejecuta la instrucción.",
+		"errores": "Escribir mal el nombre del objeto o usar mayúsculas (ej: Spid.minar() o rver.minar())."
 	},
 	"metodo": {
 		"nombre": "Método",
 		"categoria": "Fundamentos",
 		"descripcion": "Un método es una acción o comando que un objeto sabe realizar. Siempre va acompañado de paréntesis '()', que pueden o no llevar datos en su interior.",
 		"sintaxis": "objeto.nombre_metodo()",
-		"ejemplo": "rover.minar()\nrover.transferir()\nrover.norte()",
-		"errores": "Olvidar los paréntesis obligatorios (ej: escribir 'rover.minar' sin '()') o usar comas en vez de puntos."
+		"ejemplo": "spid.minar()\nspid.transferir()\nspid.norte()",
+		"errores": "Olvidar los paréntesis obligatorios (ej: escribir 'spid.minar' sin '()') o usar comas en vez de puntos."
 	},
 	"secuencia": {
 		"nombre": "Secuencia de Código",
 		"categoria": "Fundamentos",
-		"descripcion": "El ordenador ejecuta las instrucciones en orden secuencial: de arriba hacia abajo y una por una. El orden lógico de tus líneas determina si el rover cumple o falla la misión.",
+		"descripcion": "El ordenador ejecuta las instrucciones en orden secuencial: de arriba hacia abajo y una por una. El orden lógico de tus líneas determina si el spid cumple o falla la misión.",
 		"sintaxis": "instruccion_1\ninstruccion_2\ninstruccion_3",
-		"ejemplo": "rover.norte()\nrover.minar()\nrover.sur()\nrover.transferir()",
+		"ejemplo": "spid.norte()\nspid.minar()\nspid.sur()\nspid.transferir()",
 		"errores": "Intentar transferir antes de minar o antes de regresar a la casilla de la nave."
 	},
 	"parametro": {
 		"nombre": "Parámetros (Argumentos)",
 		"categoria": "Fundamentos",
 		"descripcion": "Los parámetros son valores numéricos que enviamos dentro de los paréntesis de un método para modificar su comportamiento, como indicar la cantidad exacta de pasos a avanzar.",
-		"sintaxis": "rover.direccion(cantidad)",
-		"ejemplo": "rover.norte(2)  # Avanza dos casillas al norte\nrover.sur(3)    # Avanza tres casillas al sur",
-		"errores": "Enviar números negativos, texto o enviar parámetros a comandos que no los reciben (como rover.minar(5))."
+		"sintaxis": "spid.direccion(cantidad)",
+		"ejemplo": "spid.norte(2)  # Avanza dos casillas al norte\nspid.sur(3)    # Avanza tres casillas al sur",
+		"errores": "Enviar números negativos, texto o enviar parámetros a comandos que no los reciben (como spid.minar(5))."
 	},
 	"bucle_while": {
 		"nombre": "Bucle While (Automatización)",
 		"categoria": "Control",
 		"descripcion": "Estructura de control que repite un bloque de instrucciones continuamente mientras una condición sea verdadera. Permite automatizar rutinas continuas de suministro y patrullaje.",
 		"sintaxis": "while <condicion>:\n    <instrucciones_con_sangria>",
-		"ejemplo": "# Ciclo continuo de suministro:\nwhile True:\n    rover.norte()\n    rover.minar()\n    rover.sur()\n    rover.transferir()\n\n# O según el espacio en bodega:\nwhile rover.tiene_espacio():\n    rover.minar()",
+		"ejemplo": "# Ciclo continuo de suministro:\nwhile True:\n    spid.norte()\n    spid.minar()\n    spid.sur()\n    spid.transferir()\n\n# O según el espacio en bodega:\nwhile spid.tiene_espacio():\n    spid.minar()",
 		"errores": "Olvidar los dos puntos ':' al final, olvidar aplicar sangría a las acciones interiores, o no incluir una condición de parada o retorno a base."
 	},
 	"bucle_for": {
@@ -49,24 +49,24 @@ const CONOCIMIENTOS := {
 		"categoria": "Control",
 		"descripcion": "Estructura de control que permite repetir un bloque de instrucciones un número exacto de veces usando range(N). Todo lo que se repite debe llevar sangría (tabulación o 4 espacios).",
 		"sintaxis": "for <variable> in range(<repeticiones>):\n    <instrucciones_con_sangria>",
-		"ejemplo": "for ciclo in range(10):\n    rover.norte()\n    rover.minar()\n    rover.sur()\nrover.transferir()  # Fuera del bucle",
+		"ejemplo": "for ciclo in range(10):\n    spid.norte()\n    spid.minar()\n    spid.sur()\nspid.transferir()  # Fuera del bucle",
 		"errores": "Olvidar los dos puntos ':' al final de range(), o no aplicar sangría a las instrucciones interiores."
 	},
 	"condicional_if": {
 		"nombre": "Condicional If (Decisiones)",
 		"categoria": "Control",
-		"descripcion": "Permite al rover tomar decisiones lógicas en base al estado de sus sensores o del terreno. Si la condición es verdadera, ejecuta el bloque.",
+		"descripcion": "Permite al spid tomar decisiones lógicas en base al estado de sus sensores o del terreno. Si la condición es verdadera, ejecuta el bloque.",
 		"sintaxis": "if <condicion>:\n    <instrucciones_con_sangria>",
-		"ejemplo": "if rover.hay_mineral():\n    rover.minar()",
-		"errores": "Olvidar los dos puntos ':', olvidar los paréntesis en los sensores (ej: 'rover.hay_mineral' sin '()') o no aplicar sangría a la acción interior."
+		"ejemplo": "if spid.hay_mineral():\n    spid.minar()",
+		"errores": "Olvidar los dos puntos ':', olvidar los paréntesis en los sensores (ej: 'spid.hay_mineral' sin '()') o no aplicar sangría a la acción interior."
 	},
 	"variable": {
 		"nombre": "Variables",
 		"categoria": "Organización",
 		"descripcion": "Una variable es un espacio asignado en memoria para almacenar un dato (como un entero) bajo un nombre único, permitiendo reutilizar ese dato en múltiples operaciones.",
 		"sintaxis": "nombre_variable = valor",
-		"ejemplo": "pasos = 2\nrover.norte(pasos)\nrover.minar()\nrover.sur(pasos)\nrover.transferir()",
-		"errores": "Intentar usar una variable antes de definirla (ej: rover.norte(pasos) sin definir 'pasos = 2') o utilizar nombres de palabras clave del sistema."
+		"ejemplo": "pasos = 2\nspid.norte(pasos)\nspid.minar()\nspid.sur(pasos)\nspid.transferir()",
+		"errores": "Intentar usar una variable antes de definirla (ej: spid.norte(pasos) sin definir 'pasos = 2') o utilizar nombres de palabras clave del sistema."
 	},
 	"funcion": {
 		"nombre": "Funciones Propias",

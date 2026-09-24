@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://cyf3iw3lcipme"]
 
 [ext_resource type="Script" uid="uid://cp3dprin0jl02" path="res://script/mundo.gd" id="1_7oex1"]
-[ext_resource type="PackedScene" uid="uid://dgngl5x1t4er7" path="res://escenas/rover.tscn" id="1_cdbbl"]
+[ext_resource type="PackedScene" uid="uid://dgngl5x1t4er7" path="res://escenas/spid.tscn" id="1_cdbbl"]
 [ext_resource type="MeshLibrary" uid="uid://be0yvkqbcvra0" path="res://bloques.tres" id="1_glrvs"]
 [ext_resource type="PackedScene" uid="uid://dfvy6lib4ga2h" path="res://escenas/mineral.tscn" id="2_4vydk"]
 [ext_resource type="Script" uid="uid://br4t1ndl8asky" path="res://script/interfaz.gd" id="2_6wjgb"]
 [ext_resource type="Script" uid="uid://dqmlj1jkvco4u" path="res://script/ciclo_solar.gd" id="5_16hu1"]
-[ext_resource type="Texture2D" uid="uid://debjkdltq8c76" path="res://Minerales/MineralRover.png" id="6_kckb2"]
+[ext_resource type="Texture2D" uid="uid://debjkdltq8c76" path="res://Minerales/MineralSpid.png" id="6_kckb2"]
 [ext_resource type="Texture2D" uid="uid://ehjvumyqcfbr" path="res://Minerales/MineraNave.png" id="7_ijldy"]
 [ext_resource type="PackedScene" uid="uid://b0kuh5v2yxqd7" path="res://escenas/nave.tscn" id="8_txhqv"]
 [ext_resource type="Texture2D" uid="uid://mk4i0achjumg" path="res://assets/sky/cielo_espacial_suave_4k.png" id="9_cielo"]
@@ -83,7 +83,7 @@ border_width_bottom = 1
 border_color = Color(0.37, 0.61, 0.45, 0.95)
 shadow_color = Color(0.003921569, 0.09019608, 0.011764706, 0.6509804)
 
-[sub_resource type="CodeHighlighter" id="CodeHighlighter_rover"]
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_spid"]
 keyword_colors = {"and": Color(1, 0.74, 0.22, 1), "as": Color(1, 0.74, 0.22, 1), "elif": Color(1, 0.74, 0.22, 1), "else": Color(1, 0.74, 0.22, 1), "for": Color(1, 0.74, 0.22, 1), "if": Color(1, 0.74, 0.22, 1), "in": Color(1, 0.74, 0.22, 1), "not": Color(1, 0.74, 0.22, 1), "or": Color(1, 0.74, 0.22, 1), "pass": Color(1, 0.74, 0.22, 1), "return": Color(1, 0.74, 0.22, 1), "while": Color(1, 0.74, 0.22, 1), "norte": Color(0.33, 0.91, 1, 1), "sur": Color(0.33, 0.91, 1, 1), "este": Color(0.33, 0.91, 1, 1), "oeste": Color(0.33, 0.91, 1, 1), "mover": Color(0.33, 0.91, 1, 1), "minar": Color(0.38, 1, 0.6, 1), "transferir": Color(0.38, 1, 0.6, 1), "hay_mineral": Color(0.82, 0.6, 1, 1), "tiene_espacio": Color(0.82, 0.6, 1, 1)}
 member_keyword_colors = {"norte": Color(0.33, 0.91, 1, 1), "sur": Color(0.33, 0.91, 1, 1), "este": Color(0.33, 0.91, 1, 1), "oeste": Color(0.33, 0.91, 1, 1), "mover": Color(0.33, 0.91, 1, 1), "minar": Color(0.38, 1, 0.6, 1), "transferir": Color(0.38, 1, 0.6, 1), "hay_mineral": Color(0.82, 0.6, 1, 1), "tiene_espacio": Color(0.82, 0.6, 1, 1)}
 color_regions = {"#": Color(0.48, 0.74, 0.58, 1)}
@@ -250,14 +250,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.459, 0.419, -2.619)
 mesh_library = ExtResource("1_glrvs")
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
-[node name="Rover" parent="GridMap" unique_id=771188890 instance=ExtResource("1_cdbbl")]
+[node name="Spid" parent="GridMap" unique_id=771188890 instance=ExtResource("1_cdbbl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.637, 0)
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=879746297 node_paths=PackedStringArray("mi_rover", "label_nave", "label_rover")]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=879746297 node_paths=PackedStringArray("mi_spid", "label_nave", "label_spid")]
 script = ExtResource("2_6wjgb")
-mi_rover = NodePath("../GridMap/Rover")
+mi_spid = NodePath("../GridMap/Spid")
 label_nave = NodePath("ContenedorContadores/HBoxContainer/LabelNave")
-label_rover = NodePath("ContenedorContadores/HBoxContainer/LabelRover")
+label_spid = NodePath("ContenedorContadores/HBoxContainer/LabelSpid")
 
 [node name="TransmisionADA" parent="CanvasLayer" unique_id=1467148888 instance=ExtResource("13_ada")]
 
@@ -332,7 +332,7 @@ theme_override_colors/font_color = Color(0.7608024, 0.9369633, 0.7753063, 1)
 theme_override_colors/font_outline_color = Color(0.025, 0.02, 0.055, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 18
-text = "◆ CONSOLA ROVER"
+text = "◆ CONSOLA SPID"
 
 [node name="BotonMinimizar" type="Button" parent="CanvasLayer/PanelCodigo/BarraTitulo" unique_id=1342243606]
 layout_mode = 0
@@ -380,7 +380,7 @@ gutters_draw_line_numbers = true
 gutters_draw_fold_gutter = true
 draw_current_line = true
 draw_tabs = true
-syntax_highlighter = SubResource("CodeHighlighter_rover")
+syntax_highlighter = SubResource("CodeHighlighter_spid")
 completion_sort_options = false
 
 [node name="BarraControles" type="HBoxContainer" parent="CanvasLayer/PanelCodigo/Contenido"]
@@ -398,7 +398,7 @@ theme_override_constants/separation = 8
 [node name="BotonResetBase" type="Button" parent="CanvasLayer/PanelCodigo/Contenido/BarraControles"]
 custom_minimum_size = Vector2(130, 36)
 layout_mode = 2
-tooltip_text = "Devolver el rover a la base central (0, 0)"
+tooltip_text = "Devolver spid a la base central (0, 0)"
 theme_override_colors/font_color = Color(0.7607843, 0.9372549, 0.7764706, 1)
 theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_focus")
@@ -536,7 +536,7 @@ offset_right = 670.0
 offset_bottom = 88.0
 theme_override_colors/font_color = Color(0.6003543, 0.86491835, 0.62992954, 1)
 theme_override_font_sizes/font_size = 14
-text = "Invierte los minerales de la nave para ampliar las capacidades del rover."
+text = "Invierte los minerales de la nave para ampliar las capacidades de spid."
 
 [node name="LineaProg1" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=256662853]
 points = PackedVector2Array(410, 225, 330, 225, 330, 170, 250, 170)
@@ -606,7 +606,7 @@ theme_override_font_sizes/font_size = 14
 text = "HARDWARE"
 horizontal_alignment = 1
 
-[node name="NodoEduCode" type="Panel" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=987654321]
+[node name="NodoSpidoCode" type="Panel" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=987654321]
 layout_mode = 0
 offset_left = 410.0
 offset_top = 195.0
@@ -614,7 +614,7 @@ offset_right = 590.0
 offset_bottom = 255.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_nucleo")
 
-[node name="LabelEduCode" type="Label" parent="CanvasLayer/PanelTienda/LienzoArbol/NodoEduCode" unique_id=987654322]
+[node name="LabelSpidoCode" type="Label" parent="CanvasLayer/PanelTienda/LienzoArbol/NodoSpidoCode" unique_id=987654322]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -623,8 +623,8 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.2, 0.95, 0.85, 1)
 theme_override_font_sizes/font_size = 13
-text = "NÚCLEO EDUCODE
-SISTEMA BASE ROVER"
+text = "NÚCLEO SPIDOCODE
+SISTEMA BASE SPID"
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -776,7 +776,7 @@ offset_top = 365.0
 offset_right = 590.0
 offset_bottom = 435.0
 tooltip_text = "Minería Rápida
-Optimiza el taladro del rover reduciendo el tiempo de extracción de 3 a 1 segundo.
+Optimiza el taladro dspid reduciendo el tiempo de extracción de 3 a 1 segundo.
 
 Costo: 15 minerales"
 theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
@@ -821,7 +821,7 @@ layout_mode = 2
 texture = ExtResource("6_kckb2")
 expand_mode = 1
 
-[node name="LabelRover" type="Label" parent="CanvasLayer/ContenedorContadores/HBoxContainer" unique_id=1773966557]
+[node name="LabelSpid" type="Label" parent="CanvasLayer/ContenedorContadores/HBoxContainer" unique_id=1773966557]
 layout_mode = 2
 text = "0/10"
 

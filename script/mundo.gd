@@ -36,11 +36,11 @@ func _ready():
 			push_error("Sesión autenticada sin progreso cargado. Se inicia un mundo seguro sin restaurar datos.")
 
 	aplicar_progreso_mapa(map_tier)
-	_posicionar_rover_en_casilla_inicial()
+	_posicionar_spid_en_casilla_inicial()
 	generar_minerales_iniciales()
-	var rover := grid_map.get_node_or_null("Rover")
-	if rover != null and rover.has_signal("mineral_minado"):
-		rover.mineral_minado.connect(_on_mineral_minado)
+	var spid := grid_map.get_node_or_null("Spid")
+	if spid != null and spid.has_signal("mineral_minado"):
+		spid.mineral_minado.connect(_on_mineral_minado)
 
 	if restaurar_progreso:
 		var sintaxis = progreso.get("unlocked_syntax", {})
@@ -138,28 +138,28 @@ func aplicar_progreso_mapa(map_tier: int) -> void:
 			1
 		)
 
-func _posicionar_rover_en_casilla_inicial() -> void:
-	var rover := grid_map.get_node_or_null("Rover") as Node3D
-	if rover == null:
+func _posicionar_spid_en_casilla_inicial() -> void:
+	var spid := grid_map.get_node_or_null("Spid") as Node3D
+	if spid == null:
 		return
 
 	var centro: Vector3 = grid_map.map_to_local(CASILLA_INICIAL)
-	rover.position.x = centro.x
-	rover.position.z = centro.z
+	spid.position.x = centro.x
+	spid.position.z = centro.z
 
 
-func resetear_posicion_rover() -> void:
-	var rover := grid_map.get_node_or_null("Rover") as Node3D
-	if rover == null:
+func resetear_posicion_spid() -> void:
+	var spid := grid_map.get_node_or_null("Spid") as Node3D
+	if spid == null:
 		return
 	var centro_local: Vector3 = grid_map.map_to_local(CASILLA_INICIAL)
 	var centro_global: Vector3 = grid_map.to_global(centro_local)
-	centro_global.y = rover.global_position.y
-	if rover.has_method("resetear_a_base"):
-		rover.resetear_a_base(centro_global)
+	centro_global.y = spid.global_position.y
+	if spid.has_method("resetear_a_base"):
+		spid.resetear_a_base(centro_global)
 	else:
-		rover.global_position = centro_global
-		rover.rotation = Vector3.ZERO
+		spid.global_position = centro_global
+		spid.rotation = Vector3.ZERO
 
 func generar_minerales_iniciales():
 	# Si el radio es 0 (solo 1 casilla), solo hacemos aparecer 1 mineral
@@ -249,11 +249,11 @@ func reubicar_mineral_para_corredor() -> void:
 	# Esperamos a que Godot elimine el mineral anterior.
 	call_deferred("generar_minerales_iniciales")
 
-func rover_esta_en_casilla_transferencia(rover: Node3D) -> bool:
-	if rover == null:
+func spid_esta_en_casilla_transferencia(spid: Node3D) -> bool:
+	if spid == null:
 		return false
 
-	var posicion_local := grid_map.to_local(rover.global_position)
+	var posicion_local := grid_map.to_local(spid.global_position)
 	var casilla_actual := grid_map.local_to_map(posicion_local)
 
 	# El movimiento ocurre horizontalmente.

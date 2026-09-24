@@ -36,7 +36,7 @@ func send_password_recovery(email: String) -> bool:
 		"Content-Type: application/json",
 		"Accept: application/json"
 	])
-	var redirect_to := "https://educode-web-amber.vercel.app/reset-password".uri_encode()
+	var redirect_to := "https://spidocode-web-amber.vercel.app/reset-password".uri_encode()
 	var recover_url := SUPABASE_URL + "/auth/v1/recover?redirect_to=" + redirect_to
 	var error := http_request.request(
 		recover_url,
@@ -138,7 +138,7 @@ func _on_request_completed(result: int, response_code: int, _headers: PackedStri
 		_emit_failure(operation, "Supabase devolvió una respuesta inesperada.")
 		return
 	if operation == "connection_test":
-		print("EduCode conectado correctamente a Supabase.")
+		print("SpidoCode conectado correctamente a Supabase.")
 		return
 	if operation == "password_recovery":
 		password_recovery_sent.emit()
