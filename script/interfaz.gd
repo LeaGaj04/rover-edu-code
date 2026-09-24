@@ -13,7 +13,7 @@ extends CanvasLayer
 @onready var label_mision: Label = $PanelMision/Nombre
 @onready var label_objetivo_mision: Label = $PanelMision/Objetivo
 @onready var label_estado_mision: Label = $PanelMision/Estado
-@export var mi_rover : CharacterBody3D
+@export var mi_spid : CharacterBody3D
 
 const COLOR_LINEA_ACTIVA: Color = Color(1.0, 1.0, 1.0, 0.40)
 const COLOR_LINEA_ERROR: Color = Color(1.0, 0.25, 0.25, 0.45)
@@ -37,15 +37,15 @@ var alto_panel_expandido: float = ALTO_PANEL_CODIGO
 var posicion_panel_mision: Vector2
 
 # --- VARIABLES DE RECURSOS ---
-const CAPACIDAD_ROVER : int = 10
+const CAPACIDAD_SPID : int = 10
 const CAPACIDAD_NAVE : int = 100
 
 var minerales_nave : int = 0
-var minerales_rover : int = 0
+var minerales_spid : int = 0
 
 # --- REFERENCIAS A LOS CONTADORES VISUALES ---
 @export var label_nave : Label
-@export var label_rover : Label
+@export var label_spid : Label
 
 # Mejoras
 @onready var panel_tienda = $PanelTienda
@@ -114,9 +114,9 @@ func _ready() -> void:
 	# Actualizamos los textos al iniciar
 	actualizar_contadores()
 	actualizar_mejoras_visual()
-	# Conectamos la señal del rover a una nueva función de la interfaz
-	if mi_rover != null:
-		mi_rover.mineral_recolectado.connect(_sumar_minerales_rover)
+	# Conectamos la señal dspid a una nueva función de la interfaz
+	if mi_spid != null:
+		mi_spid.mineral_recolectado.connect(_sumar_minerales_spid)
 	if panel_archivo != null:
 		panel_archivo.cerrado.connect(_on_archivo_cerrado)
 	_marcar_interfaz_inicializada()
@@ -127,29 +127,29 @@ func _on_codigo_text_changed() -> void:
 	var linea := caja_codigo.get_line(caja_codigo.get_caret_line())
 	var columna := caja_codigo.get_caret_column()
 	var texto_hasta_cursor := linea.substr(0, columna)
-	if texto_hasta_cursor.rfind("rover.") >= 0:
+	if texto_hasta_cursor.rfind("spid.") >= 0:
 		caja_codigo.call_deferred("request_code_completion", true)
 
 
 func _on_code_completion_requested() -> void:
 	var linea := caja_codigo.get_line(caja_codigo.get_caret_line())
 	var texto_hasta_cursor := linea.substr(0, caja_codigo.get_caret_column())
-	var inicio_rover := texto_hasta_cursor.rfind("rover.")
-	if inicio_rover < 0:
+	var inicio_spid := texto_hasta_cursor.rfind("spid.")
+	if inicio_spid < 0:
 		return
-	var filtro := texto_hasta_cursor.substr(inicio_rover + 6).to_lower()
+	var filtro := texto_hasta_cursor.substr(inicio_spid + 6).to_lower()
 	if filtro.contains(" ") or filtro.contains("("):
 		return
 
 	var opciones := [
-		["\u200brover.minar()", "minar()", "Extraer mineral", Color(0.35, 1, 0.38, 1)],
-		["\u200brover.transferir()", "transferir()", "Transferir minerales", Color(0.35, 1, 0.38, 1)],
-		["\u200crover.norte()", "norte()", "Mover al norte", Color(0.18, 0.86, 1, 1)],
-		["\u200crover.sur()", "sur()", "Mover al sur", Color(0.18, 0.86, 1, 1)],
-		["\u200crover.este()", "este()", "Mover al este", Color(0.18, 0.86, 1, 1)],
-		["\u200crover.oeste()", "oeste()", "Mover al oeste", Color(0.18, 0.86, 1, 1)],
-		["\u200drover.hay_mineral()", "hay_mineral()", "Consultar sensor de mineral", Color(1, 0.35, 0.85, 1)],
-		["\u200drover.tiene_espacio()", "tiene_espacio()", "Consultar capacidad del Rover", Color(1, 0.35, 0.85, 1)]
+		["\u200bspid.minar()", "minar()", "Extraer mineral", Color(0.35, 1, 0.38, 1)],
+		["\u200bspid.transferir()", "transferir()", "Transferir minerales", Color(0.35, 1, 0.38, 1)],
+		["\u200cspid.norte()", "norte()", "Mover al norte", Color(0.18, 0.86, 1, 1)],
+		["\u200cspid.sur()", "sur()", "Mover al sur", Color(0.18, 0.86, 1, 1)],
+		["\u200cspid.este()", "este()", "Mover al este", Color(0.18, 0.86, 1, 1)],
+		["\u200cspid.oeste()", "oeste()", "Mover al oeste", Color(0.18, 0.86, 1, 1)],
+		["\u200dspid.hay_mineral()", "hay_mineral()", "Consultar sensor de mineral", Color(1, 0.35, 0.85, 1)],
+		["\u200dspid.tiene_espacio()", "tiene_espacio()", "Consultar capacidad de Spid", Color(1, 0.35, 0.85, 1)]
 	]
 
 	for opcion in opciones:
@@ -314,8 +314,8 @@ func _on_button_pressed() -> void:
 
 	var resultado: Dictionary = await CodeExecutor.ejecutar_codigo(
 		caja_codigo.text,
-		ejecutar_movimiento_rover,
-		evaluar_condicion_rover,
+		ejecutar_movimiento_spid,
+		evaluar_condicion_spid,
 		false
 	)
 
@@ -339,8 +339,8 @@ func _on_boton_paso_pressed() -> void:
 
 		var resultado: Dictionary = await CodeExecutor.ejecutar_codigo(
 			caja_codigo.text,
-			ejecutar_movimiento_rover,
-			evaluar_condicion_rover,
+			ejecutar_movimiento_spid,
+			evaluar_condicion_spid,
 			true
 		)
 
@@ -357,12 +357,12 @@ func _on_boton_reset_base_pressed() -> void:
 	if CodeExecutor.ejecutando:
 		return
 	var mundo := get_parent()
-	if mundo != null and mundo.has_method("resetear_posicion_rover"):
-		mundo.resetear_posicion_rover()
+	if mundo != null and mundo.has_method("resetear_posicion_spid"):
+		mundo.resetear_posicion_spid()
 		_limpiar_resaltado_lineas()
 		if transmision_ada != null:
 			transmision_ada.mostrar_mensaje(
-				"Rover reposicionado en la base central (0, 0).",
+				"Spid reposicionado en la base central (0, 0).",
 				"progreso",
 				3.5
 			)
@@ -379,14 +379,14 @@ func _actualizar_estado_botones_ejecucion(ejecutando_ahora: bool) -> void:
 		boton_reset_base.disabled = ejecutando_ahora
 
 
-func ejecutar_movimiento_rover(
+func ejecutar_movimiento_spid(
 	comando: String,
 	pasos: int
 ) -> Dictionary:
-	if mi_rover == null:
+	if mi_spid == null:
 		return _crear_error_comando(
 			"ejecucion",
-			"El rover no está asignado en el Inspector."
+			"Spid no está asignado en el Inspector."
 		)
 
 	print(
@@ -398,49 +398,49 @@ func ejecutar_movimiento_rover(
 	)
 
 	if comando == "norte":
-		return await mi_rover.norte(pasos)
+		return await mi_spid.norte(pasos)
 
 	if comando == "sur":
-		return await mi_rover.sur(pasos)
+		return await mi_spid.sur(pasos)
 
 	if comando == "este":
-		return await mi_rover.este(pasos)
+		return await mi_spid.este(pasos)
 
 	if comando == "oeste":
-		return await mi_rover.oeste(pasos)
+		return await mi_spid.oeste(pasos)
 
 	if comando == "minar":
-		if minerales_rover >= CAPACIDAD_ROVER:
+		if minerales_spid >= CAPACIDAD_SPID:
 			return _crear_error_comando(
 				"ejecucion",
-				"El inventario del rover está lleno."
+				"El inventario dspid está lleno."
 			)
 
-		return await mi_rover.minar()
+		return await mi_spid.minar()
 
 	if comando == "transferir":
 		return procesar_transferencia()
 
 	return _crear_error_comando(
 		"ejecucion",
-		"El rover no conoce el comando '" + comando + "'."
+		"Spid no conoce el comando '" + comando + "'."
 	)
 
-func evaluar_condicion_rover(condicion: String) -> bool:
-	if mi_rover == null:
+func evaluar_condicion_spid(condicion: String) -> bool:
+	if mi_spid == null:
 		return false
 	if condicion in ["True", "true"]:
 		return true
 	if condicion in ["False", "false"]:
 		return false
-	if condicion in ["rover.hay_mineral()", "hay_mineral()"]:
-		return mi_rover.hay_mineral()
-	if condicion in ["rover.tiene_espacio()", "tiene_espacio()"]:
-		return minerales_rover < CAPACIDAD_ROVER
-	if condicion in ["rover.en_base()", "en_base()"]:
+	if condicion in ["spid.hay_mineral()", "hay_mineral()"]:
+		return mi_spid.hay_mineral()
+	if condicion in ["spid.tiene_espacio()", "tiene_espacio()"]:
+		return minerales_spid < CAPACIDAD_SPID
+	if condicion in ["spid.en_base()", "en_base()"]:
 		var mundo = get_parent()
-		if mundo != null and mundo.has_method("rover_esta_en_casilla_transferencia"):
-			return mundo.rover_esta_en_casilla_transferencia(mi_rover)
+		if mundo != null and mundo.has_method("spid_esta_en_casilla_transferencia"):
+			return mundo.spid_esta_en_casilla_transferencia(mi_spid)
 		return false
 	return false
 
@@ -460,9 +460,9 @@ func actualizar_contadores() -> void:
 	if label_nave != null:
 		#Nave
 		label_nave.text = ": " + str(minerales_nave) + "/" + str(CAPACIDAD_NAVE)
-	if label_rover != null:
-		#Rover
-		label_rover.text = ": " + str(minerales_rover) + "/" + str(CAPACIDAD_ROVER)
+	if label_spid != null:
+		#Spid
+		label_spid.text = ": " + str(minerales_spid) + "/" + str(CAPACIDAD_SPID)
 
 
 # Aplica solamente el estado persistente que corresponde a la interfaz.
@@ -474,16 +474,16 @@ func aplicar_progreso(progress: Dictionary) -> void:
 		int(progress.get("minerals_ship", 0))
 	)
 
-	minerales_rover = maxi(
+	minerales_spid = maxi(
 		0,
-		int(progress.get("minerals_rover", 0))
+		int(progress.get("minerals_spid", 0))
 	)
 
 	var hardware = progress.get("hardware_upgrades", {})
 	if typeof(hardware) == TYPE_DICTIONARY and int(hardware.get("drill_speed", 0)) > 0:
 		mineria_rapida_desbloqueada = true
-		if mi_rover != null:
-			mi_rover.tiempo_minado = 1.0
+		if mi_spid != null:
+			mi_spid.tiempo_minado = 1.0
 
 	actualizar_contadores()
 	actualizar_mejoras_visual()
@@ -495,7 +495,7 @@ func get_progress_state() -> Dictionary:
 
 	return {
 		"minerals_ship": minerales_nave,
-		"minerals_rover": minerales_rover,
+		"minerals_spid": minerales_spid,
 		"map_tier": mundo.get_map_tier() if mundo != null else 0,
 		"unlocked_syntax": GestorSintaxis.get_sintaxis_desbloqueada(),
 		"current_mission_id": MissionService.objective_id,
@@ -606,22 +606,22 @@ func intentar_compra(item_id: String, boton: Button, linea_conectora: CanvasItem
 				4.0
 			)
 		
-func _sumar_minerales_rover(cantidad: int) -> void:
-	minerales_rover = mini(minerales_rover + cantidad, CAPACIDAD_ROVER)
+func _sumar_minerales_spid(cantidad: int) -> void:
+	minerales_spid = mini(minerales_spid + cantidad, CAPACIDAD_SPID)
 	actualizar_contadores()
 	_solicitar_guardado_progreso()
 	
 func procesar_transferencia() -> Dictionary:
-	if mi_rover == null:
+	if mi_spid == null:
 		return _crear_error_comando(
 			"ejecucion",
-			"No se encontró el rover."
+			"No se encontró el spid."
 		)
 
-	if minerales_rover == 0:
+	if minerales_spid == 0:
 		return _crear_error_comando(
 			"ejecucion",
-			"El rover no tiene minerales para transferir."
+			"Spid no tiene minerales para transferir."
 		)
 
 	if minerales_nave >= CAPACIDAD_NAVE:
@@ -634,27 +634,27 @@ func procesar_transferencia() -> Dictionary:
 
 	if (
 		mundo == null
-		or not mundo.has_method("rover_esta_en_casilla_transferencia")
+		or not mundo.has_method("spid_esta_en_casilla_transferencia")
 	):
 		return _crear_error_comando(
 			"ejecucion",
 			"No se pudo comprobar la casilla de transferencia."
 		)
 
-	if not mundo.rover_esta_en_casilla_transferencia(mi_rover):
+	if not mundo.spid_esta_en_casilla_transferencia(mi_spid):
 		return _crear_error_comando(
 			"ejecucion",
-			"Debes llevar el rover a la casilla inicial para transferir."
+			"Debes llevar spid a la casilla inicial para transferir."
 		)
 
 	var espacio_disponible := CAPACIDAD_NAVE - minerales_nave
 	var cantidad_transferida := mini(
-		minerales_rover,
+		minerales_spid,
 		espacio_disponible
 	)
 
 	minerales_nave += cantidad_transferida
-	minerales_rover -= cantidad_transferida
+	minerales_spid -= cantidad_transferida
 
 	MissionService.registrar_transferencia(cantidad_transferida)
 
@@ -841,8 +841,8 @@ func _on_button_mineria_pressed() -> void:
 		return
 	minerales_nave -= costo
 	mineria_rapida_desbloqueada = true
-	if mi_rover != null:
-		mi_rover.tiempo_minado = 1.0
+	if mi_spid != null:
+		mi_spid.tiempo_minado = 1.0
 	actualizar_contadores()
 	actualizar_mejoras_visual()
 	_solicitar_guardado_progreso()
@@ -962,7 +962,7 @@ func _on_mision_completada(mision_id: String) -> void:
 
 		"ruta_calibracion":
 			transmision_ada.mostrar_mensaje(
-				"Ruta calibrada. Excelente trabajo, unidad Rover.\n" +
+				"Ruta calibrada. Excelente trabajo, unidad Spid.\n" +
 				"Ahora activamos el Bucle While para automatizar un ciclo de suministro continuo.",
 				"completado",
 				15.0
@@ -1006,9 +1006,9 @@ func _on_mision_completada(mision_id: String) -> void:
 		"comprar_if":
 			transmision_ada.mostrar_mensaje(
 				"¡Módulo Condicional IF instalado!\n" +
-				"Sensores de análisis listos en el rover.\n" +
+				"Sensores de análisis listos en el spid.\n" +
 				"Nueva misión: SEÑALES INCIERTAS.\n" +
-				"Usa 'if rover.hay_mineral():' para evaluar casillas antes de minar.",
+				"Usa 'if spid.hay_mineral():' para evaluar casillas antes de minar.",
 				"progreso",
 				12.0
 			)
@@ -1023,7 +1023,7 @@ func _on_mision_completada(mision_id: String) -> void:
 		"senales_inciertas":
 			var msg_if := (
 				"¡Lecturas confirmadas! Has dominado el condicional if y la lectura de sensores.\n" +
-				"El rover ahora solo extrae recursos cuando detecta mineral.\n" +
+				"Spid ahora solo extrae recursos cuando detecta mineral.\n" +
 				"Conocimiento desbloqueado: CONDICIONAL IF.\n" +
 				"¡Se activa la misión CICLO AUTÓNOMO! Combina while con if para patrullar continuamente."
 			)
@@ -1033,7 +1033,7 @@ func _on_mision_completada(mision_id: String) -> void:
 				"¡Módulo Bucle WHILE instalado!\n" +
 				"Capacidad de iteración condicional en línea.\n" +
 				"Nueva misión: CICLO AUTÓNOMO.\n" +
-				"Usa 'while rover.tiene_espacio():' para patrullar y extraer de forma continua.",
+				"Usa 'while spid.tiene_espacio():' para patrullar y extraer de forma continua.",
 				"progreso",
 				12.0
 			)
@@ -1048,7 +1048,7 @@ func _on_mision_completada(mision_id: String) -> void:
 		"ciclo_autonomo":
 			var msg_auto := (
 				"¡Autonomía completada! Has programado un bucle while que toma decisiones en tiempo real.\n" +
-				"El rover ahora sabe cuándo continuar y cuándo volver a la base según sus sensores.\n" +
+				"Spid ahora sabe cuándo continuar y cuándo volver a la base según sus sensores.\n" +
 				"Conocimiento desbloqueado: BUCLE WHILE.\n"
 			)
 			var mundo_node := get_parent()
@@ -1079,14 +1079,14 @@ func _on_mision_completada(mision_id: String) -> void:
 			transmision_ada.mostrar_mensaje(
 				"¡Barrido de cuadrante completado!\n" +
 				"Has recolectado y transferido los 3 minerales requeridos del sector 3x3.\n" +
-				"Excelente trabajo, unidad Rover.",
+				"Excelente trabajo, unidad Spid.",
 				"completado",
 				16.0
 			)
 		"camino_largo":
 			transmision_ada.mostrar_mensaje(
 				"¡Misión Camino Largo completada!\n" +
-				"Has optimizado las trayectorias del rover mediante parámetros numéricos.\n" +
+				"Has optimizado las trayectorias dspid mediante parámetros numéricos.\n" +
 				"Conocimiento desbloqueado: PARÁMETROS.\n" +
 				"¡Se activa la Misión 13: VARIABLES DINÁMICAS!",
 				"completado",
@@ -1095,7 +1095,7 @@ func _on_mision_completada(mision_id: String) -> void:
 		"retorno_base":
 			transmision_ada.mostrar_mensaje(
 				"¡Retorno autónomo completado!\n" +
-				"El rover utilizó la condición 'not' para detectar su llegada a la base.\n" +
+				"Spid utilizó la condición 'not' para detectar su llegada a la base.\n" +
 				"¡Se activa la misión VARIABLES DINÁMICAS!",
 				"completado",
 				14.0
@@ -1103,7 +1103,7 @@ func _on_mision_completada(mision_id: String) -> void:
 		"variables":
 			transmision_ada.mostrar_mensaje(
 				"¡Variables dinámicas dominadas!\n" +
-				"Has asignado y reutilizado valores en memoria para controlar la navegación y la repetición del rover.\n" +
+				"Has asignado y reutilizado valores en memoria para controlar la navegación y la repetición del spid.\n" +
 				"Conocimiento desbloqueado: VARIABLES.\n" +
 				"¡Excelente avance en tu formación de programador de robótica espacial!",
 				"completado",
@@ -1176,11 +1176,11 @@ func _get_objetivo_panel(mision_id: String) -> String:
 		"retorno_base":
 			return "Navega de retorno usando la condición while not en_base()."
 		"variables":
-			return "Define y utiliza variables dinámicas para controlar al rover."
+			return "Define y utiliza variables dinámicas para controlar al spid."
 		"comprar_if":
 			return "Adquiere el módulo de decisiones condicionales."
 		"senales_inciertas":
-			return "Haz que el rover reaccione a las señales del entorno."
+			return "Haz que spid reaccione a las señales del entorno."
 		"comprar_while":
 			return "Adquiere el módulo de automatización condicional."
 		"ciclo_autonomo":
@@ -1196,7 +1196,7 @@ func _mostrar_mensaje_inicial_ada() -> void:
 	if MissionService.objective_completed:
 		return
 	transmision_ada.mostrar_mensaje(
-		"Unidad Rover, enlace establecido. Soy A.D.A., " +
+		"Unidad Spid, enlace establecido. Soy A.D.A., " +
 		"la inteligencia de la nave y tu asistente durante la exploración.\n\n" +
 		"Antes de comenzar, revisa el Códice de A.D.A. " +
 		"Allí encontrarás información sobre las herramientas " +

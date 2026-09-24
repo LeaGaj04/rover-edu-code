@@ -9,7 +9,7 @@ const RESOURCE := "player_progress"
 const SELECT_FIELDS := (
 	"user_id," +
 	"minerals_ship," +
-	"minerals_rover," +
+	"minerals_spid," +
 	"map_tier," +
 	"unlocked_syntax," +
 	"current_mission_id," +
@@ -330,11 +330,11 @@ func _normalizar_progreso(progress: Dictionary) -> Dictionary:
 				progreso_base.get("minerals_ship", 0)
 			))
 		),
-		"minerals_rover": maxi(
+		"minerals_spid": maxi(
 			0,
 			int(progress.get(
-				"minerals_rover",
-				progreso_base.get("minerals_rover", 0)
+				"minerals_spid",
+				progreso_base.get("minerals_spid", 0)
 			))
 		),
 		"map_tier": maxi(

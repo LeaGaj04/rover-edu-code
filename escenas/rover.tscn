@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://dgngl5x1t4er7"]
 
-[ext_resource type="Script" uid="uid://grkn58ugprsn" path="res://script/rover.gd" id="1_il8ej"]
-[ext_resource type="PackedScene" uid="uid://ofeow1hg3mg4" path="res://Modelados3D/Rover.glb" id="2_c6mxy"]
+[ext_resource type="Script" uid="uid://grkn58ugprsn" path="res://script/spid.gd" id="1_il8ej"]
+[ext_resource type="PackedScene" uid="uid://ofeow1hg3mg4" path="res://Modelados3D/Spid.glb" id="2_c6mxy"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_d4gi6"]
 size = Vector3(1.2236328, 1, 1.5952148)
 
-[node name="Rover" type="CharacterBody3D" unique_id=771188890]
+[node name="Spid" type="CharacterBody3D" unique_id=771188890]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 script = ExtResource("1_il8ej")
 
@@ -16,5 +16,5 @@ debug_color = Color(0.4057711, 0.5572366, 0.6652401, 0.41960785)
 
 [node name="Apariencia" type="Node3D" parent="." unique_id=570368600]
 
-[node name="Rover" parent="Apariencia" unique_id=1980978573 instance=ExtResource("2_c6mxy")]
+[node name="Spid" parent="Apariencia" unique_id=1980978573 instance=ExtResource("2_c6mxy")]
 transform = Transform3D(0.15, 0, 0, 0, 0.15, 0, 0, 0, 0.15, 0, -0.423, 0)

@@ -47,7 +47,7 @@ func iniciar_mision() -> void:
 
 	objetivo_actualizado.emit(
 		objective_id,
-		"Encuentra una muestra y ejecuta rover.minar()."
+		"Encuentra una muestra y ejecuta spid.minar()."
 	)
 	
 func iniciar_ruta_calibracion() -> void:
@@ -148,7 +148,7 @@ func registrar_mineral_recolectado(cantidad: int) -> void:
 	objetivo_actualizado.emit(
 		objective_id,
 		"Buen trabajo. La muestra fue extraida correctamente. " +
-		"Progreso 1 de 2: ahora ejecuta rover.transferir() " +
+		"Progreso 1 de 2: ahora ejecuta spid.transferir() " +
 		"para enviarla a la nave."
 	)
 
@@ -339,7 +339,7 @@ func aplicar_progreso(progress: Dictionary) -> void:
 		return
 	if objective_completed:
 		estado_actual = EstadoMision.COMPLETADA
-	elif int(progress.get("minerals_rover", 0)) > 0:
+	elif int(progress.get("minerals_spid", 0)) > 0:
 		# Permite continuar si el jugador cerró el juego después de minar.
 		estado_actual = EstadoMision.TRANSFERIR_MINERAL
 	else:
@@ -359,7 +359,7 @@ func get_objetivo_actual() -> String:
 	if objective_id == "trabajo_continuo":
 		return (
 			"CICLO DE SUMINISTRO (BUCLE WHILE)\n" +
-			"Programa el rover para viajar al mineral del norte, extraerlo, " +
+			"Programa spid para viajar al mineral del norte, extraerlo, " +
 			"regresar a la base y transferirlo. Repite el ciclo usando while."
 		)
 
@@ -374,7 +374,7 @@ func get_objetivo_actual() -> String:
 		return (
 			"ADQUISICIÓN DE SENSOR (CONDICIONAL IF)\n" +
 			"Reúne 10 minerales en la nave y adquiere el [ CONDICIONAL IF ] " +
-			"en el Centro de Mejoras para habilitar el sensor rover.hay_mineral()."
+			"en el Centro de Mejoras para habilitar el sensor spid.hay_mineral()."
 		)
 
 	if objective_id == "ciclo_recoleccion":
@@ -395,9 +395,9 @@ func get_objetivo_actual() -> String:
 		return (
 			"SEÑALES INCIERTAS (SENSORES E IF)\n" +
 			"Las lecturas minerales en este sector son inestables.\n" +
-			"Usa el sensor rover.hay_mineral() y la estructura condicional:\n\n" +
-			"if rover.hay_mineral():\n" +
-			"    rover.minar()\n\n" +
+			"Usa el sensor spid.hay_mineral() y la estructura condicional:\n\n" +
+			"if spid.hay_mineral():\n" +
+			"    spid.minar()\n\n" +
 			"Tu desafío: navega a una casilla sospechosa, evalúa con if si hay mineral " +
 			"antes de extraerlo, y transfiere el cargamento a la nave."
 		)
@@ -413,9 +413,9 @@ func get_objetivo_actual() -> String:
 			"CICLO AUTÓNOMO (BUCLE WHILE)\n" +
 			"A diferencia de for, un bucle while repite instrucciones mientras una condición sea verdadera.\n\n" +
 			"Por ejemplo:\n" +
-			"while rover.tiene_espacio():\n" +
+			"while spid.tiene_espacio():\n" +
 			"    # patrulla y mina\n" +
-			"rover.transferir()\n\n" +
+			"spid.transferir()\n\n" +
 			"Tu desafío: programa un ciclo while que patrulle y extraiga recursos hasta " +
 			"recolectar al menos 3 minerales y transferirlos a la nave."
 		)
@@ -430,15 +430,15 @@ func get_objetivo_actual() -> String:
 			"BARRIDO DE CUADRANTE (SECTOR 3X3)\n" +
 			"El nuevo sector contiene 3 depósitos de mineral simultáneos y variables.\n\n" +
 			"Tu desafío: programa una rutina combinando bucles (while o for) y el sensor condicional " +
-			"'if rover.hay_mineral():' para recolectar al menos 3 minerales y transferirlos a la base."
+			"'if spid.hay_mineral():' para recolectar al menos 3 minerales y transferirlos a la base."
 		)
 	if objective_id == "retorno_base":
 		return (
 			"RETORNO A BASE (CONDICIÓN NOT)\n" +
-			"Haz que el rover regrese de forma autónoma usando:\n\n" +
-			"while not rover.en_base():\n" +
-			"    rover.sur()\n\n" +
-			"El ciclo debe detenerse al detectar que el rover llegó a la base."
+			"Haz que spid regrese de forma autónoma usando:\n\n" +
+			"while not spid.en_base():\n" +
+			"    spid.sur()\n\n" +
+			"El ciclo debe detenerse al detectar que spid llegó a la base."
 		)
 
 	if objective_id == "variables":
@@ -446,9 +446,9 @@ func get_objetivo_actual() -> String:
 			"VARIABLES DINÁMICAS (ASIGNACIÓN Y USO)\n" +
 			"Una variable almacena datos en memoria para reutilizarlos:\n\n" +
 			"pasos = 2\n" +
-			"rover.norte(pasos)\n\n" +
+			"spid.norte(pasos)\n\n" +
 			"Tu desafío: define una variable con un valor numérico (ej. pasos = 2), " +
-			"utilízala como argumento en los comandos del rover o en range(), extrae un mineral " +
+			"utilízala como argumento en los comandos dspid o en range(), extrae un mineral " +
 			"y transfírelo a la nave en la base."
 		)
 
@@ -684,7 +684,7 @@ func _evaluar_camino_largo(resultado: Dictionary) -> void:
 		objetivo_actualizado.emit(
 			objective_id,
 			"Para completar esta misión debes usar parámetros numéricos mayores a 1. " +
-			"Por ejemplo: rover.norte(2) o rover.sur(2) en lugar de dar pasos individuales."
+			"Por ejemplo: spid.norte(2) o spid.sur(2) en lugar de dar pasos individuales."
 		)
 		return
 
@@ -721,10 +721,10 @@ func iniciar_retorno_base() -> void:
 func _evaluar_retorno_base(resultado: Dictionary) -> void:
 	var codigo: String = str(resultado.get("code", "")).to_lower().replace(" ", "")
 	var iteraciones: int = int(resultado.get("loop_iterations", 0))
-	if not codigo.contains("whilenotrover.en_base():") or iteraciones < 1:
+	if not codigo.contains("whilenotspid.en_base():") or iteraciones < 1:
 		objetivo_actualizado.emit(
 			objective_id,
-			"Debes usar 'while not rover.en_base():' para que el rover regrese " +
+			"Debes usar 'while not spid.en_base():' para que spid regrese " +
 			"de forma autónoma y se detenga al llegar a la base."
 		)
 		return
@@ -764,7 +764,7 @@ func _evaluar_variables(resultado: Dictionary) -> void:
 	if variables_usadas.is_empty():
 		objetivo_actualizado.emit(
 			objective_id,
-			"Definiste una variable, pero debes utilizarla como parámetro en los comandos del rover (ej. 'rover.norte(pasos)') o en 'range()'."
+			"Definiste una variable, pero debes utilizarla como parámetro en los comandos dspid (ej. 'spid.norte(pasos)') o en 'range()'."
 		)
 		return
 
@@ -836,7 +836,7 @@ func _evaluar_senales_inciertas(resultado: Dictionary) -> void:
 	if if_evaluations < 1:
 		objetivo_actualizado.emit(
 			objective_id,
-			"Debes usar la estructura 'if rover.hay_mineral():' para evaluar " +
+			"Debes usar la estructura 'if spid.hay_mineral():' para evaluar " +
 			"la presencia de recursos antes de tomar una decisión."
 		)
 		return
@@ -902,22 +902,22 @@ func _evaluar_ciclo_autonomo(resultado: Dictionary) -> void:
 	if iteraciones < 1:
 		objetivo_actualizado.emit(
 			objective_id,
-			"Debes usar la estructura 'while <condicion>:' (como rover.tiene_espacio()) " +
-			"para que el rover decida de forma autónoma cuándo detenerse."
+			"Debes usar la estructura 'while <condicion>:' (como spid.tiene_espacio()) " +
+			"para que spid decida de forma autónoma cuándo detenerse."
 		)
 		return
 	if if_evaluations < 1:
 		objetivo_actualizado.emit(
 			objective_id,
-			"El ciclo se repite, pero todavía debes usar 'if rover.hay_mineral():' " +
-			"para que el rover decida cuándo extraer."
+			"El ciclo se repite, pero todavía debes usar 'if spid.hay_mineral():' " +
+			"para que spid decida cuándo extraer."
 		)
 		return
 	if recolectados < 3 or transferidos < 3:
 		objetivo_actualizado.emit(
 			objective_id,
 			"El ciclo while funcionó, pero debes recolectar y transferir al menos 3 minerales " +
-			"para demostrar la autonomía del rover."
+			"para demostrar la autonomía dspid."
 		)
 		return
 	objective_completed = true
@@ -980,7 +980,7 @@ func _evaluar_exploracion_3x3(resultado: Dictionary) -> void:
 	if if_evaluations < 1:
 		objetivo_actualizado.emit(
 			objective_id,
-			"Antes de minar, usa 'if rover.hay_mineral():' para leer las señales " +
+			"Antes de minar, usa 'if spid.hay_mineral():' para leer las señales " +
 			"del cuadrante. Los depósitos cambian de posición."
 		)
 		return

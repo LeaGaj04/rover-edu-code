@@ -3,7 +3,7 @@ extends RefCounted
 
 # 1. Definimos los tipos de piezas (Tokens) que nuestro lenguaje entiende
 enum TipoToken {
-	IDENTIFICADOR,   # Palabras como: mi_rover, avanzar, atras, izquierda
+	IDENTIFICADOR,   # Palabras como: mi_spid, avanzar, atras, izquierda
 	PUNTO,           # El símbolo: .
 	PARENTESIS_IZQ,  # El símbolo: (
 	PARENTESIS_DER   # El símbolo: )

@@ -18,7 +18,7 @@ var _objective_id_at_start: String = ""
 var _objective_completed_at_start: bool = false
 
 const PALABRAS_RESERVADAS := [
-	"rover", "for", "while", "if", "else", "in", "range",
+	"spid", "for", "while", "if", "else", "in", "range",
 	"not", "and", "or", "true", "false", "True", "False"
 ]
 
@@ -453,11 +453,11 @@ func _analizar_asignacion(contenido: String, numero_linea: int) -> Dictionary:
 	}
 
 func analizar_linea(contenido: String, numero_linea: int) -> Dictionary:
-	if not contenido.begins_with("rover."):
+	if not contenido.begins_with("spid."):
 		return _error_de_linea(
 			numero_linea,
 			contenido,
-			"La instrucción debe comenzar con 'rover.' o ser una asignación de variable (ej: pasos = 2)."
+			"La instrucción debe comenzar con 'spid.' o ser una asignación de variable (ej: pasos = 2)."
 		)
 
 	var posicion_punto := contenido.find(".")
@@ -503,7 +503,7 @@ func analizar_linea(contenido: String, numero_linea: int) -> Dictionary:
 		return _error_de_linea(
 			numero_linea,
 			contenido,
-			"El rover no conoce el comando '" + comando + "'."
+			"spid no conoce el comando '" + comando + "'."
 		)
 
 	var argumento := contenido.substr(
@@ -981,22 +981,22 @@ func _analizar_if(contenido: String, numero_linea: int) -> Dictionary:
 	if condicion.begins_with("not "):
 		invertido = true
 		condicion = condicion.substr(4).strip_edges()
-	if condicion == "rover.hay_mineral()" or condicion == "hay_mineral()":
+	if condicion == "spid.hay_mineral()" or condicion == "hay_mineral()":
 		return {
 			"ok": true,
-			"condition": "rover.hay_mineral()",
+			"condition": "spid.hay_mineral()",
 			"inverted": invertido
 		}
-	if condicion in ["rover.hay_mineral", "hay_mineral"]:
+	if condicion in ["spid.hay_mineral", "hay_mineral"]:
 		return _error_de_linea(
 			numero_linea,
 			contenido,
-			"Te faltaron los paréntesis de la función: usa 'if rover.hay_mineral():'"
+			"Te faltaron los paréntesis de la función: usa 'if spid.hay_mineral():'"
 		)
 	return _error_de_linea(
 		numero_linea,
 		contenido,
-		"Condición no reconocida. Sensor disponible: rover.hay_mineral()"
+		"Condición no reconocida. Sensor disponible: spid.hay_mineral()"
 	)
 
 func _crear_resultado(codigo: String) -> Dictionary:
@@ -1092,11 +1092,11 @@ func _analizar_while(contenido: String, numero_linea: int) -> Dictionary:
 		"False",
 		"true",
 		"false",
-		"rover.hay_mineral()",
+		"spid.hay_mineral()",
 		"hay_mineral()",
-		"rover.tiene_espacio()",
+		"spid.tiene_espacio()",
 		"tiene_espacio()",
-		"rover.en_base()",
+		"spid.en_base()",
 		"en_base()"
 	]
 	
@@ -1107,7 +1107,7 @@ func _analizar_while(contenido: String, numero_linea: int) -> Dictionary:
 			"inverted": invertido
 		}
 
-	if condicion in ["rover.hay_mineral", "hay_mineral", "rover.tiene_espacio", "tiene_espacio", "rover.en_base", "en_base"]:
+	if condicion in ["spid.hay_mineral", "hay_mineral", "spid.tiene_espacio", "tiene_espacio", "spid.en_base", "en_base"]:
 		return _error_de_linea(
 			numero_linea,
 			contenido,
@@ -1118,6 +1118,6 @@ func _analizar_while(contenido: String, numero_linea: int) -> Dictionary:
 		numero_linea,
 		contenido,
 		"Condición no válida para while. Puedes usar True, False " +
-		"o los sensores rover.tiene_espacio(), rover.en_base() " +
-		"y rover.hay_mineral()."
+		"o los sensores spid.tiene_espacio(), spid.en_base() " +
+		"y spid.hay_mineral()."
 	)

@@ -111,7 +111,7 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme_override_colors/default_color = Color(0.8651328, 0.9999998, 0.866359, 1)
 theme_override_font_sizes/normal_font_size = 18
-text = "Unidad Rover, conexion establecida."
+text = "Unidad Spid, conexion establecida."
 fit_content = true
 scroll_active = false
 
