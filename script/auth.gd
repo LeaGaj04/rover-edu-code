@@ -7,8 +7,10 @@ const ESCENA_MENU := "res://escenas/menu_inicio.tscn"
 @onready var login_button: Button = $Panel/Contenedor/IniciarSesion
 @onready var signup_button: Button = $Panel/Contenedor/Registrarse
 @onready var status_label: Label = $Panel/Contenedor/Mensaje
+@onready var fondo: TextureRect = $Fondo
 
 func _ready() -> void:
+	_animar_estrellas()
 	Supabase.login_succeeded.connect(_on_login_succeeded)
 	Supabase.login_failed.connect(_on_login_failed)
 	Supabase.signup_succeeded.connect(_on_signup_succeeded)
@@ -21,6 +23,20 @@ func _ready() -> void:
 	var tween := create_tween().set_parallel(true)
 	tween.tween_property(panel, "modulate:a", 1.0, 0.25)
 	tween.tween_property(panel, "position:y", panel.position.y - 12.0, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+func _animar_estrellas() -> void:
+	var frames: Array[Texture2D] = []
+	for indice in range(36):
+		var textura := load("res://Fondos/estrellas_frames/frame_%02d.png" % indice) as Texture2D
+		if textura:
+			frames.append(textura)
+	if frames.is_empty():
+		return
+	var indice := 0
+	while is_inside_tree():
+		fondo.texture = frames[indice]
+		indice = (indice + 1) % frames.size()
+		await get_tree().create_timer(0.055).timeout
 
 func _on_iniciar_sesion_pressed() -> void:
 	if not _validar_campos():
