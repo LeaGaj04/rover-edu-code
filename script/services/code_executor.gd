@@ -1121,4 +1121,3 @@ func _analizar_while(contenido: String, numero_linea: int) -> Dictionary:
 		"o los sensores rover.tiene_espacio(), rover.en_base() " +
 		"y rover.hay_mineral()."
 	)
-

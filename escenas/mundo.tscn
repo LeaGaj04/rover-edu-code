@@ -685,6 +685,31 @@ theme_override_styles/disabled = SubResource("StyleBoxFlat_tienda_disabled")
 text = "[ BUCLE FOR ]
 BLOQUEADO"
 
+[node name="LineaProg4" type="Line2D" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1908208216]
+points = PackedVector2Array(165, 435, 165, 475)
+width = 4.0
+default_color = Color(0.3, 0.33, 0.38, 1)
+
+[node name="ButtonVariables" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=75203909]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 475.0
+offset_right = 250.0
+offset_bottom = 545.0
+tooltip_text = "Variables Dinámicas
+Capacidad de almacenar datos en memoria para reutilizarlos en métodos y bucles.
+
+Desbloqueo automático por progresión de misión"
+theme_override_colors/font_color = Color(0.88, 0.88, 0.9, 1)
+theme_override_colors/font_disabled_color = Color(0.55, 0.55, 0.58, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_tienda_code")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tienda_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tienda_disabled")
+disabled = true
+text = "[ VARIABLES ]
+DESBLOQUEADO"
+
 [node name="ButtonExpansion1" type="Button" parent="CanvasLayer/PanelTienda/LienzoArbol" unique_id=1665977669]
 layout_mode = 0
 offset_left = 750.0

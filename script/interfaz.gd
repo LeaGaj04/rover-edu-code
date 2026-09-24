@@ -55,6 +55,7 @@ var minerales_rover : int = 0
 @onready var boton_while: Button = $PanelTienda/LienzoArbol/ButtonWhile
 @onready var boton_for: Button = $PanelTienda/LienzoArbol/ButtonFor
 @onready var boton_if: Button = $PanelTienda/LienzoArbol/ButtonIf
+@onready var boton_variables: Button = $PanelTienda/LienzoArbol/ButtonVariables
 @onready var boton_expansion: Button = $PanelTienda/LienzoArbol/ButtonExpansion1
 @onready var boton_expansion_2: Button = $PanelTienda/LienzoArbol/ButtonExpansion2
 @onready var boton_expansion_3: Button = $PanelTienda/LienzoArbol/ButtonExpansion3
@@ -63,6 +64,7 @@ var minerales_rover : int = 0
 @onready var linea_prog_1: Line2D = $PanelTienda/LienzoArbol/LineaProg1
 @onready var linea_prog_2: Line2D = $PanelTienda/LienzoArbol/LineaProg2
 @onready var linea_prog_3: Line2D = $PanelTienda/LienzoArbol/LineaProg3
+@onready var linea_prog_4: Line2D = $PanelTienda/LienzoArbol/LineaProg4
 @onready var linea_terr_1: Line2D = $PanelTienda/LienzoArbol/LineaTerr1
 @onready var linea_terr_2: Line2D = $PanelTienda/LienzoArbol/LineaTerr2
 @onready var linea_terr_3: Line2D = $PanelTienda/LienzoArbol/LineaTerr3
@@ -529,6 +531,15 @@ func actualizar_mejoras_visual() -> void:
 		boton_for.disabled = for_on or not if_on
 		boton_for.text = "[ BUCLE FOR ]\nDESBLOQUEADO" if for_on else ("[ BUCLE FOR ]\n10 MINERALES" if if_on else "[ BUCLE FOR ]\nBLOQUEADO")
 
+	var vars_on: bool = (
+		"variable" in MissionService.get_unlocked_knowledge()
+		or "variables" in MissionService.get_completed_missions()
+		or MissionService.objective_id == "variables"
+	)
+	if boton_variables != null:
+		boton_variables.disabled = true
+		boton_variables.text = "[ VARIABLES ]\nDESBLOQUEADO" if vars_on else "[ VARIABLES ]\nPOR MISIÓN"
+
 	if boton_expansion != null:
 		boton_expansion.disabled = exp1_on
 		boton_expansion.text = "[ CORREDOR 1X3 ]\nDESBLOQUEADO" if exp1_on else "[ CORREDOR 1X3 ]\n1 MINERAL"
@@ -549,6 +560,8 @@ func actualizar_mejoras_visual() -> void:
 		linea_prog_2.default_color = Color(0.2, 0.8, 1.0) if if_on else Color(0.3, 0.33, 0.38)
 	if linea_prog_3 != null:
 		linea_prog_3.default_color = Color(0.2, 0.8, 1.0) if for_on else Color(0.3, 0.33, 0.38)
+	if linea_prog_4 != null:
+		linea_prog_4.default_color = Color(0.2, 0.8, 1.0) if vars_on else Color(0.3, 0.33, 0.38)
 
 	if linea_terr_1 != null:
 		linea_terr_1.default_color = Color(0.3, 0.9, 0.5) if exp1_on else Color(0.3, 0.33, 0.38)
