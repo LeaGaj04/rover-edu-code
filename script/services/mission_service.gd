@@ -705,7 +705,7 @@ func _evaluar_camino_largo(resultado: Dictionary) -> void:
 
 	desbloquear_conocimiento("parametro")
 	mision_completada.emit(objective_id)
-	iniciar_retorno_base()
+	iniciar_variables()
 	print("Misión camino_largo completada!")
 
 
