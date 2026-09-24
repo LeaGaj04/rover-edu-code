@@ -7,6 +7,7 @@ const ESCENA_PERFIL = "res://escenas/perfil.tscn"
 @onready var boton_login: Button = $PanelPerfil/HBoxContainer/ButtonLogin
 @onready var panel_perfil: PanelContainer = $PanelPerfil
 @onready var boton_jugar: Button = $PanelMenu/ContenedorPrincipal/BotonJugar
+@onready var fondo: TextureRect = $TextureRect
 @onready var dropdown: PanelContainer = $ProfileDropdown
 @onready var boton_ver_perfil: Button = $ProfileDropdown/Options/VerPerfil
 @onready var boton_cerrar_sesion: Button = $ProfileDropdown/Options/CerrarSesion
@@ -14,6 +15,7 @@ var dropdown_abierto := false
 var cargando_progreso := false
 
 func _ready() -> void:
+	_animar_estrellas()
 	boton_login.mouse_entered.connect(_animar_hover.bind(true))
 	boton_login.mouse_exited.connect(_animar_hover.bind(false))
 	boton_ver_perfil.mouse_entered.connect(_animar_opcion_hover.bind(boton_ver_perfil, true))
@@ -23,6 +25,20 @@ func _ready() -> void:
 	ProgressService.progress_loaded.connect(_on_progress_loaded)
 	ProgressService.progress_load_failed.connect(_on_progress_load_failed)
 	actualizar_estado_autenticacion()
+
+func _animar_estrellas() -> void:
+	var frames: Array[Texture2D] = []
+	for indice in range(36):
+		var textura := load("res://Fondos/estrellas_frames/frame_%02d.png" % indice) as Texture2D
+		if textura:
+			frames.append(textura)
+	if frames.is_empty():
+		return
+	var indice := 0
+	while is_inside_tree():
+		fondo.texture = frames[indice]
+		indice = (indice + 1) % frames.size()
+		await get_tree().create_timer(0.055).timeout
 
 func actualizar_estado_autenticacion() -> void:
 	cerrar_dropdown()
