@@ -1074,9 +1074,18 @@ func _on_mision_completada(mision_id: String) -> void:
 			transmision_ada.mostrar_mensaje(
 				"¡Retorno autónomo completado!\n" +
 				"El rover utilizó la condición 'not' para detectar su llegada a la base.\n" +
-				"Ahora puede navegar y detenerse sin una distancia fija.",
+				"¡Se activa la misión VARIABLES DINÁMICAS!",
 				"completado",
 				14.0
+			)
+		"variables":
+			transmision_ada.mostrar_mensaje(
+				"¡Variables dinámicas dominadas!\n" +
+				"Has asignado y reutilizado valores en memoria para controlar la navegación y la repetición del rover.\n" +
+				"Conocimiento desbloqueado: VARIABLES.\n" +
+				"¡Excelente avance en tu formación de programador de robótica espacial!",
+				"completado",
+				16.0
 			)
 		_:
 			transmision_ada.mostrar_mensaje(
@@ -1142,6 +1151,10 @@ func _get_objetivo_panel(mision_id: String) -> String:
 			return "Recolecta y entrega minerales en el sector 2x3 usando for."
 		"camino_largo":
 			return "Navega una distancia extendida usando parámetros."
+		"retorno_base":
+			return "Navega de retorno usando la condición while not en_base()."
+		"variables":
+			return "Define y utiliza variables dinámicas para controlar al rover."
 		"comprar_if":
 			return "Adquiere el módulo de decisiones condicionales."
 		"senales_inciertas":
