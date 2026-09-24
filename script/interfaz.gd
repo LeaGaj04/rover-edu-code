@@ -13,6 +13,7 @@ extends CanvasLayer
 @onready var label_mision: Label = $PanelMision/Nombre
 @onready var label_objetivo_mision: Label = $PanelMision/Objetivo
 @onready var label_estado_mision: Label = $PanelMision/Estado
+@onready var brujula: Control = get_node_or_null("Brujula")
 @export var mi_spid : CharacterBody3D
 
 const COLOR_LINEA_ACTIVA: Color = Color(1.0, 1.0, 1.0, 0.40)
@@ -179,6 +180,8 @@ func _on_boton_tienda_pressed() -> void:
 		boton_archivo.hide()
 	if panel_codigo != null:
 		panel_codigo.hide()
+	if brujula != null:
+		brujula.hide()
 
 
 func _on_boton_archivo_pressed() -> void:
@@ -189,6 +192,8 @@ func _on_boton_archivo_pressed() -> void:
 			boton_archivo.hide()
 		if panel_codigo != null:
 			panel_codigo.hide()
+		if brujula != null:
+			brujula.hide()
 
 
 func _on_archivo_cerrado() -> void:
@@ -197,6 +202,8 @@ func _on_archivo_cerrado() -> void:
 		boton_archivo.show()
 	if panel_codigo != null:
 		panel_codigo.show()
+	if brujula != null:
+		brujula.show()
 
 
 func _input(event: InputEvent) -> void:
@@ -455,6 +462,8 @@ func _on_boton_cerrar_pressed() -> void:
 		boton_archivo.show()
 	if panel_codigo != null:
 		panel_codigo.show()
+	if brujula != null:
+		brujula.show()
 	
 func actualizar_contadores() -> void:
 	if label_nave != null:

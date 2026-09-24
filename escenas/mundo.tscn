@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" uid="uid://wgb3qc1i2srg" path="res://escenas/mapa.tscn" id="12_kckb2"]
 [ext_resource type="PackedScene" path="res://escenas/transmision_ada.tscn" id="13_ada"]
 [ext_resource type="PackedScene" path="res://escenas/archivo_ada.tscn" id="14_codice"]
+[ext_resource type="PackedScene" path="res://escenas/brujula.tscn" id="15_brujula"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_codigo"]
 bg_color = Color(0.005, 0.055, 0.02, 0.96)
@@ -834,6 +835,8 @@ expand_mode = 1
 [node name="LabelNave" type="Label" parent="CanvasLayer/ContenedorContadores/HBoxContainer" unique_id=896875989]
 layout_mode = 2
 text = "0/100"
+
+[node name="Brujula" parent="CanvasLayer" unique_id=99283177 instance=ExtResource("15_brujula")]
 
 [node name="ArchivoADA" parent="CanvasLayer" unique_id=1467148889 instance=ExtResource("14_codice")]
 visible = false
