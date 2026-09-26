@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://c8brujulaspido"]
+
+[ext_resource type="Script" path="res://script/brujula.gd" id="1_brujula"]
+
+[node name="Brujula" type="Control" unique_id=99283177]
+custom_minimum_size = Vector2(112, 112)
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -132.0
+offset_top = -132.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_default_cursor_shape = 13
+script = ExtResource("1_brujula")
